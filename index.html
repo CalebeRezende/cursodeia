@@ -8,7 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{--purple-50:#EEEDFE;--purple-100:#CECBF6;--purple-600:#534AB7;--purple-800:#3C3489;--purple-900:#26215C;--teal-50:#E1F5EE;--teal-600:#0F6E56;--teal-400:#1D9E75;--amber-50:#FAEEDA;--amber-600:#854F0B;--coral-50:#FAECE7;--coral-600:#993C1D;--green-50:#EAF3DE;--green-600:#3B6D11;--blue-50:#E6F1FB;--blue-600:#185FA5;--gray-50:#F7F6F3;--gray-100:#EEECE6;--gray-200:#D6D3CA;--gray-400:#9B9890;--gray-600:#5C5A55;--gray-900:#1C1B18;--bg:#FAFAF8;--surface:#fff;--border:rgba(0,0,0,.09);--border-md:rgba(0,0,0,.16);--text:#1C1B18;--muted:#5C5A55;--hint:#9B9890;--radius:10px;--radius-lg:14px;--radius-xl:20px}
-*{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.6}nav{background:rgba(255,255,255,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;justify-content:space-between;min-height:64px;position:sticky;top:0;z-index:50}.nav-logo{display:flex;align-items:center;gap:10px}.nav-logo-icon{width:38px;height:38px;background:linear-gradient(135deg,var(--purple-800),var(--purple-600));border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700}.nav-title{font-family:'DM Serif Display',serif;font-size:20px;color:var(--purple-900);letter-spacing:-.3px}.nav-subtitle{font-size:11px;color:var(--hint);margin-top:-3px}.nav-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 15px;border-radius:var(--radius);font-size:14px;font-weight:600;cursor:pointer;border:1px solid var(--border-md);background:transparent;color:var(--text);font-family:'DM Sans',sans-serif;transition:all .15s;text-decoration:none;white-space:nowrap}.btn:hover{background:var(--gray-100)}.btn:active{transform:scale(.98)}.btn-primary{background:var(--purple-800);border-color:var(--purple-800);color:#fff}.btn-primary:hover{background:var(--purple-600);border-color:var(--purple-600)}.btn-success{background:var(--teal-600);border-color:var(--teal-600);color:#fff}.btn-danger{color:#C0392B;border-color:#FADBD8}.btn-danger:hover{background:#FADBD8}.btn-ghost{border-color:transparent}.btn-sm{padding:6px 11px;font-size:13px}.screen{display:none;max-width:1060px;margin:0 auto;padding:38px 24px 80px}.screen.active{display:block}.narrow{max-width:760px}.hero{text-align:center;padding:24px 0 34px}.hero-eyebrow{display:inline-flex;align-items:center;gap:6px;background:var(--purple-50);color:var(--purple-800);font-size:12px;font-weight:700;padding:5px 13px;border-radius:20px;letter-spacing:.04em;text-transform:uppercase;margin-bottom:20px}.hero h1{font-family:'DM Serif Display',serif;font-size:clamp(34px,5vw,56px);color:var(--purple-900);line-height:1.08;letter-spacing:-1px;margin-bottom:16px}.hero h1 em{font-style:italic;color:var(--purple-600)}.hero p{font-size:17px;color:var(--muted);max-width:650px;margin:0 auto 28px}.grid{display:grid;gap:16px}.grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}.grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:22px;margin-bottom:16px}.card.soft{background:linear-gradient(180deg,#fff,var(--gray-50))}.feature-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px}.feature-icon{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;font-size:21px}.feature-card h3{font-size:15px;margin-bottom:6px}.feature-card p{font-size:13px;color:var(--muted)}.form-header{margin-bottom:24px}.form-header h2,.admin-header h2{font-family:'DM Serif Display',serif;font-size:32px;color:var(--purple-900);letter-spacing:-.5px;margin-bottom:6px}.form-header p{color:var(--muted)}.field{margin-bottom:18px}.field:last-child{margin-bottom:0}label.field-label{display:block;font-size:13px;font-weight:700;color:var(--muted);margin-bottom:8px}input[type=text],input[type=email],input[type=password],input[type=tel],textarea,select,input[type=file]{width:100%;padding:11px 14px;border:1px solid var(--border-md);border-radius:var(--radius);font-size:14px;color:var(--text);background:var(--surface);font-family:'DM Sans',sans-serif;transition:border-color .15s,box-shadow .15s}input:focus,textarea:focus,select:focus{outline:none;border-color:var(--purple-600);box-shadow:0 0 0 3px rgba(83,74,183,.12)}textarea{resize:vertical;min-height:105px}.check-group{display:flex;flex-direction:column;gap:9px}.check-item{display:flex;align-items:center;gap:10px;cursor:pointer;font-size:14px}.check-item input{width:17px;height:17px;accent-color:var(--purple-600)}.btn-row{display:flex;gap:10px;margin-top:24px;flex-wrap:wrap}.badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.02em}.badge-ok{background:var(--teal-50);color:var(--teal-600)}.badge-late{background:var(--coral-50);color:var(--coral-600)}.badge-block{background:var(--amber-50);color:var(--amber-600)}.badge-info{background:var(--purple-50);color:var(--purple-800)}.tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:24px;gap:0;overflow-x:auto}.tab{padding:10px 18px;font-size:14px;font-weight:700;color:var(--hint);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;background:none;border-top:none;border-left:none;border-right:none;font-family:'DM Sans',sans-serif}.tab.active{color:var(--purple-800);border-bottom-color:var(--purple-800)}.tab-panel{display:none}.tab-panel.active{display:block}.admin-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;gap:12px;flex-wrap:wrap}.metrics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:24px}.metric-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px}.metric-val{font-size:34px;font-weight:300;color:var(--purple-900);font-family:'DM Serif Display',serif;line-height:1}.metric-lbl{font-size:12px;color:var(--hint);margin-top:5px}.table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:var(--radius-lg);background:#fff}table{width:100%;border-collapse:collapse;min-width:760px}th,td{padding:12px 13px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top;font-size:13px}th{background:var(--gray-50);font-weight:700;color:var(--muted)}tr:last-child td{border-bottom:none}.material-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px;margin-bottom:12px}.material-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.material-card h3{font-size:16px;color:var(--purple-900);margin-bottom:5px}.material-meta{font-size:12px;color:var(--hint);margin-bottom:8px}.material-card p{font-size:14px;color:var(--muted)}.empty-state{text-align:center;padding:45px 20px;color:var(--hint);background:var(--gray-50);border:1px dashed var(--gray-200);border-radius:var(--radius-lg)}.success-wrap{text-align:center;padding:50px 0}.success-icon{width:72px;height:72px;background:var(--teal-50);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 22px;color:var(--teal-600);font-size:34px}.success-wrap h2{font-family:'DM Serif Display',serif;font-size:32px;color:var(--purple-900);margin-bottom:10px}.hidden{display:none!important}.small{font-size:12px;color:var(--hint)}.notice{background:var(--blue-50);border-left:4px solid var(--blue-600);padding:13px 15px;border-radius:10px;color:#164d83;font-size:13px;margin-bottom:16px}.warning{background:var(--amber-50);border-left:4px solid var(--amber-600);padding:13px 15px;border-radius:10px;color:var(--amber-600);font-size:13px;margin-bottom:16px}.login-wrap{max-width:420px;margin:45px auto}.profile-box{display:grid;grid-template-columns:1fr auto;gap:16px;align-items:start}.pill-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.linkish{color:var(--purple-800);font-weight:700;text-decoration:none}.error-msg{color:#C0392B;font-size:13px;margin-top:8px;display:none;padding:8px 12px;background:#FADBD8;border-radius:var(--radius)}@media(max-width:720px){nav{padding:10px 16px;align-items:flex-start;gap:10px;flex-direction:column}.nav-actions{width:100%}.screen{padding:24px 16px 60px}.grid-2,.grid-3{grid-template-columns:1fr}.hero h1{font-size:31px}.profile-box{grid-template-columns:1fr}}
+*{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.6}nav{background:rgba(255,255,255,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;justify-content:space-between;min-height:64px;position:sticky;top:0;z-index:50}.nav-logo{display:flex;align-items:center;gap:10px}.nav-logo-icon{width:38px;height:38px;background:linear-gradient(135deg,var(--purple-800),var(--purple-600));border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700}.nav-title{font-family:'DM Serif Display',serif;font-size:20px;color:var(--purple-900);letter-spacing:-.3px}.nav-subtitle{font-size:11px;color:var(--hint);margin-top:-3px}.nav-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 15px;border-radius:var(--radius);font-size:14px;font-weight:600;cursor:pointer;border:1px solid var(--border-md);background:transparent;color:var(--text);font-family:'DM Sans',sans-serif;transition:all .15s;text-decoration:none;white-space:nowrap}.btn:hover{background:var(--gray-100)}.btn:active{transform:scale(.98)}.btn-primary{background:var(--purple-800);border-color:var(--purple-800);color:#fff}.btn-primary:hover{background:var(--purple-600);border-color:var(--purple-600)}.btn-success{background:var(--teal-600);border-color:var(--teal-600);color:#fff}.btn-danger{color:#C0392B;border-color:#FADBD8}.btn-danger:hover{background:#FADBD8}.btn-ghost{border-color:transparent}.btn-sm{padding:6px 11px;font-size:13px}.screen{display:none;max-width:1060px;margin:0 auto;padding:38px 24px 80px}.screen.active{display:block}.narrow{max-width:760px}.hero{text-align:center;padding:24px 0 34px}.hero-eyebrow{display:inline-flex;align-items:center;gap:6px;background:var(--purple-50);color:var(--purple-800);font-size:12px;font-weight:700;padding:5px 13px;border-radius:20px;letter-spacing:.04em;text-transform:uppercase;margin-bottom:20px}.hero h1{font-family:'DM Serif Display',serif;font-size:clamp(34px,5vw,56px);color:var(--purple-900);line-height:1.08;letter-spacing:-1px;margin-bottom:16px}.hero h1 em{font-style:italic;color:var(--purple-600)}.hero p{font-size:17px;color:var(--muted);max-width:650px;margin:0 auto 28px}.grid{display:grid;gap:16px}.grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}.grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:22px;margin-bottom:16px}.card.soft{background:linear-gradient(180deg,#fff,var(--gray-50))}.feature-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px}.feature-icon{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;font-size:21px}.feature-card h3{font-size:15px;margin-bottom:6px}.feature-card p{font-size:13px;color:var(--muted)}.form-header{margin-bottom:24px}.form-header h2,.admin-header h2{font-family:'DM Serif Display',serif;font-size:32px;color:var(--purple-900);letter-spacing:-.5px;margin-bottom:6px}.form-header p{color:var(--muted)}.field{margin-bottom:18px}.field:last-child{margin-bottom:0}label.field-label{display:block;font-size:13px;font-weight:700;color:var(--muted);margin-bottom:8px}input[type=text],input[type=email],input[type=password],input[type=tel],input[type=date],textarea,select,input[type=file]{width:100%;padding:11px 14px;border:1px solid var(--border-md);border-radius:var(--radius);font-size:14px;color:var(--text);background:var(--surface);font-family:'DM Sans',sans-serif;transition:border-color .15s,box-shadow .15s}input:focus,textarea:focus,select:focus{outline:none;border-color:var(--purple-600);box-shadow:0 0 0 3px rgba(83,74,183,.12)}textarea{resize:vertical;min-height:105px}.check-group{display:flex;flex-direction:column;gap:9px}.check-item{display:flex;align-items:center;gap:10px;cursor:pointer;font-size:14px}.check-item input{width:17px;height:17px;accent-color:var(--purple-600)}.btn-row{display:flex;gap:10px;margin-top:24px;flex-wrap:wrap}.badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.02em}.badge-ok{background:var(--teal-50);color:var(--teal-600)}.badge-late{background:var(--coral-50);color:var(--coral-600)}.badge-block{background:var(--amber-50);color:var(--amber-600)}.badge-info{background:var(--purple-50);color:var(--purple-800)}.tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:24px;gap:0;overflow-x:auto}.tab{padding:10px 18px;font-size:14px;font-weight:700;color:var(--hint);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;background:none;border-top:none;border-left:none;border-right:none;font-family:'DM Sans',sans-serif}.tab.active{color:var(--purple-800);border-bottom-color:var(--purple-800)}.tab-panel{display:none}.tab-panel.active{display:block}.admin-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;gap:12px;flex-wrap:wrap}.metrics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:24px}.metric-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px}.metric-val{font-size:34px;font-weight:300;color:var(--purple-900);font-family:'DM Serif Display',serif;line-height:1}.metric-lbl{font-size:12px;color:var(--hint);margin-top:5px}.table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:var(--radius-lg);background:#fff}table{width:100%;border-collapse:collapse;min-width:760px}th,td{padding:12px 13px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top;font-size:13px}th{background:var(--gray-50);font-weight:700;color:var(--muted)}tr:last-child td{border-bottom:none}.material-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px;margin-bottom:12px}.material-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.material-card h3{font-size:16px;color:var(--purple-900);margin-bottom:5px}.material-meta{font-size:12px;color:var(--hint);margin-bottom:8px}.material-card p{font-size:14px;color:var(--muted)}.empty-state{text-align:center;padding:45px 20px;color:var(--hint);background:var(--gray-50);border:1px dashed var(--gray-200);border-radius:var(--radius-lg)}.success-wrap{text-align:center;padding:50px 0}.success-icon{width:72px;height:72px;background:var(--teal-50);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 22px;color:var(--teal-600);font-size:34px}.success-wrap h2{font-family:'DM Serif Display',serif;font-size:32px;color:var(--purple-900);margin-bottom:10px}.hidden{display:none!important}.small{font-size:12px;color:var(--hint)}.notice{background:var(--blue-50);border-left:4px solid var(--blue-600);padding:13px 15px;border-radius:10px;color:#164d83;font-size:13px;margin-bottom:16px}.warning{background:var(--amber-50);border-left:4px solid var(--amber-600);padding:13px 15px;border-radius:10px;color:var(--amber-600);font-size:13px;margin-bottom:16px}.login-wrap{max-width:420px;margin:45px auto}.profile-box{display:grid;grid-template-columns:1fr auto;gap:16px;align-items:start}.pill-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.linkish{color:var(--purple-800);font-weight:700;text-decoration:none}.error-msg{color:#C0392B;font-size:13px;margin-top:8px;display:none;padding:8px 12px;background:#FADBD8;border-radius:var(--radius)}@media(max-width:720px){nav{padding:10px 16px;align-items:flex-start;gap:10px;flex-direction:column}.nav-actions{width:100%}.screen{padding:24px 16px 60px}.grid-2,.grid-3{grid-template-columns:1fr}.hero h1{font-size:31px}.profile-box{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -122,11 +122,14 @@
     </div>
   </div>
   <div class="notice"><strong>Orientação:</strong> os materiais serão atualizados conforme o andamento do grupo, experiências dos participantes e necessidades que surgirem nos encontros.</div>
-  <div class="tabs">
-    <button class="tab active" onclick="showTab('user-materiais',this)">Materiais</button>
+  <div id="user-access-warning"></div>
+  <div class="tabs" id="user-tabs">
+    <button class="tab active" id="tab-btn-user-materiais" onclick="showTab('user-materiais',this)">Materiais</button>
+    <button class="tab" onclick="showTab('user-pagamento',this)">Pagamento</button>
     <button class="tab" onclick="showTab('user-perfil',this)">Minha anamnese</button>
   </div>
   <div class="tab-panel active" id="user-materiais"></div>
+  <div class="tab-panel" id="user-pagamento"></div>
   <div class="tab-panel" id="user-perfil"></div>
 </section>
 
@@ -147,11 +150,13 @@
   <div class="tabs">
     <button class="tab active" onclick="showTab('admin-cadastros',this)">Anamneses</button>
     <button class="tab" onclick="showTab('admin-usuarios',this)">Usuários</button>
+    <button class="tab" onclick="showTab('admin-mensalidades',this)">Mensalidades</button>
     <button class="tab" onclick="showTab('admin-materiais',this)">Materiais</button>
     <button class="tab" onclick="showTab('admin-novo-user',this)">Criar usuário</button>
   </div>
   <div class="tab-panel active" id="admin-cadastros"></div>
   <div class="tab-panel" id="admin-usuarios"></div>
+  <div class="tab-panel" id="admin-mensalidades"></div>
   <div class="tab-panel" id="admin-materiais"></div>
   <div class="tab-panel" id="admin-novo-user"></div>
 </section>
@@ -192,9 +197,15 @@ function normalizeRespostas(raw){
   const base = initialData();
   if (Array.isArray(raw)) return {...base, legado: raw};
   if (!raw || typeof raw !== 'object') return base;
+  const usuarios = Array.isArray(raw.usuarios) ? raw.usuarios.map(u=>({
+    ...u,
+    mensalidadeInicio: u.mensalidadeInicio || '',
+    mensalidadeFim: u.mensalidadeFim || '',
+    comprovantes: Array.isArray(u.comprovantes) ? u.comprovantes : []
+  })) : [];
   return {
     cadastros: Array.isArray(raw.cadastros) ? raw.cadastros : [],
-    usuarios: Array.isArray(raw.usuarios) ? raw.usuarios : [],
+    usuarios,
     materiais: Array.isArray(raw.materiais) ? raw.materiais : base.materiais,
     legado: Array.isArray(raw.legado) ? raw.legado : []
   };
@@ -310,10 +321,42 @@ async function checkAdminLogin(){
   }else document.getElementById('admin-error').style.display='block'
 }
 
+function toDateInput(date){
+  const d = new Date(date);
+  const yyyy=d.getFullYear(), mm=String(d.getMonth()+1).padStart(2,'0'), dd=String(d.getDate()).padStart(2,'0');
+  return `${yyyy}-${mm}-${dd}`;
+}
+function formatDateBR(iso){
+  if(!iso) return '';
+  const [y,m,d]=String(iso).split('-');
+  if(!y||!m||!d) return iso;
+  return `${d}/${m}/${y}`;
+}
+function isExpiredDate(iso){
+  if(!iso) return false;
+  const end = new Date(iso + 'T23:59:59');
+  const now = new Date();
+  return now > end;
+}
+function isUserActive(u){
+  return !!u && !u.bloqueado && u.pagamento==='em dia' && !isExpiredDate(u.mensalidadeFim);
+}
+async function applyPaymentRules(d){
+  let changed=false;
+  d.usuarios.forEach(u=>{
+    if(isExpiredDate(u.mensalidadeFim)){
+      if(u.pagamento !== 'em atraso'){ u.pagamento='em atraso'; changed=true; }
+      if(!u.bloqueado){ u.bloqueado=true; changed=true; }
+    }
+    if(!Array.isArray(u.comprovantes)){ u.comprovantes=[]; changed=true; }
+  });
+  if(changed) await saveData(d);
+}
+
 async function renderAdmin(){
   const d=await getData();
-  document.getElementById('admin-metrics').innerHTML=`<div class="metric-card"><div class="metric-val">${d.cadastros.length}</div><div class="metric-lbl">Anamneses recebidas</div></div><div class="metric-card"><div class="metric-val">${d.usuarios.length}</div><div class="metric-lbl">Usuários criados</div></div><div class="metric-card"><div class="metric-val">${d.usuarios.filter(u=>u.pagamento==='em dia').length}</div><div class="metric-lbl">Pagamentos em dia</div></div><div class="metric-card"><div class="metric-val">${d.materiais.length}</div><div class="metric-lbl">Materiais publicados</div></div>`;
-  renderCadastros(d); renderUsuarios(d); renderMateriaisAdmin(d); renderNovoUser(d);
+  document.getElementById('admin-metrics').innerHTML=`<div class="metric-card"><div class="metric-val">${d.cadastros.length}</div><div class="metric-lbl">Anamneses recebidas</div></div><div class="metric-card"><div class="metric-val">${d.usuarios.length}</div><div class="metric-lbl">Usuários criados</div></div><div class="metric-card"><div class="metric-val">${d.usuarios.filter(u=>isUserActive(u)).length}</div><div class="metric-lbl">Acessos ativos</div></div><div class="metric-card"><div class="metric-val">${d.materiais.length}</div><div class="metric-lbl">Materiais publicados</div></div>`;
+  await applyPaymentRules(d); renderCadastros(d); renderUsuarios(d); renderMensalidades(d); renderMateriaisAdmin(d); renderNovoUser(d);
 }
 
 function renderCadastros(d){
@@ -325,7 +368,7 @@ function renderCadastros(d){
 }
 
 function renderNovoUser(d){
-  document.getElementById('admin-novo-user').innerHTML=`<div class="card"><h3 style="margin-bottom:14px;color:var(--purple-900)">Criar novo usuário</h3><div class="grid grid-2"><div class="field"><label class="field-label">Nome completo</label><input type="text" id="new-nome"></div><div class="field"><label class="field-label">CPF</label><input type="text" id="new-cpf"></div><div class="field"><label class="field-label">E-mail</label><input type="email" id="new-email"></div><div class="field"><label class="field-label">WhatsApp</label><input type="text" id="new-whatsapp"></div><div class="field"><label class="field-label">Usuário</label><input type="text" id="new-user"></div><div class="field"><label class="field-label">Senha</label><input type="text" id="new-pass"></div><div class="field"><label class="field-label">Status de pagamento</label><select id="new-pay"><option value="em dia">Em dia</option><option value="em atraso">Em atraso</option></select></div><div class="field"><label class="field-label">Acesso</label><select id="new-block"><option value="false">Liberado</option><option value="true">Bloqueado</option></select></div></div><div class="btn-row"><button class="btn btn-primary" onclick="createUser()">Salvar usuário</button></div></div>`
+  document.getElementById('admin-novo-user').innerHTML=`<div class="card"><h3 style="margin-bottom:14px;color:var(--purple-900)">Criar novo usuário</h3><div class="grid grid-2"><div class="field"><label class="field-label">Nome completo</label><input type="text" id="new-nome"></div><div class="field"><label class="field-label">CPF</label><input type="text" id="new-cpf"></div><div class="field"><label class="field-label">E-mail</label><input type="email" id="new-email"></div><div class="field"><label class="field-label">WhatsApp</label><input type="text" id="new-whatsapp"></div><div class="field"><label class="field-label">Usuário</label><input type="text" id="new-user"></div><div class="field"><label class="field-label">Senha</label><input type="text" id="new-pass"></div><div class="field"><label class="field-label">Status de pagamento</label><select id="new-pay"><option value="em dia">Em dia</option><option value="em atraso">Em atraso</option></select></div><div class="field"><label class="field-label">Acesso</label><select id="new-block"><option value="false">Liberado</option><option value="true">Bloqueado</option></select></div><div class="field"><label class="field-label">Mensalidade paga de</label><input type="date" id="new-pay-start"></div><div class="field"><label class="field-label">Mensalidade paga até</label><input type="date" id="new-pay-end"></div></div><div class="btn-row"><button class="btn btn-primary" onclick="createUser()">Salvar usuário</button></div></div>`
 }
 
 async function prefillUser(id){
@@ -333,14 +376,16 @@ async function prefillUser(id){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
   document.getElementById('admin-novo-user').classList.add('active'); renderNovoUser(d);
   document.getElementById('new-nome').value=c.nome; document.getElementById('new-cpf').value=c.cpf; document.getElementById('new-email').value=c.email; document.getElementById('new-whatsapp').value=c.whatsapp;
-  document.getElementById('new-user').value=(c.email.split('@')[0]||c.nome.split(' ')[0]).toLowerCase().replace(/[^a-z0-9._-]/g,''); document.getElementById('new-pass').value=Math.random().toString(36).slice(2,8)
+  document.getElementById('new-user').value=(c.email.split('@')[0]||c.nome.split(' ')[0]).toLowerCase().replace(/[^a-z0-9._-]/g,''); document.getElementById('new-pass').value=Math.random().toString(36).slice(2,8);
+  const today=new Date(); const next=new Date(today); next.setMonth(next.getMonth()+1);
+  document.getElementById('new-pay-start').value=toDateInput(today); document.getElementById('new-pay-end').value=toDateInput(next)
 }
 
 async function createUser(){
   const d=await getData(); const usuario=val('new-user'),senha=val('new-pass'),nome=val('new-nome');
   if(!usuario||!senha||!nome){alert('Preencha nome, usuário e senha.');return}
   if(d.usuarios.some(u=>u.usuario===usuario)){alert('Já existe um usuário com esse login.');return}
-  d.usuarios.push({id:Date.now(),nome,cpf:val('new-cpf'),email:val('new-email'),whatsapp:val('new-whatsapp'),usuario,senha,pagamento:document.getElementById('new-pay').value,bloqueado:document.getElementById('new-block').value==='true',criadoEm:new Date().toLocaleString('pt-BR')});
+  d.usuarios.push({id:Date.now(),nome,cpf:val('new-cpf'),email:val('new-email'),whatsapp:val('new-whatsapp'),usuario,senha,pagamento:document.getElementById('new-pay').value,bloqueado:document.getElementById('new-block').value==='true',mensalidadeInicio:val('new-pay-start'),mensalidadeFim:val('new-pay-end'),criadoEm:new Date().toLocaleString('pt-BR'),comprovantes:[]});
   const c=d.cadastros.find(x=>x.email===val('new-email')||x.cpf===val('new-cpf')); if(c)c.usuarioCriado=true;
   await saveData(d); await renderAdmin(); alert('Usuário criado com sucesso!')
 }
@@ -348,7 +393,7 @@ async function createUser(){
 function renderUsuarios(d){
   const el=document.getElementById('admin-usuarios'); if(!d.usuarios.length){el.innerHTML=empty('Nenhum usuário criado ainda.');return}
   let html='<div class="table-wrap"><table><thead><tr><th>Nome</th><th>Acesso</th><th>Status</th><th>Contato</th><th>Ações</th></tr></thead><tbody>';
-  d.usuarios.forEach(u=>{html+=`<tr><td><strong>${esc(u.nome)}</strong><br><span class="small">CPF: ${esc(u.cpf||'—')}</span></td><td><strong>${esc(u.usuario)}</strong><br><span class="small">Senha: ${esc(u.senha)}</span></td><td>${badgePay(u)} ${u.bloqueado?'<span class="badge badge-block">bloqueado</span>':''}</td><td>${esc(u.email||'—')}<br>${esc(u.whatsapp||'—')}</td><td><button class="btn btn-sm" onclick="togglePay(${u.id})">Alternar pagamento</button><br><button class="btn btn-sm" style="margin-top:6px" onclick="toggleBlock(${u.id})">Bloquear/liberar</button><br><button class="btn btn-sm btn-danger" style="margin-top:6px" onclick="deleteUser(${u.id})">Apagar</button></td></tr>`});
+  d.usuarios.forEach(u=>{html+=`<tr><td><strong>${esc(u.nome)}</strong><br><span class="small">CPF: ${esc(u.cpf||'—')}</span></td><td><strong>${esc(u.usuario)}</strong><br><span class="small">Senha: ${esc(u.senha)}</span></td><td>${badgePay(u)} ${u.bloqueado?'<span class="badge badge-block">bloqueado</span>':''}<br><span class="small">Pago: ${formatDateBR(u.mensalidadeInicio)||'—'} até ${formatDateBR(u.mensalidadeFim)||'—'}</span></td><td>${esc(u.email||'—')}<br>${esc(u.whatsapp||'—')}</td><td><button class="btn btn-sm" onclick="togglePay(${u.id})">Alternar pagamento</button><br><button class="btn btn-sm" style="margin-top:6px" onclick="toggleBlock(${u.id})">Bloquear/liberar</button><br><button class="btn btn-sm btn-danger" style="margin-top:6px" onclick="deleteUser(${u.id})">Apagar</button></td></tr>`});
   html+='</tbody></table></div>'; el.innerHTML=html;
 }
 function badgePay(u){return u.pagamento==='em dia'?'<span class="badge badge-ok">em dia</span>':'<span class="badge badge-late">em atraso</span>'}
@@ -357,6 +402,48 @@ async function toggleBlock(id){const d=await getData();const u=d.usuarios.find(x
 async function deleteUser(id){if(!confirm('Apagar este usuário?'))return;const d=await getData();d.usuarios=d.usuarios.filter(u=>u.id!==id);await saveData(d);await renderAdmin()}
 async function deleteCadastro(id){if(!confirm('Apagar esta anamnese?'))return;const d=await getData();d.cadastros=d.cadastros.filter(c=>c.id!==id);await saveData(d);await renderAdmin()}
 
+
+function renderMensalidades(d){
+  const el=document.getElementById('admin-mensalidades');
+  if(!d.usuarios.length){el.innerHTML=empty('Nenhum usuário criado ainda.');return}
+  let html='<div class="notice"><strong>Controle automático:</strong> quando a data “pago até” vence, o participante fica em atraso, o acesso é bloqueado e a aba de materiais deixa de aparecer para ele.</div>';
+  html+='<div class="table-wrap"><table><thead><tr><th>Participante</th><th>Vigência da mensalidade</th><th>Status</th><th>Comprovantes</th><th>Ações</th></tr></thead><tbody>';
+  d.usuarios.forEach(u=>{
+    const comps=(u.comprovantes||[]).slice().reverse().map(c=>`<div class="small">${esc(c.data||'')} · ${esc(c.fileName||'comprovante')} ${c.enviado?'<span class="badge badge-ok">e-mail enviado</span>':'<span class="badge badge-late">pendente</span>'}</div>`).join('') || '<span class="small">Nenhum comprovante complementar.</span>';
+    html+=`<tr>
+      <td><strong>${esc(u.nome)}</strong><br><span class="small">${esc(u.usuario)} · ${esc(u.email||'')}</span></td>
+      <td>
+        <div class="grid grid-2" style="gap:8px;min-width:260px">
+          <div><label class="field-label">Pago de</label><input type="date" id="pay-start-${u.id}" value="${esc(u.mensalidadeInicio||'')}"></div>
+          <div><label class="field-label">Pago até</label><input type="date" id="pay-end-${u.id}" value="${esc(u.mensalidadeFim||'')}"></div>
+        </div>
+      </td>
+      <td>${badgePay(u)} ${u.bloqueado?'<span class="badge badge-block">bloqueado</span>':''}</td>
+      <td>${comps}</td>
+      <td>
+        <button class="btn btn-sm btn-primary" onclick="savePaymentPeriod(${u.id})">Salvar vigência</button><br>
+        <button class="btn btn-sm" style="margin-top:6px" onclick="renewOneMonth(${u.id})">Renovar +1 mês</button><br>
+        <button class="btn btn-sm" style="margin-top:6px" onclick="toggleBlock(${u.id})">Bloquear/liberar</button>
+      </td>
+    </tr>`;
+  });
+  html+='</tbody></table></div>';
+  el.innerHTML=html;
+}
+async function savePaymentPeriod(id){
+  const d=await getData(); const u=d.usuarios.find(x=>x.id===id); if(!u)return;
+  u.mensalidadeInicio=document.getElementById('pay-start-'+id).value;
+  u.mensalidadeFim=document.getElementById('pay-end-'+id).value;
+  if(u.mensalidadeFim && !isExpiredDate(u.mensalidadeFim)){ u.pagamento='em dia'; u.bloqueado=false; }
+  else { u.pagamento='em atraso'; u.bloqueado=true; }
+  await saveData(d); await renderAdmin();
+}
+async function renewOneMonth(id){
+  const d=await getData(); const u=d.usuarios.find(x=>x.id===id); if(!u)return;
+  const start=new Date(); const end=new Date(start); end.setMonth(end.getMonth()+1);
+  u.mensalidadeInicio=toDateInput(start); u.mensalidadeFim=toDateInput(end); u.pagamento='em dia'; u.bloqueado=false;
+  await saveData(d); await renderAdmin();
+}
 function renderMateriaisAdmin(d){
   const el=document.getElementById('admin-materiais');
   let form=`<div class="card"><h3 style="margin-bottom:14px;color:var(--purple-900)">Adicionar material</h3><div class="grid grid-2"><div class="field"><label class="field-label">Tipo</label><select id="mat-tipo"><option>Artigo</option><option>Slide</option><option>Podcast</option><option>Imagem</option><option>Vídeo</option><option>Link</option><option>Atividade</option></select></div><div class="field"><label class="field-label">Título</label><input type="text" id="mat-titulo"></div></div><div class="field"><label class="field-label">Descrição/orientação</label><textarea id="mat-desc"></textarea></div><div class="field"><label class="field-label">Link do material ou pasta</label><input type="text" id="mat-link" placeholder="https://..."></div><button class="btn btn-primary" onclick="addMaterial()">Publicar material</button></div>`;
@@ -368,15 +455,60 @@ async function deleteMaterial(id){if(!confirm('Apagar este material?'))return;co
 
 async function loginUser(){
   const usuario=val('login-user'),senha=val('login-pass'); const d=await getData();
-  const u=d.usuarios.find(x=>x.usuario===usuario&&x.senha===senha&&!x.bloqueado);
+  await applyPaymentRules(d); const u=d.usuarios.find(x=>x.usuario===usuario&&x.senha===senha);
   if(!u){document.getElementById('login-error').style.display='block';return}
   currentUser=u; document.getElementById('btn-logout').classList.remove('hidden'); renderUserArea(d); showScreen('screen-user')
 }
 function renderUserArea(d){
-  document.getElementById('user-title').textContent='Olá, '+(currentUser.nome.split(' ')[0]||currentUser.nome)+'!'; document.getElementById('user-pay-badge').innerHTML=badgePay(currentUser);
-  document.getElementById('user-materiais').innerHTML=d.materiais.length?d.materiais.slice().reverse().map(m=>`<div class="material-card"><h3>${esc(m.titulo)}</h3><div class="material-meta">${esc(m.tipo)} · ${esc(m.data)}</div><p>${esc(m.descricao||'')}</p>${m.link?`<p style="margin-top:8px"><a class="btn btn-sm btn-primary" href="${esc(m.link)}" target="_blank">Abrir material</a></p>`:''}</div>`).join(''):empty('Ainda não há materiais publicados.');
+  currentUser = d.usuarios.find(u=>u.id===currentUser.id) || currentUser;
+  const accessOk = isUserActive(currentUser);
+  document.getElementById('user-title').textContent='Olá, '+(currentUser.nome.split(' ')[0]||currentUser.nome)+'!';
+  document.getElementById('user-pay-badge').innerHTML=badgePay(currentUser)+`<div class="small" style="margin-top:6px">Vigência: ${formatDateBR(currentUser.mensalidadeInicio)||'—'} até ${formatDateBR(currentUser.mensalidadeFim)||'—'}</div>`;
+  document.getElementById('user-access-warning').innerHTML = accessOk ? '' : `<div class="warning"><strong>Acesso aos materiais bloqueado.</strong> Sua mensalidade está vencida ou o acesso foi bloqueado pelo administrador. Anexe um novo comprovante na aba Pagamento para solicitar a regularização.</div>`;
+
+  const btnMat = document.getElementById('tab-btn-user-materiais');
+  if(accessOk){
+    btnMat.style.display='';
+    document.getElementById('user-materiais').innerHTML=d.materiais.length?d.materiais.slice().reverse().map(m=>`<div class="material-card"><h3>${esc(m.titulo)}</h3><div class="material-meta">${esc(m.tipo)} · ${esc(m.data)}</div><p>${esc(m.descricao||'')}</p>${m.link?`<p style="margin-top:8px"><a class="btn btn-sm btn-primary" href="${esc(m.link)}" target="_blank">Abrir material</a></p>`:''}</div>`).join(''):empty('Ainda não há materiais publicados.');
+    showTab('user-materiais', btnMat);
+  }else{
+    btnMat.style.display='none';
+    document.getElementById('user-materiais').innerHTML='';
+    showTab('user-pagamento', document.querySelector("button[onclick=\"showTab('user-pagamento',this)\"]"));
+  }
+
+  document.getElementById('user-pagamento').innerHTML = `<div class="card">
+    <h3 style="color:var(--purple-900);margin-bottom:10px">Regularizar mensalidade</h3>
+    <p class="small" style="margin-bottom:14px">Envie aqui o comprovante da próxima mensalidade. O comprovante será enviado por e-mail ao administrador e ficará registrado no seu perfil.</p>
+    <div class="field"><label class="field-label">Comprovante Pix</label><input type="file" id="user-pix-file" accept="image/*,.pdf"></div>
+    <div class="field"><label class="field-label">Observação</label><input type="text" id="user-pix-obs" placeholder="Ex.: pagamento feito em outro nome, data do Pix..."></div>
+    <button class="btn btn-primary" onclick="submitUserPayment()">Enviar comprovante</button>
+    <div id="user-pay-msg" class="small" style="margin-top:10px"></div>
+  </div>`;
   const cad=d.cadastros.find(c=>c.email===currentUser.email||c.cpf===currentUser.cpf);
   document.getElementById('user-perfil').innerHTML=cad?`<div class="card"><h3 style="color:var(--purple-900);margin-bottom:10px">Sua anamnese</h3><p><strong>Profissão:</strong> ${esc(cad.profissao||'—')}</p><p><strong>O que conhece de IA:</strong> ${esc(cad.conhece||'—')}</p><p><strong>O que gostaria de aprender:</strong> ${esc(cad.aprender||'—')}</p><p><strong>O que espera acelerar:</strong> ${esc(cad.acelerar||'—')}</p><p><strong>Áreas:</strong> ${esc((cad.areas||[]).join(', ')||'—')}</p></div>`:empty('Anamnese não vinculada a este usuário.');
+}
+
+async function submitUserPayment(){
+  if(!currentUser) return;
+  const file=document.getElementById('user-pix-file').files[0] || null;
+  const msg=document.getElementById('user-pay-msg');
+  if(!file){ msg.textContent='Anexe um comprovante antes de enviar.'; return; }
+  const cadastro={
+    nome: currentUser.nome, cpf: currentUser.cpf, email: currentUser.email,
+    whatsapp: currentUser.whatsapp, profissao:'Participante do curso',
+  };
+  msg.textContent='Enviando comprovante...';
+  let result;
+  try{ result=await sendPixEmail(cadastro,file); }
+  catch(e){ result={enviado:false,fileName:file.name,motivo:'erro no envio por e-mail'}; }
+  const d=await getData(); const u=d.usuarios.find(x=>x.id===currentUser.id);
+  if(u){
+    if(!Array.isArray(u.comprovantes)) u.comprovantes=[];
+    u.comprovantes.push({data:new Date().toLocaleString('pt-BR'),fileName:file.name,enviado:!!result.enviado,observacao:val('user-pix-obs')});
+    await saveData(d);
+  }
+  msg.textContent='Comprovante enviado. Aguarde o administrador regularizar a vigência da mensalidade.';
 }
 function logoutAll(){currentUser=null;document.getElementById('btn-logout').classList.add('hidden');showScreen('screen-home')}
 async function resetPlatform(){if(!confirm('Apagar cadastros, usuários e materiais da plataforma? O legado antigo em respostas.legado será preservado.'))return;const d=await getData();d.cadastros=[];d.usuarios=[];d.materiais=[];await saveData(d);await renderAdmin()}
