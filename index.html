@@ -51,6 +51,27 @@
       <div class="field"><label class="field-label">E-mail</label><input type="email" id="cad-email" placeholder="email@exemplo.com"></div>
       <div class="field"><label class="field-label">WhatsApp</label><input type="tel" id="cad-whatsapp" placeholder="(11) 99999-9999"></div>
       <div class="field"><label class="field-label">Profissão principal</label><input type="text" id="cad-profissao" placeholder="Ex.: advogada, médico, designer, gestor..."></div>
+      <div class="field" style="grid-column:1 / -1;">
+        <label class="field-label">Pagamento via Pix</label>
+        <div style="background:#F7F6F3;border:1px solid rgba(0,0,0,.09);border-radius:14px;padding:16px;">
+          <div style="font-size:13px;color:#5C5A55;margin-bottom:10px;">
+            Realize o pagamento usando a chave Pix abaixo. Depois, anexe o comprovante no campo seguinte.
+          </div>
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+            <input
+              type="text"
+              id="pix-chave"
+              value="38756702809"
+              readonly
+              style="flex:1;min-width:220px;font-size:16px;font-weight:700;letter-spacing:1px;background:white;"
+            >
+            <button type="button" class="btn btn-primary" onclick="copiarPix()">Copiar chave Pix</button>
+          </div>
+          <div id="pix-copy-msg" style="display:none;margin-top:10px;color:#0F6E56;font-size:13px;font-weight:700;">
+            ✓ Chave Pix copiada!
+          </div>
+        </div>
+      </div>
       <div class="field">
         <label class="field-label">Comprovante Pix</label>
         <input type="file" id="cad-pix-file" accept="image/*,.pdf">
@@ -113,7 +134,7 @@
   <div class="login-wrap">
     <div class="form-header"><h2>Acesso administrativo</h2><p>Área para gerenciar participantes, pagamentos e materiais.</p></div>
     <div class="card">
-      <div class="field"><label class="field-label">Senha de administrador</label><input type="password" id="admin-pwd" placeholder="Digite a senha" onkeydown="if(event.key==='Enter')checkAdminLogin()"><div class="small"> <strong></strong></div></div>
+      <div class="field"><label class="field-label">Senha de administrador</label><input type="password" id="admin-pwd" placeholder="Digite a senha" onkeydown="if(event.key==='Enter')checkAdminLogin()"><div class="small">Senha inicial: <strong>singularidades</strong></div></div>
       <div class="btn-row"><button class="btn btn-primary" onclick="checkAdminLogin()">Entrar</button><button class="btn" onclick="showScreen('screen-home')">Cancelar</button></div>
       <div class="error-msg" id="admin-error">Senha incorreta.</div>
     </div>
@@ -150,7 +171,7 @@ const HEADERS  = { 'Content-Type': 'application/json', 'X-Master-Key': JSONBIN_A
 
 // URL do Google Apps Script publicado como Web App para enviar o comprovante por e-mail.
 // Troque pelo link /exec gerado no Apps Script.
-const PIX_EMAIL_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbwqJF9Dku9kgaUfxEMbeq98tzc8tDlg78IcSy6UDl2ZJrPyYi0I2iXdfpnbvRu82kx7/exec';
+const PIX_EMAIL_WEBAPP_URL = 'https://script.google.com/macros/library/d/1hW-ZBBHAFChy23B-Zs83QWlpr3HjYbDQBd1VJB2dAhbq1G1NT7S5zFK0/1';
 
 let currentUser = null;
 let latestRecord = { respostas: initialData() };
@@ -212,6 +233,24 @@ function startAnamnese(){
   showScreen('screen-anamnese');
 }
 
+
+
+function copiarPix(){
+  const input = document.getElementById('pix-chave');
+  if(!input) return;
+  const chave = input.value;
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(chave);
+  }else{
+    input.select();
+    document.execCommand('copy');
+  }
+  const msg = document.getElementById('pix-copy-msg');
+  if(msg){
+    msg.style.display = 'block';
+    setTimeout(()=>{ msg.style.display = 'none'; }, 2500);
+  }
+}
 
 function fileToBase64(file){
   return new Promise((resolve,reject)=>{
