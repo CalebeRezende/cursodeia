@@ -107,7 +107,7 @@
       <div class="field"><label class="field-label">Usuário</label><input type="text" id="login-user" placeholder="Usuário recebido"></div>
       <div class="field"><label class="field-label">Senha</label><input type="password" id="login-pass" placeholder="Senha" onkeydown="if(event.key==='Enter')loginUser()"></div>
       <div class="btn-row"><button class="btn btn-primary" onclick="loginUser()">Entrar</button><button class="btn" onclick="showScreen('screen-home')">Voltar</button></div>
-      <div class="error-msg" id="login-error">Usuário ou senha inválidos, ou acesso bloqueado.</div>
+      <div class="error-msg" id="login-error">Usuário ou senha inválidos.</div>
     </div>
   </div>
 </section>
@@ -206,7 +206,7 @@ function normalizeRespostas(raw){
   return {
     cadastros: Array.isArray(raw.cadastros) ? raw.cadastros : [],
     usuarios,
-    materiais: Array.isArray(raw.materiais) ? raw.materiais : base.materiais,
+    materiais: Array.isArray(raw.materiais) ? raw.materiais.map(m=>({...m, links:Array.isArray(m.links)?m.links:(m.link?[m.link]:[])})) : base.materiais,
     legado: Array.isArray(raw.legado) ? raw.legado : []
   };
 }
@@ -392,10 +392,27 @@ async function createUser(){
 
 function renderUsuarios(d){
   const el=document.getElementById('admin-usuarios'); if(!d.usuarios.length){el.innerHTML=empty('Nenhum usuário criado ainda.');return}
-  let html='<div class="table-wrap"><table><thead><tr><th>Nome</th><th>Acesso</th><th>Status</th><th>Contato</th><th>Ações</th></tr></thead><tbody>';
-  d.usuarios.forEach(u=>{html+=`<tr><td><strong>${esc(u.nome)}</strong><br><span class="small">CPF: ${esc(u.cpf||'—')}</span></td><td><strong>${esc(u.usuario)}</strong><br><span class="small">Senha: ${esc(u.senha)}</span></td><td>${badgePay(u)} ${u.bloqueado?'<span class="badge badge-block">bloqueado</span>':''}<br><span class="small">Pago: ${formatDateBR(u.mensalidadeInicio)||'—'} até ${formatDateBR(u.mensalidadeFim)||'—'}</span></td><td>${esc(u.email||'—')}<br>${esc(u.whatsapp||'—')}</td><td><button class="btn btn-sm" onclick="togglePay(${u.id})">Alternar pagamento</button><br><button class="btn btn-sm" style="margin-top:6px" onclick="toggleBlock(${u.id})">Bloquear/liberar</button><br><button class="btn btn-sm btn-danger" style="margin-top:6px" onclick="deleteUser(${u.id})">Apagar</button></td></tr>`});
+  let html='<div class="table-wrap"><table><thead><tr><th>Nome</th><th>Acesso</th><th>Status</th><th>Contato</th><th>Comprovante</th><th>Ações</th></tr></thead><tbody>';
+  d.usuarios.forEach(u=>{html+=`<tr><td><strong>${esc(u.nome)}</strong><br><span class="small">CPF: ${esc(u.cpf||'—')}</span></td><td><strong>${esc(u.usuario)}</strong><br><span class="small">Senha: ${esc(u.senha)}</span></td><td>${badgePay(u)} ${u.bloqueado?'<span class="badge badge-block">bloqueado</span>':''}<br><span class="small">Pago: ${formatDateBR(u.mensalidadeInicio)||'—'} até ${formatDateBR(u.mensalidadeFim)||'—'}</span></td><td>${esc(u.email||'—')}<br>${esc(u.whatsapp||'—')}</td><td>${u.ultimoComprovantePix?`<strong>${esc(u.ultimoComprovantePix)}</strong><br><span class="small">${esc(u.ultimoComprovanteEm||'')}</span><br><span class="small">${esc(u.ultimoComprovanteObs||'')}</span>`:'—'}</td><td><button class="btn btn-sm" onclick="togglePay(${u.id})">Alternar pagamento</button><br><button class="btn btn-sm" style="margin-top:6px" onclick="toggleBlock(${u.id})">Bloquear/liberar</button><br><button class="btn btn-sm btn-danger" style="margin-top:6px" onclick="deleteUser(${u.id})">Apagar</button></td></tr>`});
   html+='</tbody></table></div>'; el.innerHTML=html;
 }
+
+function usuarioPodeVerMateriais(u){
+  return !!u && !u.bloqueado && u.pagamento === 'em dia';
+}
+function formatDateBR(iso){
+  if(!iso) return '';
+  if(String(iso).includes('/')) return iso;
+  const parts=String(iso).split('-');
+  if(parts.length===3) return `${parts[2]}/${parts[1]}/${parts[0]}`;
+  return iso;
+}
+function vencimentoTexto(u){
+  if(!u) return '';
+  const fim = u.mensalidadeFim || u.dataFim || u.validadeFim || '';
+  return fim ? `Vigência até ${esc(formatDateBR(fim))}` : '';
+}
+
 function badgePay(u){return u.pagamento==='em dia'?'<span class="badge badge-ok">em dia</span>':'<span class="badge badge-late">em atraso</span>'}
 async function togglePay(id){const d=await getData();const u=d.usuarios.find(x=>x.id===id);if(u){u.pagamento=u.pagamento==='em dia'?'em atraso':'em dia';await saveData(d);await renderAdmin()}}
 async function toggleBlock(id){const d=await getData();const u=d.usuarios.find(x=>x.id===id);if(u){u.bloqueado=!u.bloqueado;await saveData(d);await renderAdmin()}}
@@ -514,45 +531,110 @@ async function loginUser(){
   currentUser=u; document.getElementById('btn-logout').classList.remove('hidden'); renderUserArea(d); showScreen('screen-user')
 }
 function renderUserArea(d){
-  const acessoAtivo = userCanAccessMaterials(currentUser);
   document.getElementById('user-title').textContent='Olá, '+(currentUser.nome.split(' ')[0]||currentUser.nome)+'!';
-  document.getElementById('user-pay-badge').innerHTML=badgePay(currentUser);
+  const vigencia = vencimentoTexto(currentUser);
+  document.getElementById('user-pay-badge').innerHTML = badgePay(currentUser) + (currentUser.bloqueado ? ' <span class="badge badge-block">materiais bloqueados</span>' : '') + (vigencia ? `<div class="small" style="margin-top:8px">${vigencia}</div>` : '');
+
   const tabs = document.querySelector('#screen-user .tabs');
-  if(tabs){
-    tabs.innerHTML = acessoAtivo
-      ? `<button class="tab active" onclick="showTab('user-materiais',this)">Materiais</button><button class="tab" onclick="showTab('user-perfil',this)">Minha anamnese</button>`
-      : `<button class="tab active" onclick="showTab('user-perfil',this)">Minha anamnese</button>`;
+  tabs.innerHTML = usuarioPodeVerMateriais(currentUser)
+    ? `<button class="tab active" onclick="showTab('user-materiais',this)">Materiais</button><button class="tab" onclick="showTab('user-perfil',this)">Minha anamnese</button><button class="tab" onclick="showTab('user-regularizacao',this)">Pagamento</button>`
+    : `<button class="tab active" onclick="showTab('user-regularizacao',this)">Regularizar pagamento</button><button class="tab" onclick="showTab('user-perfil',this)">Minha anamnese</button>`;
+
+  let regularizacao = `
+    <div class="card">
+      <h3 style="color:var(--purple-900);margin-bottom:10px">Regularização de pagamento</h3>
+      <p style="color:var(--muted);margin-bottom:14px">Seu acesso aos materiais está bloqueado ou em atraso. Para regularizar, faça o Pix, anexe o comprovante abaixo e aguarde a liberação pelo administrador.</p>
+      <div style="background:#F7F6F3;border:1px solid rgba(0,0,0,.09);border-radius:14px;padding:16px;margin-bottom:16px;">
+        <div style="font-size:13px;color:#5C5A55;margin-bottom:10px;">Chave Pix</div>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+          <input type="text" id="pix-chave-user" value="38756702809" readonly style="flex:1;min-width:220px;font-size:16px;font-weight:700;letter-spacing:1px;background:white;">
+          <button type="button" class="btn btn-primary" onclick="copiarPixUsuario()">Copiar chave Pix</button>
+        </div>
+        <div id="pix-copy-msg-user" style="display:none;margin-top:10px;color:#0F6E56;font-size:13px;font-weight:700;">✓ Chave Pix copiada!</div>
+      </div>
+      <div class="field"><label class="field-label">Anexar novo comprovante Pix</label><input type="file" id="user-pix-file" accept="image/*,.pdf"></div>
+      <div class="field"><label class="field-label">Observações sobre o pagamento</label><input type="text" id="user-pix-obs" placeholder="Ex.: pago em nome de outra pessoa, data do Pix..."></div>
+      <button class="btn btn-primary" onclick="submitComprovanteUsuario()">Enviar comprovante para análise</button>
+      <div class="small" style="margin-top:10px">Depois do envio, o administrador precisará conferir e liberar seu acesso aos materiais.</div>
+    </div>`;
+
+  const regPanelId='user-regularizacao';
+  let regPanel=document.getElementById(regPanelId);
+  if(!regPanel){
+    regPanel=document.createElement('div');
+    regPanel.id=regPanelId;
+    regPanel.className='tab-panel';
+    document.getElementById('user-perfil').before(regPanel);
   }
-  if(acessoAtivo){
+
+  if(usuarioPodeVerMateriais(currentUser)){
     document.getElementById('user-materiais').classList.add('active');
-    document.getElementById('user-perfil').classList.remove('active');
-    document.getElementById('user-materiais').innerHTML=d.materiais.length?d.materiais.slice().reverse().map(m=>`<div class="material-card"><h3>${esc(m.titulo)}</h3><div class="material-meta">${esc(m.tipo)} · ${esc(m.data)}</div><p>${esc(m.descricao||'')}</p>${renderMaterialEmbed(m,false)}</div>`).join(''):empty('Ainda não há materiais publicados.');
-  }else{
+    regPanel.classList.remove('active');
+    regPanel.innerHTML=regularizacao;
+    document.getElementById('user-materiais').innerHTML=d.materiais.length?d.materiais.slice().reverse().map(m=>`<div class="material-card"><h3>${esc(m.titulo)}</h3><div class="material-meta">${esc(m.tipo)} · ${esc(m.data)}</div><p>${esc(m.descricao||'')}</p>${(m.links||[]).map((l,i)=>`<p style="margin-top:8px"><a class="btn btn-sm btn-primary" href="${esc(l)}" target="_blank">Abrir material ${i+1}</a></p>`).join('')}</div>`).join(''):empty('Ainda não há materiais publicados.');
+  } else {
     document.getElementById('user-materiais').classList.remove('active');
-    document.getElementById('user-materiais').innerHTML='';
-    document.getElementById('user-perfil').classList.add('active');
+    regPanel.classList.add('active');
+    regPanel.innerHTML=regularizacao;
+    document.getElementById('user-materiais').innerHTML=empty('Materiais bloqueados até a regularização do pagamento.');
   }
+
   const cad=d.cadastros.find(c=>c.email===currentUser.email||c.cpf===currentUser.cpf);
-  const aviso=!acessoAtivo?`<div class="warning"><strong>Acesso aos materiais temporariamente bloqueado.</strong><br>Seu período de mensalidade venceu ou o acesso foi bloqueado pelo administrador. Envie o novo comprovante para regularização.</div>`:'';
-  document.getElementById('user-perfil').innerHTML=aviso+(cad?`<div class="card"><h3 style="color:var(--purple-900);margin-bottom:10px">Sua anamnese</h3><p><strong>Profissão:</strong> ${esc(cad.profissao||'—')}</p><p><strong>O que conhece de IA:</strong> ${esc(cad.conhece||'—')}</p><p><strong>O que gostaria de aprender:</strong> ${esc(cad.aprender||'—')}</p><p><strong>O que espera acelerar:</strong> ${esc(cad.acelerar||'—')}</p><p><strong>Áreas:</strong> ${esc((cad.areas||[]).join(', ')||'—')}</p></div>`:empty('Anamnese não vinculada a este usuário.'));
+  document.getElementById('user-perfil').innerHTML=cad?`<div class="card"><h3 style="color:var(--purple-900);margin-bottom:10px">Sua anamnese</h3><p><strong>Profissão:</strong> ${esc(cad.profissao||'—')}</p><p><strong>O que conhece de IA:</strong> ${esc(cad.conhece||'—')}</p><p><strong>O que gostaria de aprender:</strong> ${esc(cad.aprender||'—')}</p><p><strong>O que espera acelerar:</strong> ${esc(cad.acelerar||'—')}</p><p><strong>Áreas:</strong> ${esc((cad.areas||[]).join(', ')||'—')}</p></div>`:empty('Anamnese não vinculada a este usuário.');
 }
 
-async function moveMaterialUp(id){
-const d=await getData();
-const idx=d.materiais.findIndex(m=>m.id===id);
-if(idx>0){
-[d.materiais[idx-1],d.materiais[idx]]=[d.materiais[idx],d.materiais[idx-1]];
-await saveData(d);
-await renderAdmin();
-}}
-async function moveMaterialDown(id){
-const d=await getData();
-const idx=d.materiais.findIndex(m=>m.id===id);
-if(idx>=0 && idx<d.materiais.length-1){
-[d.materiais[idx+1],d.materiais[idx]]=[d.materiais[idx],d.materiais[idx+1]];
-await saveData(d);
-await renderAdmin();
-}}
+
+function copiarPixUsuario(){
+  const input = document.getElementById('pix-chave-user');
+  if(!input) return;
+  const chave = input.value;
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(chave);
+  }else{
+    input.select();
+    document.execCommand('copy');
+  }
+  const msg = document.getElementById('pix-copy-msg-user');
+  if(msg){
+    msg.style.display = 'block';
+    setTimeout(()=>{ msg.style.display = 'none'; }, 2500);
+  }
+}
+
+async function submitComprovanteUsuario(){
+  if(!currentUser){alert('Faça login novamente.');return}
+  const fileEl=document.getElementById('user-pix-file');
+  const file=fileEl && fileEl.files ? fileEl.files[0] : null;
+  if(!file){alert('Anexe o comprovante Pix antes de enviar.');return}
+  const obsEl=document.getElementById('user-pix-obs');
+  const cadastro={
+    nome: currentUser.nome,
+    cpf: currentUser.cpf || '',
+    email: currentUser.email || '',
+    whatsapp: currentUser.whatsapp || '',
+    profissao: currentUser.profissao || ''
+  };
+  let emailStatus={enviado:false,fileName:file.name,atualizadoEm:new Date().toLocaleString('pt-BR')};
+  try{
+    emailStatus=await sendPixEmail(cadastro,file);
+  }catch(e){
+    emailStatus={enviado:false,fileName:file.name,motivo:'erro no envio por e-mail',atualizadoEm:new Date().toLocaleString('pt-BR')};
+  }
+  const d=await getData();
+  const u=d.usuarios.find(x=>x.id===currentUser.id);
+  if(u){
+    u.ultimoComprovantePix=file.name;
+    u.ultimoComprovanteObs=obsEl ? obsEl.value.trim() : '';
+    u.ultimoComprovanteEm=new Date().toLocaleString('pt-BR');
+    u.comprovanteEmail=emailStatus;
+    u.pagamento='em atraso';
+    u.bloqueado=true;
+    currentUser={...u};
+  }
+  await saveData(d);
+  alert('Comprovante enviado. Aguarde o administrador conferir e liberar seu acesso.');
+  renderUserArea(d);
+}
 
 function logoutAll(){currentUser=null;document.getElementById('btn-logout').classList.add('hidden');showScreen('screen-home')}
 async function resetPlatform(){if(!confirm('Apagar cadastros, usuários e materiais da plataforma? O legado antigo em respostas.legado será preservado.'))return;const d=await getData();d.cadastros=[];d.usuarios=[];d.materiais=[];await saveData(d);await renderAdmin()}
