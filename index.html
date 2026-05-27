@@ -537,8 +537,8 @@ function renderUserArea(d){
 
   const tabs = document.querySelector('#screen-user .tabs');
   tabs.innerHTML = usuarioPodeVerMateriais(currentUser)
-    ? `<button class="tab active" onclick="showTab('user-materiais',this)">Materiais</button><button class="tab" onclick="showTab('user-perfil',this)">Minha anamnese</button><button class="tab" onclick="showTab('user-regularizacao',this)">Pagamento</button>`
-    : `<button class="tab active" onclick="showTab('user-regularizacao',this)">Regularizar pagamento</button><button class="tab" onclick="showTab('user-perfil',this)">Minha anamnese</button>`;
+    ? `<button class="tab active" onclick="showTab('user-materiais',this)">Materiais</button><button class="tab" onclick="showTab('user-perfil',this)">Minha anamnese</button><button class="tab" onclick="showTab('user-regularizacao',this)">Pagamento</button><button class="tab" onclick="showTab('user-senha',this)">Alterar senha</button>`
+    : `<button class="tab active" onclick="showTab('user-regularizacao',this)">Regularizar pagamento</button><button class="tab" onclick="showTab('user-perfil',this)">Minha anamnese</button><button class="tab" onclick="showTab('user-senha',this)">Alterar senha</button>`;
 
   let regularizacao = `
     <div class="card">
@@ -566,6 +566,25 @@ function renderUserArea(d){
     regPanel.className='tab-panel';
     document.getElementById('user-perfil').before(regPanel);
   }
+
+  let senhaPanel=document.getElementById('user-senha');
+  if(!senhaPanel){
+    senhaPanel=document.createElement('div');
+    senhaPanel.id='user-senha';
+    senhaPanel.className='tab-panel';
+    document.getElementById('user-perfil').after(senhaPanel);
+  }
+  senhaPanel.innerHTML = `
+    <div class="card">
+      <h3 style="color:var(--purple-900);margin-bottom:10px">Alterar senha</h3>
+      <p style="color:var(--muted);margin-bottom:14px">Digite sua senha atual e escolha uma nova senha com pelo menos 6 caracteres.</p>
+      <div class="field"><label class="field-label">Senha atual</label><input type="password" id="senha-atual" placeholder="Digite sua senha atual"></div>
+      <div class="field"><label class="field-label">Nova senha</label><input type="password" id="senha-nova" placeholder="Nova senha"></div>
+      <div class="field"><label class="field-label">Confirmar nova senha</label><input type="password" id="senha-confirma" placeholder="Repita a nova senha"></div>
+      <button class="btn btn-primary" onclick="alterarSenhaUsuario()">Salvar nova senha</button>
+      <div class="error-msg" id="senha-error"></div>
+      <div id="senha-ok" style="display:none;margin-top:10px;color:#0F6E56;font-size:13px;font-weight:700;">✓ Senha alterada com sucesso!</div>
+    </div>`;
 
   if(usuarioPodeVerMateriais(currentUser)){
     document.getElementById('user-materiais').classList.add('active');
@@ -634,6 +653,55 @@ async function submitComprovanteUsuario(){
   await saveData(d);
   alert('Comprovante enviado. Aguarde o administrador conferir e liberar seu acesso.');
   renderUserArea(d);
+}
+
+
+async function alterarSenhaUsuario(){
+  if(!currentUser){alert('Faça login novamente.');return}
+  const atual=document.getElementById('senha-atual').value;
+  const nova=document.getElementById('senha-nova').value;
+  const confirma=document.getElementById('senha-confirma').value;
+  const err=document.getElementById('senha-error');
+  const ok=document.getElementById('senha-ok');
+  err.style.display='none';
+  ok.style.display='none';
+
+  if(!atual || !nova || !confirma){
+    err.textContent='Preencha todos os campos.';
+    err.style.display='block';
+    return;
+  }
+  if(atual !== currentUser.senha){
+    err.textContent='A senha atual está incorreta.';
+    err.style.display='block';
+    return;
+  }
+  if(nova.length < 6){
+    err.textContent='A nova senha precisa ter pelo menos 6 caracteres.';
+    err.style.display='block';
+    return;
+  }
+  if(nova !== confirma){
+    err.textContent='A confirmação da nova senha não confere.';
+    err.style.display='block';
+    return;
+  }
+
+  const d=await getData();
+  const u=d.usuarios.find(x=>x.id===currentUser.id);
+  if(!u){
+    err.textContent='Usuário não encontrado. Faça login novamente.';
+    err.style.display='block';
+    return;
+  }
+  u.senha=nova;
+  u.senhaAlteradaEm=new Date().toLocaleString('pt-BR');
+  await saveData(d);
+  currentUser={...u};
+  document.getElementById('senha-atual').value='';
+  document.getElementById('senha-nova').value='';
+  document.getElementById('senha-confirma').value='';
+  ok.style.display='block';
 }
 
 function logoutAll(){currentUser=null;document.getElementById('btn-logout').classList.add('hidden');showScreen('screen-home')}
