@@ -8,7 +8,46 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{--purple-50:#EEEDFE;--purple-100:#CECBF6;--purple-600:#534AB7;--purple-800:#3C3489;--purple-900:#26215C;--teal-50:#E1F5EE;--teal-600:#0F6E56;--teal-400:#1D9E75;--amber-50:#FAEEDA;--amber-600:#854F0B;--coral-50:#FAECE7;--coral-600:#993C1D;--green-50:#EAF3DE;--green-600:#3B6D11;--blue-50:#E6F1FB;--blue-600:#185FA5;--gray-50:#F7F6F3;--gray-100:#EEECE6;--gray-200:#D6D3CA;--gray-400:#9B9890;--gray-600:#5C5A55;--gray-900:#1C1B18;--bg:#FAFAF8;--surface:#fff;--border:rgba(0,0,0,.09);--border-md:rgba(0,0,0,.16);--text:#1C1B18;--muted:#5C5A55;--hint:#9B9890;--radius:10px;--radius-lg:14px;--radius-xl:20px}
-*{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.6}nav{background:rgba(255,255,255,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;justify-content:space-between;min-height:64px;position:sticky;top:0;z-index:50}.nav-logo{display:flex;align-items:center;gap:10px}.nav-logo-icon{width:38px;height:38px;background:linear-gradient(135deg,var(--purple-800),var(--purple-600));border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700}.nav-title{font-family:'DM Serif Display',serif;font-size:20px;color:var(--purple-900);letter-spacing:-.3px}.nav-subtitle{font-size:11px;color:var(--hint);margin-top:-3px}.nav-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 15px;border-radius:var(--radius);font-size:14px;font-weight:600;cursor:pointer;border:1px solid var(--border-md);background:transparent;color:var(--text);font-family:'DM Sans',sans-serif;transition:all .15s;text-decoration:none;white-space:nowrap}.btn:hover{background:var(--gray-100)}.btn:active{transform:scale(.98)}.btn-primary{background:var(--purple-800);border-color:var(--purple-800);color:#fff}.btn-primary:hover{background:var(--purple-600);border-color:var(--purple-600)}.btn-success{background:var(--teal-600);border-color:var(--teal-600);color:#fff}.btn-danger{color:#C0392B;border-color:#FADBD8}.btn-danger:hover{background:#FADBD8}.btn-ghost{border-color:transparent}.btn-sm{padding:6px 11px;font-size:13px}.screen{display:none;max-width:1060px;margin:0 auto;padding:38px 24px 80px}.screen.active{display:block}.narrow{max-width:760px}.hero{text-align:center;padding:24px 0 34px}.hero-eyebrow{display:inline-flex;align-items:center;gap:6px;background:var(--purple-50);color:var(--purple-800);font-size:12px;font-weight:700;padding:5px 13px;border-radius:20px;letter-spacing:.04em;text-transform:uppercase;margin-bottom:20px}.hero h1{font-family:'DM Serif Display',serif;font-size:clamp(34px,5vw,56px);color:var(--purple-900);line-height:1.08;letter-spacing:-1px;margin-bottom:16px}.hero h1 em{font-style:italic;color:var(--purple-600)}.hero p{font-size:17px;color:var(--muted);max-width:650px;margin:0 auto 28px}.grid{display:grid;gap:16px}.grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}.grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:22px;margin-bottom:16px}.card.soft{background:linear-gradient(180deg,#fff,var(--gray-50))}.feature-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px}.feature-icon{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;font-size:21px}.feature-card h3{font-size:15px;margin-bottom:6px}.feature-card p{font-size:13px;color:var(--muted)}.form-header{margin-bottom:24px}.form-header h2,.admin-header h2{font-family:'DM Serif Display',serif;font-size:32px;color:var(--purple-900);letter-spacing:-.5px;margin-bottom:6px}.form-header p{color:var(--muted)}.field{margin-bottom:18px}.field:last-child{margin-bottom:0}label.field-label{display:block;font-size:13px;font-weight:700;color:var(--muted);margin-bottom:8px}input[type=text],input[type=email],input[type=password],input[type=tel],input[type=date],textarea,select,input[type=file]{width:100%;padding:11px 14px;border:1px solid var(--border-md);border-radius:var(--radius);font-size:14px;color:var(--text);background:var(--surface);font-family:'DM Sans',sans-serif;transition:border-color .15s,box-shadow .15s}input:focus,textarea:focus,select:focus{outline:none;border-color:var(--purple-600);box-shadow:0 0 0 3px rgba(83,74,183,.12)}textarea{resize:vertical;min-height:105px}.check-group{display:flex;flex-direction:column;gap:9px}.check-item{display:flex;align-items:center;gap:10px;cursor:pointer;font-size:14px}.check-item input{width:17px;height:17px;accent-color:var(--purple-600)}.btn-row{display:flex;gap:10px;margin-top:24px;flex-wrap:wrap}.badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.02em}.badge-ok{background:var(--teal-50);color:var(--teal-600)}.badge-late{background:var(--coral-50);color:var(--coral-600)}.badge-block{background:var(--amber-50);color:var(--amber-600)}.badge-info{background:var(--purple-50);color:var(--purple-800)}.tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:24px;gap:0;overflow-x:auto}.tab{padding:10px 18px;font-size:14px;font-weight:700;color:var(--hint);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;background:none;border-top:none;border-left:none;border-right:none;font-family:'DM Sans',sans-serif}.tab.active{color:var(--purple-800);border-bottom-color:var(--purple-800)}.tab-panel{display:none}.tab-panel.active{display:block}.admin-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;gap:12px;flex-wrap:wrap}.metrics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:24px}.metric-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px}.metric-val{font-size:34px;font-weight:300;color:var(--purple-900);font-family:'DM Serif Display',serif;line-height:1}.metric-lbl{font-size:12px;color:var(--hint);margin-top:5px}.table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:var(--radius-lg);background:#fff}table{width:100%;border-collapse:collapse;min-width:760px}th,td{padding:12px 13px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top;font-size:13px}th{background:var(--gray-50);font-weight:700;color:var(--muted)}tr:last-child td{border-bottom:none}.material-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px;margin-bottom:12px}.material-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.material-card h3{font-size:16px;color:var(--purple-900);margin-bottom:5px}.material-meta{font-size:12px;color:var(--hint);margin-bottom:8px}.material-card p{font-size:14px;color:var(--muted)}.empty-state{text-align:center;padding:45px 20px;color:var(--hint);background:var(--gray-50);border:1px dashed var(--gray-200);border-radius:var(--radius-lg)}.success-wrap{text-align:center;padding:50px 0}.success-icon{width:72px;height:72px;background:var(--teal-50);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 22px;color:var(--teal-600);font-size:34px}.success-wrap h2{font-family:'DM Serif Display',serif;font-size:32px;color:var(--purple-900);margin-bottom:10px}.hidden{display:none!important}.small{font-size:12px;color:var(--hint)}.notice{background:var(--blue-50);border-left:4px solid var(--blue-600);padding:13px 15px;border-radius:10px;color:#164d83;font-size:13px;margin-bottom:16px}.warning{background:var(--amber-50);border-left:4px solid var(--amber-600);padding:13px 15px;border-radius:10px;color:var(--amber-600);font-size:13px;margin-bottom:16px}.login-wrap{max-width:420px;margin:45px auto}.profile-box{display:grid;grid-template-columns:1fr auto;gap:16px;align-items:start}.pill-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.linkish{color:var(--purple-800);font-weight:700;text-decoration:none}.error-msg{color:#C0392B;font-size:13px;margin-top:8px;display:none;padding:8px 12px;background:#FADBD8;border-radius:var(--radius)}.drive-embed{margin-top:12px;border:1px solid var(--border);border-radius:14px;overflow:hidden;background:#fff}.drive-frame{width:100%;height:560px;border:0;background:#fff}.drive-img{width:100%;max-height:680px;object-fit:contain;display:block;background:#fff}.drive-audio,.drive-video{width:100%;display:block}.drive-placeholder{padding:18px;background:var(--gray-50);border:1px dashed var(--gray-200);border-radius:14px;color:var(--muted);font-size:13px;margin-top:12px}.inline-note{font-size:12px;color:var(--muted);margin-top:8px}@media(max-width:720px){nav{padding:10px 16px;align-items:flex-start;gap:10px;flex-direction:column}.nav-actions{width:100%}.screen{padding:24px 16px 60px}.grid-2,.grid-3{grid-template-columns:1fr}.hero h1{font-size:31px}.profile-box{grid-template-columns:1fr}}
+*{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.6}nav{background:rgba(255,255,255,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;justify-content:space-between;min-height:64px;position:sticky;top:0;z-index:50}.nav-logo{display:flex;align-items:center;gap:10px}.nav-logo-icon{width:38px;height:38px;background:linear-gradient(135deg,var(--purple-800),var(--purple-600));border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700}.nav-title{font-family:'DM Serif Display',serif;font-size:20px;color:var(--purple-900);letter-spacing:-.3px}.nav-subtitle{font-size:11px;color:var(--hint);margin-top:-3px}.nav-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 15px;border-radius:var(--radius);font-size:14px;font-weight:600;cursor:pointer;border:1px solid var(--border-md);background:transparent;color:var(--text);font-family:'DM Sans',sans-serif;transition:all .15s;text-decoration:none;white-space:nowrap}.btn:hover{background:var(--gray-100)}.btn:active{transform:scale(.98)}.btn:focus-visible{outline:2px solid var(--purple-600);outline-offset:2px}.btn-primary{background:var(--purple-800);border-color:var(--purple-800);color:#fff}.btn-primary:hover{background:var(--purple-600);border-color:var(--purple-600)}.btn-success{background:var(--teal-600);border-color:var(--teal-600);color:#fff}.btn-danger{color:#C0392B;border-color:#FADBD8}.btn-danger:hover{background:#FADBD8}.btn-ghost{border-color:transparent}.btn-sm{padding:6px 11px;font-size:13px}.screen{display:none;max-width:1060px;margin:0 auto;padding:38px 24px 80px}.screen.active{display:block}.narrow{max-width:760px}.hero{text-align:center;padding:24px 0 34px}.hero-eyebrow{display:inline-flex;align-items:center;gap:6px;background:var(--purple-50);color:var(--purple-800);font-size:12px;font-weight:700;padding:5px 13px;border-radius:20px;letter-spacing:.04em;text-transform:uppercase;margin-bottom:20px}.hero h1{font-family:'DM Serif Display',serif;font-size:clamp(34px,5vw,56px);color:var(--purple-900);line-height:1.08;letter-spacing:-1px;margin-bottom:16px}.hero h1 em{font-style:italic;color:var(--purple-600)}.hero p{font-size:17px;color:var(--muted);max-width:650px;margin:0 auto 28px}.grid{display:grid;gap:16px}.grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}.grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:22px;margin-bottom:16px}.card.soft{background:linear-gradient(180deg,#fff,var(--gray-50))}.feature-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px}.feature-icon{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;font-size:21px}.feature-card h3{font-size:15px;margin-bottom:6px}.feature-card p{font-size:13px;color:var(--muted)}.form-header{margin-bottom:24px}.form-header h2,.admin-header h2{font-family:'DM Serif Display',serif;font-size:32px;color:var(--purple-900);letter-spacing:-.5px;margin-bottom:6px}.form-header p{color:var(--muted)}.field{margin-bottom:18px}.field:last-child{margin-bottom:0}label.field-label{display:block;font-size:13px;font-weight:700;color:var(--muted);margin-bottom:8px}input[type=text],input[type=email],input[type=password],input[type=tel],input[type=date],textarea,select,input[type=file]{width:100%;padding:11px 14px;border:1px solid var(--border-md);border-radius:var(--radius);font-size:14px;color:var(--text);background:var(--surface);font-family:'DM Sans',sans-serif;transition:border-color .15s,box-shadow .15s}input:focus,textarea:focus,select:focus{outline:none;border-color:var(--purple-600);box-shadow:0 0 0 3px rgba(83,74,183,.12)}textarea{resize:vertical;min-height:105px}.check-group{display:flex;flex-direction:column;gap:9px}.check-item{display:flex;align-items:center;gap:10px;cursor:pointer;font-size:14px}.check-item input{width:17px;height:17px;accent-color:var(--purple-600)}.btn-row{display:flex;gap:10px;margin-top:24px;flex-wrap:wrap}.badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.02em}.badge-ok{background:var(--teal-50);color:var(--teal-600)}.badge-late{background:var(--coral-50);color:var(--coral-600)}.badge-block{background:var(--amber-50);color:var(--amber-600)}.badge-info{background:var(--purple-50);color:var(--purple-800)}.tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:24px;gap:0;overflow-x:auto}.tab{padding:10px 18px;font-size:14px;font-weight:700;color:var(--hint);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;background:none;border-top:none;border-left:none;border-right:none;font-family:'DM Sans',sans-serif}.tab.active{color:var(--purple-800);border-bottom-color:var(--purple-800)}.tab-panel{display:none}.tab-panel.active{display:block}.admin-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;gap:12px;flex-wrap:wrap}.metrics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:24px}.metric-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px}.metric-val{font-size:34px;font-weight:300;color:var(--purple-900);font-family:'DM Serif Display',serif;line-height:1}.metric-lbl{font-size:12px;color:var(--hint);margin-top:5px}.table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:var(--radius-lg);background:#fff}table{width:100%;border-collapse:collapse;min-width:760px}th,td{padding:12px 13px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top;font-size:13px}th{background:var(--gray-50);font-weight:700;color:var(--muted)}tr:last-child td{border-bottom:none}.material-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px;margin-bottom:12px}.material-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.material-card h3{font-size:16px;color:var(--purple-900);margin-bottom:5px}.material-meta{font-size:12px;color:var(--hint);margin-bottom:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}.material-card p{font-size:14px;color:var(--muted)}.empty-state{text-align:center;padding:45px 20px;color:var(--hint);background:var(--gray-50);border:1px dashed var(--gray-200);border-radius:var(--radius-lg)}.success-wrap{text-align:center;padding:50px 0}.success-icon{width:72px;height:72px;background:var(--teal-50);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 22px;color:var(--teal-600);font-size:34px}.success-wrap h2{font-family:'DM Serif Display',serif;font-size:32px;color:var(--purple-900);margin-bottom:10px}.hidden{display:none!important}.small{font-size:12px;color:var(--hint)}.notice{background:var(--blue-50);border-left:4px solid var(--blue-600);padding:13px 15px;border-radius:10px;color:#164d83;font-size:13px;margin-bottom:16px}.warning{background:var(--amber-50);border-left:4px solid var(--amber-600);padding:13px 15px;border-radius:10px;color:var(--amber-600);font-size:13px;margin-bottom:16px}.login-wrap{max-width:420px;margin:45px auto}.profile-box{display:grid;grid-template-columns:1fr auto;gap:16px;align-items:start}.pill-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.linkish{color:var(--purple-800);font-weight:700;text-decoration:none}.error-msg{color:#C0392B;font-size:13px;margin-top:8px;display:none;padding:8px 12px;background:#FADBD8;border-radius:var(--radius)}.drive-embed{margin-top:12px;border:1px solid var(--border);border-radius:14px;overflow:hidden;background:#fff}.drive-frame{width:100%;height:560px;border:0;background:#fff}.drive-img{width:100%;max-height:680px;object-fit:contain;display:block;background:#fff}.drive-audio,.drive-video{width:100%;display:block}.drive-placeholder{padding:18px;background:var(--gray-50);border:1px dashed var(--gray-200);border-radius:14px;color:var(--muted);font-size:13px;margin-top:12px}.inline-note{font-size:12px;color:var(--muted);margin-top:8px}
+
+/* ===== Melhorias: banner de status do participante ===== */
+.status-banner{border-radius:var(--radius-lg);padding:20px 22px;margin-bottom:20px;display:flex;gap:16px;align-items:flex-start;border:1px solid transparent}
+.status-banner .status-icon{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.status-banner h3{font-size:17px;margin-bottom:3px}
+.status-banner p{font-size:14px;margin:0}
+.status-banner .status-body{flex:1}
+.status-banner.status-ok{background:var(--teal-50);border-color:rgba(15,110,86,.25)}
+.status-banner.status-ok h3{color:var(--teal-600)}
+.status-banner.status-ok p{color:#0c5a46}
+.status-banner.status-ok .status-icon{background:#fff;color:var(--teal-600)}
+.status-banner.status-late{background:var(--coral-50);border-color:rgba(153,60,29,.3)}
+.status-banner.status-late h3{color:var(--coral-600)}
+.status-banner.status-late p{color:#7a3018}
+.status-banner.status-late .status-icon{background:#fff;color:var(--coral-600)}
+.status-banner.status-soon{background:var(--amber-50);border-color:rgba(133,79,11,.3)}
+.status-banner.status-soon h3{color:var(--amber-600)}
+.status-banner.status-soon p{color:#6d420b}
+.status-banner.status-soon .status-icon{background:#fff;color:var(--amber-600)}
+.status-banner .btn{margin-top:12px}
+.status-chip{display:inline-flex;align-items:center;gap:5px;background:#fff;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;margin-top:10px;margin-right:8px}
+
+/* ===== Melhorias: filtros de categoria de materiais ===== */
+.filter-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
+.filter-pill{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:20px;border:1px solid var(--border-md);background:#fff;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
+.filter-pill:hover{border-color:var(--purple-600);color:var(--purple-800)}
+.filter-pill.active{background:var(--purple-800);border-color:var(--purple-800);color:#fff}
+.filter-pill .count{background:rgba(0,0,0,.08);border-radius:12px;padding:1px 7px;font-size:11px}
+.filter-pill.active .count{background:rgba(255,255,255,.22)}
+.mat-search{max-width:320px;flex:1;min-width:200px}
+.cat-header{display:flex;align-items:center;gap:10px;margin:24px 0 12px}
+.cat-header:first-child{margin-top:0}
+.cat-header .cat-icon{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;background:var(--purple-50)}
+.cat-header h3{font-family:'DM Serif Display',serif;font-size:20px;color:var(--purple-900);letter-spacing:-.3px}
+.cat-header .small{margin-left:auto}
+.mat-type-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700}
+
+@media(max-width:720px){nav{padding:10px 16px;align-items:flex-start;gap:10px;flex-direction:column}.nav-actions{width:100%}.screen{padding:24px 16px 60px}.grid-2,.grid-3{grid-template-columns:1fr}.hero h1{font-size:31px}.profile-box{grid-template-columns:1fr}.status-banner{flex-direction:column}.drive-frame{height:420px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
 </style>
 </head>
 <body>
@@ -37,7 +76,7 @@
   </div>
   <div class="grid grid-3">
     <div class="feature-card"><div class="feature-icon" style="background:var(--purple-50);color:var(--purple-800)">🧭</div><h3>Anamnese inicial</h3><p>Mapeia conhecimentos, expectativas, profissão e interesses práticos com IA.</p></div>
-    <div class="feature-card"><div class="feature-icon" style="background:var(--teal-50);color:var(--teal-600)">📚</div><h3>Materiais do curso</h3><p>Slides, podcasts, imagens, artigos e links organizados pelo administrador.</p></div>
+    <div class="feature-card"><div class="feature-icon" style="background:var(--teal-50);color:var(--teal-600)">📚</div><h3>Materiais do curso</h3><p>Slides, podcasts, imagens, artigos e links organizados por categoria.</p></div>
     <div class="feature-card"><div class="feature-icon" style="background:var(--amber-50);color:var(--amber-600)">🔐</div><h3>Gestão de acesso</h3><p>Usuários, senhas, bloqueios e status de pagamento: em dia ou em atraso.</p></div>
   </div>
 </section>
@@ -91,7 +130,7 @@
         <label class="check-item"><input type="checkbox" class="cad-area" value="Ética, privacidade e segurança"> Ética, privacidade e segurança</label>
       </div>
     </div>
-    <div class="btn-row"><button class="btn btn-primary" onclick="submitAnamnese()">Enviar anamnese</button><button class="btn" onclick="showScreen('screen-home')">Cancelar</button></div>
+    <div class="btn-row"><button class="btn btn-primary" id="btn-enviar-anamnese" onclick="submitAnamnese()">Enviar anamnese</button><button class="btn" onclick="showScreen('screen-home')">Cancelar</button></div>
     <div class="error-msg" id="cad-error">Preencha pelo menos nome completo, CPF, e-mail e WhatsApp.</div>
   </div>
 </section>
@@ -118,9 +157,9 @@
     <div class="card soft" style="min-width:260px">
       <div class="small">Status de pagamento</div>
       <div id="user-pay-badge" style="margin-top:8px"></div>
-      <div class="small" style="margin-top:10px">Caso esteja em atraso, envie o comprovante para regularização.</div>
     </div>
   </div>
+  <div id="user-status-banner"></div>
   <div class="notice"><strong>Orientação:</strong> os materiais serão atualizados conforme o andamento do grupo, experiências dos participantes e necessidades que surgirem nos encontros.</div>
   <div id="user-access-warning"></div>
   <div class="tabs" id="user-tabs">
@@ -180,6 +219,13 @@ const PIX_EMAIL_WEBAPP_URL = 'https://script.google.com/macros/library/d/1hW-ZBB
 
 let currentUser = null;
 let latestRecord = { respostas: initialData() };
+
+// Filtros de materiais (admin e participante) — apenas estado de tela, nada é salvo.
+let matFilterAdmin = 'todos';
+let matFilterUser  = 'todos';
+let matSearchUser  = '';
+let cachedAdminData = null;
+let cachedUserData  = null;
 
 function initialData(){
   return {
@@ -244,8 +290,6 @@ function startAnamnese(){
   showScreen('screen-anamnese');
 }
 
-
-
 function copiarPix(){
   const input = document.getElementById('pix-chave');
   if(!input) return;
@@ -293,6 +337,8 @@ async function sendPixEmail(cadastro, file){
 async function submitAnamnese(){
   const nome=val('cad-nome'),cpf=val('cad-cpf'),email=val('cad-email'),whatsapp=val('cad-whatsapp');
   if(!nome||!cpf||!email||!whatsapp){document.getElementById('cad-error').style.display='block';return}
+  const btn=document.getElementById('btn-enviar-anamnese');
+  if(btn){btn.disabled=true;btn.textContent='Enviando...';}
   const file=document.getElementById('cad-pix-file').files[0] || null;
   const cadastro={
     id:Date.now(), ts:new Date().toLocaleString('pt-BR'), nome, cpf, email, whatsapp,
@@ -306,10 +352,16 @@ async function submitAnamnese(){
   }catch(e){
     cadastro.comprovanteEmail = {enviado:false, fileName:file ? file.name : '', motivo:'erro no envio por e-mail'};
   }
-  const d=await getData();
-  d.cadastros.push(cadastro);
-  await saveData(d);
-  showScreen('screen-success');
+  try{
+    const d=await getData();
+    d.cadastros.push(cadastro);
+    await saveData(d);
+    showScreen('screen-success');
+  }catch(e){
+    alert('Não foi possível salvar a anamnese. Verifique a internet e tente novamente.');
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent='Enviar anamnese';}
+  }
 }
 
 function showAdminLogin(){document.getElementById('admin-pwd').value='';document.getElementById('admin-error').style.display='none';showScreen('screen-admin-login')}
@@ -328,15 +380,23 @@ function toDateInput(date){
 }
 function formatDateBR(iso){
   if(!iso) return '';
-  const [y,m,d]=String(iso).split('-');
-  if(!y||!m||!d) return iso;
-  return `${d}/${m}/${y}`;
+  if(String(iso).includes('/')) return iso;
+  const parts=String(iso).split('-');
+  if(parts.length===3) return `${parts[2]}/${parts[1]}/${parts[0]}`;
+  return iso;
 }
 function isExpiredDate(iso){
   if(!iso) return false;
   const end = new Date(iso + 'T23:59:59');
   const now = new Date();
   return now > end;
+}
+function diasRestantes(iso){
+  if(!iso) return null;
+  const end = new Date(iso + 'T23:59:59');
+  if(isNaN(end.getTime())) return null;
+  const diff = end.getTime() - Date.now();
+  return Math.ceil(diff / (1000*60*60*24));
 }
 function isUserActive(u){
   return !!u && !u.bloqueado && u.pagamento==='em dia' && !isExpiredDate(u.mensalidadeFim);
@@ -355,15 +415,16 @@ async function applyPaymentRules(d){
 
 async function renderAdmin(){
   const d=await getData();
-  document.getElementById('admin-metrics').innerHTML=`<div class="metric-card"><div class="metric-val">${d.cadastros.length}</div><div class="metric-lbl">Anamneses recebidas</div></div><div class="metric-card"><div class="metric-val">${d.usuarios.length}</div><div class="metric-lbl">Usuários criados</div></div><div class="metric-card"><div class="metric-val">${d.usuarios.filter(u=>isUserActive(u)).length}</div><div class="metric-lbl">Acessos ativos</div></div><div class="metric-card"><div class="metric-val">${d.materiais.length}</div><div class="metric-lbl">Materiais publicados</div></div>`;
+  cachedAdminData=d;
+  document.getElementById('admin-metrics').innerHTML=`<div class="metric-card"><div class="metric-val">${d.cadastros.length}</div><div class="metric-lbl">Anamneses recebidas</div></div><div class="metric-card"><div class="metric-val">${d.usuarios.length}</div><div class="metric-lbl">Usuários criados</div></div><div class="metric-card"><div class="metric-val">${d.usuarios.filter(u=>isUserActive(u)).length}</div><div class="metric-lbl">Acessos ativos</div></div><div class="metric-card"><div class="metric-val">${d.usuarios.filter(u=>!isUserActive(u)).length}</div><div class="metric-lbl">Pendências</div></div><div class="metric-card"><div class="metric-val">${d.materiais.length}</div><div class="metric-lbl">Materiais publicados</div></div>`;
   await applyPaymentRules(d); renderCadastros(d); renderUsuarios(d); renderMensalidades(d); renderMateriaisAdmin(d); renderNovoUser(d);
 }
 
 function renderCadastros(d){
   const el=document.getElementById('admin-cadastros');
-  if(!d.cadastros.length){el.innerHTML=empty('Nenhuma anamnese recebida ainda.');return}
+  if(!d.cadastros.length){el.innerHTML=empty('Nenhuma anamnese recebida ainda. Quando alguém preencher o formulário de inscrição, ela aparecerá aqui.');return}
   let html='<div class="table-wrap"><table><thead><tr><th>Participante</th><th>Contato</th><th>Conhece / quer aprender</th><th>Pix</th><th>Ações</th></tr></thead><tbody>';
-  d.cadastros.slice().reverse().forEach(c=>{html+=`<tr><td><strong>${esc(c.nome)}</strong><br><span class="small">CPF: ${esc(c.cpf)}<br>${esc(c.profissao||'Profissão não informada')}</span></td><td>${esc(c.email)}<br>${esc(c.whatsapp)}<br><span class="small">${esc(c.ts)}</span></td><td><strong>Conhece:</strong> ${esc(c.conhece||'—')}<br><strong>Quer aprender:</strong> ${esc(c.aprender||'—')}<br><strong>Acelerar:</strong> ${esc(c.acelerar||'—')}</td><td>${esc(c.pix||'—')}${c.comprovanteEmail&&c.comprovanteEmail.enviado?'<br><span class="badge badge-ok">e-mail enviado</span>':(c.pix&&c.pix!=='Não enviado'?'<br><span class="badge badge-late">e-mail não confirmado</span>':'')}${c.observacoes?`<br><span class="small">${esc(c.observacoes)}</span>`:''}</td><td><button class="btn btn-sm btn-primary" onclick="prefillUser(${c.id})">Criar usuário</button><br><button class="btn btn-sm btn-danger" style="margin-top:6px" onclick="deleteCadastro(${c.id})">Apagar</button></td></tr>`});
+  d.cadastros.slice().reverse().forEach(c=>{html+=`<tr><td><strong>${esc(c.nome)}</strong>${c.usuarioCriado?' <span class="badge badge-ok">usuário criado</span>':' <span class="badge badge-info">aguardando usuário</span>'}<br><span class="small">CPF: ${esc(c.cpf)}<br>${esc(c.profissao||'Profissão não informada')}</span></td><td>${esc(c.email)}<br>${esc(c.whatsapp)}<br><span class="small">${esc(c.ts)}</span></td><td><strong>Conhece:</strong> ${esc(c.conhece||'—')}<br><strong>Quer aprender:</strong> ${esc(c.aprender||'—')}<br><strong>Acelerar:</strong> ${esc(c.acelerar||'—')}</td><td>${esc(c.pix||'—')}${c.comprovanteEmail&&c.comprovanteEmail.enviado?'<br><span class="badge badge-ok">e-mail enviado</span>':(c.pix&&c.pix!=='Não enviado'?'<br><span class="badge badge-late">e-mail não confirmado</span>':'')}${c.observacoes?`<br><span class="small">${esc(c.observacoes)}</span>`:''}</td><td><button class="btn btn-sm btn-primary" onclick="prefillUser(${c.id})">Criar usuário</button><br><button class="btn btn-sm btn-danger" style="margin-top:6px" onclick="deleteCadastro(${c.id})">Apagar</button></td></tr>`});
   html+='</tbody></table></div>'; el.innerHTML=html;
 }
 
@@ -391,21 +452,17 @@ async function createUser(){
 }
 
 function renderUsuarios(d){
-  const el=document.getElementById('admin-usuarios'); if(!d.usuarios.length){el.innerHTML=empty('Nenhum usuário criado ainda.');return}
+  const el=document.getElementById('admin-usuarios'); if(!d.usuarios.length){el.innerHTML=empty('Nenhum usuário criado ainda. Crie usuários a partir das anamneses recebidas ou na aba "Criar usuário".');return}
   let html='<div class="table-wrap"><table><thead><tr><th>Nome</th><th>Acesso</th><th>Status</th><th>Contato</th><th>Comprovante</th><th>Ações</th></tr></thead><tbody>';
   d.usuarios.forEach(u=>{html+=`<tr><td><strong>${esc(u.nome)}</strong><br><span class="small">CPF: ${esc(u.cpf||'—')}</span></td><td><strong>${esc(u.usuario)}</strong><br><span class="small">Senha: ${esc(u.senha)}</span></td><td>${badgePay(u)} ${u.bloqueado?'<span class="badge badge-block">bloqueado</span>':''}<br><span class="small">Pago: ${formatDateBR(u.mensalidadeInicio)||'—'} até ${formatDateBR(u.mensalidadeFim)||'—'}</span></td><td>${esc(u.email||'—')}<br>${esc(u.whatsapp||'—')}</td><td>${u.ultimoComprovantePix?`<strong>${esc(u.ultimoComprovantePix)}</strong><br><span class="small">${esc(u.ultimoComprovanteEm||'')}</span><br><span class="small">${esc(u.ultimoComprovanteObs||'')}</span>`:'—'}</td><td><button class="btn btn-sm" onclick="togglePay(${u.id})">Alternar pagamento</button><br><button class="btn btn-sm" style="margin-top:6px" onclick="toggleBlock(${u.id})">Bloquear/liberar</button><br><button class="btn btn-sm btn-danger" style="margin-top:6px" onclick="deleteUser(${u.id})">Apagar</button></td></tr>`});
   html+='</tbody></table></div>'; el.innerHTML=html;
 }
 
 function usuarioPodeVerMateriais(u){
-  return !!u && !u.bloqueado && u.pagamento === 'em dia';
-}
-function formatDateBR(iso){
-  if(!iso) return '';
-  if(String(iso).includes('/')) return iso;
-  const parts=String(iso).split('-');
-  if(parts.length===3) return `${parts[2]}/${parts[1]}/${parts[0]}`;
-  return iso;
+  if(!u || u.bloqueado) return false;
+  if(u.pagamento && u.pagamento!=='em dia') return false;
+  if(u.mensalidadeFim && isExpiredDate(u.mensalidadeFim)) return false;
+  return true;
 }
 function vencimentoTexto(u){
   if(!u) return '';
@@ -426,7 +483,10 @@ function renderMensalidades(d){
   let html='<div class="notice"><strong>Controle automático:</strong> quando a data “pago até” vence, o participante fica em atraso, o acesso é bloqueado e a aba de materiais deixa de aparecer para ele.</div>';
   html+='<div class="table-wrap"><table><thead><tr><th>Participante</th><th>Vigência da mensalidade</th><th>Status</th><th>Comprovantes</th><th>Ações</th></tr></thead><tbody>';
   d.usuarios.forEach(u=>{
+    const dias=diasRestantes(u.mensalidadeFim);
+    const diasTxt=(dias===null)?'':(dias<0?`<span class="badge badge-late">vencida há ${Math.abs(dias)} dia(s)</span>`:(dias<=5?`<span class="badge badge-block">vence em ${dias} dia(s)</span>`:`<span class="small">${dias} dia(s) restantes</span>`));
     const comps=(u.comprovantes||[]).slice().reverse().map(c=>`<div class="small">${esc(c.data||'')} · ${esc(c.fileName||'comprovante')} ${c.enviado?'<span class="badge badge-ok">e-mail enviado</span>':'<span class="badge badge-late">pendente</span>'}</div>`).join('') || '<span class="small">Nenhum comprovante complementar.</span>';
+    const ultimoComp=u.ultimoComprovantePix?`<div class="small" style="margin-top:4px"><strong>Último enviado:</strong> ${esc(u.ultimoComprovantePix)}<br>${esc(u.ultimoComprovanteEm||'')}</div>`:'';
     html+=`<tr>
       <td><strong>${esc(u.nome)}</strong><br><span class="small">${esc(u.usuario)} · ${esc(u.email||'')}</span></td>
       <td>
@@ -434,9 +494,10 @@ function renderMensalidades(d){
           <div><label class="field-label">Pago de</label><input type="date" id="pay-start-${u.id}" value="${esc(u.mensalidadeInicio||'')}"></div>
           <div><label class="field-label">Pago até</label><input type="date" id="pay-end-${u.id}" value="${esc(u.mensalidadeFim||'')}"></div>
         </div>
+        <div style="margin-top:6px">${diasTxt}</div>
       </td>
       <td>${badgePay(u)} ${u.bloqueado?'<span class="badge badge-block">bloqueado</span>':''}</td>
-      <td>${comps}</td>
+      <td>${comps}${ultimoComp}</td>
       <td>
         <button class="btn btn-sm btn-primary" onclick="savePaymentPeriod(${u.id})">Salvar vigência</button><br>
         <button class="btn btn-sm" style="margin-top:6px" onclick="renewOneMonth(${u.id})">Renovar +1 mês</button><br>
@@ -486,6 +547,44 @@ function materialDisplayType(m){
   if(tipo.includes('slide')||tipo.includes('pdf')||tipo.includes('artigo')||link.includes('drive.google.com')||link.match(/\.pdf(\?|$)/)) return 'pdf';
   return 'link';
 }
+
+// ===== Categorias de materiais (organização por tipo) =====
+const MAT_CATEGORIAS=[
+  {key:'audio', label:'Podcasts e áudios', icon:'🎧', badgeBg:'var(--teal-50)', badgeColor:'var(--teal-600)'},
+  {key:'pdf',   label:'PDFs, slides e artigos', icon:'📄', badgeBg:'var(--purple-50)', badgeColor:'var(--purple-800)'},
+  {key:'video', label:'Vídeos', icon:'🎬', badgeBg:'var(--coral-50)', badgeColor:'var(--coral-600)'},
+  {key:'image', label:'Imagens', icon:'🖼️', badgeBg:'var(--amber-50)', badgeColor:'var(--amber-600)'},
+  {key:'link',  label:'Sites e links', icon:'🔗', badgeBg:'var(--blue-50)', badgeColor:'var(--blue-600)'}
+];
+function matCategoria(m){
+  const t=materialDisplayType(m);
+  return MAT_CATEGORIAS.find(c=>c.key===t) || MAT_CATEGORIAS[4];
+}
+function matTypeBadge(m){
+  const c=matCategoria(m);
+  return `<span class="mat-type-badge" style="background:${c.badgeBg};color:${c.badgeColor}">${c.icon} ${esc(m.tipo||c.label)}</span>`;
+}
+function buildFilterBar(materiais, currentFilter, onclickName, extraHtml=''){
+  const counts={};
+  materiais.forEach(m=>{const k=matCategoria(m).key; counts[k]=(counts[k]||0)+1;});
+  let html=`<div class="filter-bar">${extraHtml}<button class="filter-pill ${currentFilter==='todos'?'active':''}" onclick="${onclickName}('todos')">Todos <span class="count">${materiais.length}</span></button>`;
+  MAT_CATEGORIAS.forEach(c=>{
+    if(!counts[c.key]) return;
+    html+=`<button class="filter-pill ${currentFilter===c.key?'active':''}" onclick="${onclickName}('${c.key}')">${c.icon} ${c.label} <span class="count">${counts[c.key]}</span></button>`;
+  });
+  html+='</div>';
+  return html;
+}
+function filtrarMateriais(materiais, filtro, busca=''){
+  let list=materiais.slice().reverse();
+  if(filtro && filtro!=='todos') list=list.filter(m=>matCategoria(m).key===filtro);
+  if(busca){
+    const b=busca.toLowerCase();
+    list=list.filter(m=>String(m.titulo||'').toLowerCase().includes(b)||String(m.descricao||'').toLowerCase().includes(b)||String(m.tipo||'').toLowerCase().includes(b));
+  }
+  return list;
+}
+
 function youtubeEmbedUrl(url){
   const u=String(url||'');
   let m=u.match(/youtu\.be\/([^?&]+)/); if(m) return `https://www.youtube.com/embed/${m[1]}`;
@@ -493,27 +592,61 @@ function youtubeEmbedUrl(url){
   return u;
 }
 function renderMaterialEmbed(m,admin=false){
-  if(!m.link) return `<div class="drive-placeholder">Material cadastrado sem link. Adicione o link no painel administrativo quando estiver disponível.</div>`;
+  if(!m.link) return `<div class="drive-placeholder">Material cadastrado sem link. ${admin?'Adicione o link quando o arquivo estiver disponível.':'O conteúdo será liberado em breve pelo administrador.'}</div>`;
   const type=materialDisplayType(m); const link=esc(m.link);
   if(type==='image') return `<div class="drive-embed"><img class="drive-img" src="${esc(googleDirectUrl(m.link))}" alt="${esc(m.titulo)}" onerror="this.outerHTML='<iframe class=&quot;drive-frame&quot; src=&quot;${esc(googlePreviewUrl(m.link))}&quot; allow=&quot;autoplay&quot;></iframe>'"></div>`;
   if(type==='audio') return `<div class="drive-embed" style="padding:14px"><audio class="drive-audio" controls src="${esc(googleDirectUrl(m.link))}"></audio><div class="inline-note">Se o áudio não carregar, verifique se o arquivo do Drive está compartilhado para visualização.</div></div>`;
   if(type==='video') return `<div class="drive-embed"><iframe class="drive-frame" src="${esc(m.link.includes('youtu')?youtubeEmbedUrl(m.link):googlePreviewUrl(m.link))}" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>`;
   if(type==='pdf') return `<div class="drive-embed"><iframe class="drive-frame" src="${esc(googlePreviewUrl(m.link))}" allow="autoplay"></iframe></div>`;
-  return `<div class="drive-placeholder"><strong>${esc(m.titulo||'Material')}</strong><br>Este material é um link externo. <a class="linkish" href="${link}" target="_blank">Abrir conteúdo</a></div>`;
+  return `<div class="drive-placeholder"><strong>${esc(m.titulo||'Material')}</strong><br>Este material é um link externo. <a class="linkish" href="${link}" target="_blank" rel="noopener">Abrir conteúdo ↗</a></div>`;
+}
+
+function setMatFilterAdmin(f){
+  matFilterAdmin=f;
+  if(cachedAdminData) renderMateriaisAdmin(cachedAdminData);
 }
 function renderMateriaisAdmin(d){
+  cachedAdminData=d;
   const el=document.getElementById('admin-materiais');
   let form=`<div class="card"><h3 style="margin-bottom:14px;color:var(--purple-900)">Adicionar material</h3><div class="notice"><strong>Como funciona:</strong> você pode colar o link de um arquivo do Google Drive. O participante verá o conteúdo incorporado dentro da plataforma, sem precisar entrar manualmente no Drive. Para funcionar bem, deixe o arquivo como “qualquer pessoa com o link pode visualizar”.</div><div class="grid grid-2"><div class="field"><label class="field-label">Tipo</label><select id="mat-tipo"><option>Artigo</option><option>Slide</option><option>Podcast</option><option>Imagem</option><option>Vídeo</option><option>Link</option><option>Atividade</option><option>PDF</option></select></div><div class="field"><label class="field-label">Como exibir na plataforma</label><select id="mat-display"><option value="auto">Detectar automaticamente</option><option value="pdf">PDF / Slides em visualizador</option><option value="image">Imagem dentro da página</option><option value="audio">Áudio / podcast dentro da página</option><option value="video">Vídeo dentro da página</option><option value="link">Card com link</option></select></div></div><div class="field"><label class="field-label">Título</label><input type="text" id="mat-titulo"></div><div class="field"><label class="field-label">Descrição/orientação</label><textarea id="mat-desc"></textarea></div><div class="field"><label class="field-label">Link do arquivo no Drive, YouTube, áudio, PDF ou outro material</label><input type="text" id="mat-link" placeholder="https://drive.google.com/file/d/... ou outro link"></div><button class="btn btn-primary" onclick="addMaterial()">Publicar material</button></div>`;
-  let list=d.materiais.length?d.materiais.slice().reverse().map(m=>`<div class="material-card"><div class="material-top"><div style="width:100%"><h3>${esc(m.titulo)}</h3><div class="material-meta">${esc(m.tipo)} · ${esc(m.data)}</div><p>${esc(m.descricao||'')}</p>${renderMaterialEmbed(m,true)}</div><div style="display:flex;flex-direction:column;gap:6px">
-<button class="btn btn-sm" onclick="moveMaterialUp(${m.id})">↑ Subir</button>
-<button class="btn btn-sm" onclick="moveMaterialDown(${m.id})">↓ Descer</button>
+
+  let list='';
+  if(!d.materiais.length){
+    list=empty('Nenhum material publicado. Use o formulário acima para publicar o primeiro material do curso.');
+  }else{
+    list+=buildFilterBar(d.materiais, matFilterAdmin, 'setMatFilterAdmin');
+    const filtrados=filtrarMateriais(d.materiais, matFilterAdmin);
+    if(!filtrados.length){
+      list+=empty('Nenhum material nessa categoria.');
+    }else{
+      list+=filtrados.map(m=>`<div class="material-card"><div class="material-top"><div style="width:100%"><h3>${esc(m.titulo)}</h3><div class="material-meta">${matTypeBadge(m)} <span>Publicado em ${esc(m.data)}</span></div><p>${esc(m.descricao||'')}</p>${renderMaterialEmbed(m,true)}</div><div style="display:flex;flex-direction:column;gap:6px">
+<button class="btn btn-sm" onclick="moveMaterialUp(${m.id})" title="Mover para cima na lista">↑ Subir</button>
+<button class="btn btn-sm" onclick="moveMaterialDown(${m.id})" title="Mover para baixo na lista">↓ Descer</button>
 <button class="btn btn-danger btn-sm" onclick="deleteMaterial(${m.id})">Apagar</button>
-</div></div></div>`).join(''):empty('Nenhum material publicado.');
+</div></div></div>`).join('');
+    }
+  }
   el.innerHTML=form+list;
 }
-async function addMaterial(){const titulo=val('mat-titulo');if(!titulo){alert('Informe o título do material.');return}const d=await getData();d.materiais.push({id:Date.now(),tipo:document.getElementById('mat-tipo').value,titulo,descricao:val('mat-desc'),link:val('mat-link'),display:document.getElementById('mat-display').value,data:new Date().toLocaleDateString('pt-BR')});await saveData(d);await renderAdmin()}
+async function addMaterial(){const titulo=val('mat-titulo');if(!titulo){alert('Informe o título do material.');return}const d=await getData();d.materiais.push({id:Date.now(),tipo:document.getElementById('mat-tipo').value,titulo,descricao:val('mat-desc'),link:val('mat-link'),display:document.getElementById('mat-display').value,data:new Date().toLocaleDateString('pt-BR')});await saveData(d);await renderAdmin();alert('Material publicado!')}
 async function deleteMaterial(id){if(!confirm('Apagar este material?'))return;const d=await getData();d.materiais=d.materiais.filter(m=>m.id!==id);await saveData(d);await renderAdmin()}
 
+// A lista é exibida do mais novo para o mais antigo (array invertido).
+// "Subir" na tela = mover para mais perto do fim do array; "Descer" = mais perto do início.
+async function moveMaterialUp(id){
+  const d=await getData();
+  const i=d.materiais.findIndex(m=>m.id===id);
+  if(i<0 || i>=d.materiais.length-1) return;
+  [d.materiais[i], d.materiais[i+1]]=[d.materiais[i+1], d.materiais[i]];
+  await saveData(d); renderMateriaisAdmin(d);
+}
+async function moveMaterialDown(id){
+  const d=await getData();
+  const i=d.materiais.findIndex(m=>m.id===id);
+  if(i<=0) return;
+  [d.materiais[i], d.materiais[i-1]]=[d.materiais[i-1], d.materiais[i]];
+  await saveData(d); renderMateriaisAdmin(d);
+}
 
 function userCanAccessMaterials(u){
   if(!u || u.bloqueado) return false;
@@ -530,20 +663,111 @@ async function loginUser(){
   if(!u){document.getElementById('login-error').style.display='block';return}
   currentUser=u; document.getElementById('btn-logout').classList.remove('hidden'); renderUserArea(d); showScreen('screen-user')
 }
+
+function statusBannerHtml(u){
+  const ativo=usuarioPodeVerMateriais(u);
+  const dias=diasRestantes(u.mensalidadeFim);
+  const fimTxt=u.mensalidadeFim?formatDateBR(u.mensalidadeFim):'';
+  if(!ativo){
+    return `<div class="status-banner status-late" role="alert">
+      <div class="status-icon">⚠️</div>
+      <div class="status-body">
+        <h3>Você tem uma pendência de pagamento</h3>
+        <p>Seu acesso aos materiais está bloqueado. Para voltar a acessar, faça o Pix, envie o comprovante na aba abaixo e aguarde a liberação pelo administrador.</p>
+        ${fimTxt?`<span class="status-chip">Vigência encerrada em ${fimTxt}</span>`:''}
+        ${u.ultimoComprovantePix?`<span class="status-chip">📎 Comprovante enviado em ${esc(u.ultimoComprovanteEm||'')} — em análise</span>`:''}
+        <br><button class="btn btn-primary" onclick="irParaRegularizacao()">Regularizar pagamento agora</button>
+      </div>
+    </div>`;
+  }
+  if(dias!==null && dias<=5){
+    return `<div class="status-banner status-soon">
+      <div class="status-icon">⏳</div>
+      <div class="status-body">
+        <h3>Sua mensalidade vence em ${dias} dia${dias===1?'':'s'}</h3>
+        <p>Seu acesso está em dia até <strong>${fimTxt}</strong>. Para não perder o acesso aos materiais, renove antes do vencimento na aba Pagamento.</p>
+      </div>
+    </div>`;
+  }
+  return `<div class="status-banner status-ok">
+    <div class="status-icon">✓</div>
+    <div class="status-body">
+      <h3>Tudo certo! Seu pagamento está em dia</h3>
+      <p>Você tem acesso completo aos materiais do curso.${fimTxt?` Sua mensalidade está paga até <strong>${fimTxt}</strong>${dias!==null?` (${dias} dia${dias===1?'':'s'} restantes)`:''}.`:''}</p>
+    </div>
+  </div>`;
+}
+function irParaRegularizacao(){
+  const btn=Array.from(document.querySelectorAll('#screen-user .tab')).find(t=>t.textContent.toLowerCase().includes('regulariza')||t.textContent.toLowerCase().includes('pagamento'));
+  if(btn){showTab('user-regularizacao',btn);}
+  else{showTab('user-regularizacao',null);}
+  const panel=document.getElementById('user-regularizacao');
+  if(panel) panel.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function setMatFilterUser(f){
+  matFilterUser=f;
+  if(cachedUserData) renderMateriaisUsuario(cachedUserData);
+}
+function setMatSearchUser(v){
+  matSearchUser=v;
+  if(cachedUserData) renderMateriaisUsuario(cachedUserData, true);
+}
+function renderMateriaisUsuario(d, keepSearchFocus=false){
+  const el=document.getElementById('user-materiais');
+  if(!d.materiais.length){el.innerHTML=empty('Ainda não há materiais publicados. Eles aparecerão aqui conforme os encontros do curso acontecerem.');return}
+  const searchHtml=`<input class="mat-search" type="text" placeholder="Buscar material..." value="${esc(matSearchUser)}" oninput="setMatSearchUser(this.value)" aria-label="Buscar material">`;
+  let html=buildFilterBar(d.materiais, matFilterUser, 'setMatFilterUser', searchHtml);
+  const filtrados=filtrarMateriais(d.materiais, matFilterUser, matSearchUser);
+  if(!filtrados.length){
+    html+=empty('Nenhum material encontrado com esse filtro ou busca.');
+  }else if(matFilterUser==='todos' && !matSearchUser){
+    // Visão "Todos": agrupado por categoria, para o participante achar rápido o que procura.
+    MAT_CATEGORIAS.forEach(cat=>{
+      const doGrupo=filtrados.filter(m=>matCategoria(m).key===cat.key);
+      if(!doGrupo.length) return;
+      html+=`<div class="cat-header"><div class="cat-icon">${cat.icon}</div><h3>${cat.label}</h3><span class="small">${doGrupo.length} material${doGrupo.length===1?'':'is'}</span></div>`;
+      html+=doGrupo.map(m=>materialCardUsuario(m)).join('');
+    });
+  }else{
+    html+=filtrados.map(m=>materialCardUsuario(m)).join('');
+  }
+  el.innerHTML=html;
+  if(keepSearchFocus){
+    const s=el.querySelector('.mat-search');
+    if(s){s.focus();const v=s.value;s.value='';s.value=v;}
+  }
+}
+function materialCardUsuario(m){
+  const linksExtras=(m.links||[]).filter(l=>l&&l!==m.link);
+  return `<div class="material-card">
+    <h3>${esc(m.titulo)}</h3>
+    <div class="material-meta">${matTypeBadge(m)} <span>Publicado em ${esc(m.data)}</span></div>
+    <p>${esc(m.descricao||'')}</p>
+    ${renderMaterialEmbed(m,false)}
+    ${m.link?`<p style="margin-top:10px"><a class="btn btn-sm" href="${esc(m.link)}" target="_blank" rel="noopener">Abrir em nova aba ↗</a></p>`:''}
+    ${linksExtras.map((l,i)=>`<p style="margin-top:8px"><a class="btn btn-sm btn-primary" href="${esc(l)}" target="_blank" rel="noopener">Abrir material complementar ${i+1} ↗</a></p>`).join('')}
+  </div>`;
+}
+
 function renderUserArea(d){
+  cachedUserData=d;
+  matFilterUser='todos'; matSearchUser='';
   document.getElementById('user-title').textContent='Olá, '+(currentUser.nome.split(' ')[0]||currentUser.nome)+'!';
   const vigencia = vencimentoTexto(currentUser);
   document.getElementById('user-pay-badge').innerHTML = badgePay(currentUser) + (currentUser.bloqueado ? ' <span class="badge badge-block">materiais bloqueados</span>' : '') + (vigencia ? `<div class="small" style="margin-top:8px">${vigencia}</div>` : '');
+  document.getElementById('user-status-banner').innerHTML = statusBannerHtml(currentUser);
+  document.getElementById('user-access-warning').innerHTML = '';
 
   const tabs = document.querySelector('#screen-user .tabs');
   tabs.innerHTML = usuarioPodeVerMateriais(currentUser)
-    ? `<button class="tab active" onclick="showTab('user-materiais',this)">Materiais</button><button class="tab" onclick="showTab('user-perfil',this)">Minha anamnese</button><button class="tab" onclick="showTab('user-regularizacao',this)">Pagamento</button><button class="tab" onclick="showTab('user-senha',this)">Alterar senha</button>`
-    : `<button class="tab active" onclick="showTab('user-regularizacao',this)">Regularizar pagamento</button><button class="tab" onclick="showTab('user-perfil',this)">Minha anamnese</button><button class="tab" onclick="showTab('user-senha',this)">Alterar senha</button>`;
+    ? `<button class="tab active" onclick="showTab('user-materiais',this)">📚 Materiais</button><button class="tab" onclick="showTab('user-perfil',this)">Minha anamnese</button><button class="tab" onclick="showTab('user-regularizacao',this)">Pagamento</button><button class="tab" onclick="showTab('user-senha',this)">Alterar senha</button>`
+    : `<button class="tab active" onclick="showTab('user-regularizacao',this)">⚠️ Regularizar pagamento</button><button class="tab" onclick="showTab('user-perfil',this)">Minha anamnese</button><button class="tab" onclick="showTab('user-senha',this)">Alterar senha</button>`;
 
   let regularizacao = `
     <div class="card">
-      <h3 style="color:var(--purple-900);margin-bottom:10px">Regularização de pagamento</h3>
-      <p style="color:var(--muted);margin-bottom:14px">Seu acesso aos materiais está bloqueado ou em atraso. Para regularizar, faça o Pix, anexe o comprovante abaixo e aguarde a liberação pelo administrador.</p>
+      <h3 style="color:var(--purple-900);margin-bottom:10px">${usuarioPodeVerMateriais(currentUser)?'Pagamento e renovação':'Regularização de pagamento'}</h3>
+      <p style="color:var(--muted);margin-bottom:14px">${usuarioPodeVerMateriais(currentUser)?'Para renovar sua mensalidade, faça o Pix e anexe o comprovante abaixo. O administrador confirmará a renovação.':'Seu acesso aos materiais está bloqueado ou em atraso. Para regularizar, faça o Pix, anexe o comprovante abaixo e aguarde a liberação pelo administrador.'}</p>
       <div style="background:#F7F6F3;border:1px solid rgba(0,0,0,.09);border-radius:14px;padding:16px;margin-bottom:16px;">
         <div style="font-size:13px;color:#5C5A55;margin-bottom:10px;">Chave Pix</div>
         <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
@@ -556,6 +780,7 @@ function renderUserArea(d){
       <div class="field"><label class="field-label">Observações sobre o pagamento</label><input type="text" id="user-pix-obs" placeholder="Ex.: pago em nome de outra pessoa, data do Pix..."></div>
       <button class="btn btn-primary" onclick="submitComprovanteUsuario()">Enviar comprovante para análise</button>
       <div class="small" style="margin-top:10px">Depois do envio, o administrador precisará conferir e liberar seu acesso aos materiais.</div>
+      ${currentUser.ultimoComprovantePix?`<div class="notice" style="margin-top:14px;margin-bottom:0"><strong>Último comprovante enviado:</strong> ${esc(currentUser.ultimoComprovantePix)} em ${esc(currentUser.ultimoComprovanteEm||'')}. Aguardando conferência do administrador.</div>`:''}
     </div>`;
 
   const regPanelId='user-regularizacao';
@@ -586,13 +811,12 @@ function renderUserArea(d){
       <div id="senha-ok" style="display:none;margin-top:10px;color:#0F6E56;font-size:13px;font-weight:700;">✓ Senha alterada com sucesso!</div>
     </div>`;
 
+  document.querySelectorAll('#screen-user .tab-panel').forEach(p=>p.classList.remove('active'));
   if(usuarioPodeVerMateriais(currentUser)){
     document.getElementById('user-materiais').classList.add('active');
-    regPanel.classList.remove('active');
     regPanel.innerHTML=regularizacao;
-    document.getElementById('user-materiais').innerHTML=d.materiais.length?d.materiais.slice().reverse().map(m=>`<div class="material-card"><h3>${esc(m.titulo)}</h3><div class="material-meta">${esc(m.tipo)} · ${esc(m.data)}</div><p>${esc(m.descricao||'')}</p>${(m.links||[]).map((l,i)=>`<p style="margin-top:8px"><a class="btn btn-sm btn-primary" href="${esc(l)}" target="_blank">Abrir material ${i+1}</a></p>`).join('')}</div>`).join(''):empty('Ainda não há materiais publicados.');
+    renderMateriaisUsuario(d);
   } else {
-    document.getElementById('user-materiais').classList.remove('active');
     regPanel.classList.add('active');
     regPanel.innerHTML=regularizacao;
     document.getElementById('user-materiais').innerHTML=empty('Materiais bloqueados até a regularização do pagamento.');
@@ -646,6 +870,8 @@ async function submitComprovanteUsuario(){
     u.ultimoComprovanteObs=obsEl ? obsEl.value.trim() : '';
     u.ultimoComprovanteEm=new Date().toLocaleString('pt-BR');
     u.comprovanteEmail=emailStatus;
+    if(!Array.isArray(u.comprovantes)) u.comprovantes=[];
+    u.comprovantes.push({data:new Date().toLocaleString('pt-BR'), fileName:file.name, enviado:!!emailStatus.enviado, obs:obsEl?obsEl.value.trim():''});
     u.pagamento='em atraso';
     u.bloqueado=true;
     currentUser={...u};
