@@ -374,6 +374,7 @@ tr:last-child td{border-bottom:none}
     </div>
   </div>
   <div id="user-status-banner"></div>
+  <div id="user-dashboard"></div>
   <div class="notice"><strong>Orientação:</strong> os materiais serão atualizados conforme o andamento do grupo, experiências dos participantes e necessidades que surgirem nos encontros.</div>
   <div id="user-access-warning"></div>
   <div class="tabs" id="user-tabs">
@@ -407,12 +408,18 @@ tr:last-child td{border-bottom:none}
     <button class="tab" onclick="showTab('admin-usuarios',this)">Usuários</button>
     <button class="tab" onclick="showTab('admin-mensalidades',this)">Mensalidades</button>
     <button class="tab" onclick="showTab('admin-materiais',this)">Materiais</button>
+    <button class="tab" onclick="showTab('admin-avisos',this)">📢 Avisos</button>
+    <button class="tab" onclick="showTab('admin-agenda',this)">🗓️ Agenda</button>
+    <button class="tab" onclick="showTab('admin-tarefas',this)">📝 Tarefas</button>
     <button class="tab" onclick="showTab('admin-novo-user',this)">Criar usuário</button>
   </div>
   <div class="tab-panel active" id="admin-cadastros"></div>
   <div class="tab-panel" id="admin-usuarios"></div>
   <div class="tab-panel" id="admin-mensalidades"></div>
   <div class="tab-panel" id="admin-materiais"></div>
+  <div class="tab-panel" id="admin-avisos"></div>
+  <div class="tab-panel" id="admin-agenda"></div>
+  <div class="tab-panel" id="admin-tarefas"></div>
   <div class="tab-panel" id="admin-novo-user"></div>
 </section>
 
@@ -485,6 +492,11 @@ function initialData(){
       {id: Date.now()-3, tipo:'Artigo', titulo:'Primeiro roteiro de estudo: o que é IA generativa?', descricao:'Material introdutório para começar a conversa sobre IA no cotidiano e no mundo do trabalho.', link:'', data:new Date().toLocaleDateString('pt-BR')},
       {id: Date.now()-2, tipo:'Slide', titulo:'Encontro 1 — Boas-vindas e usos práticos', descricao:'Espaço para disponibilizar a apresentação do primeiro encontro.', link:'', data:new Date().toLocaleDateString('pt-BR')}
     ],
+    avisos: [],
+    agenda: [],
+    tarefas: [],
+    entregas: [],
+    config: {},
     legado: []
   };
 }
@@ -503,6 +515,11 @@ function normalizeRespostas(raw){
     cadastros: Array.isArray(raw.cadastros) ? raw.cadastros : [],
     usuarios,
     materiais: Array.isArray(raw.materiais) ? raw.materiais.map(m=>({...m, links:Array.isArray(m.links)?m.links:(m.link?[m.link]:[])})) : base.materiais,
+    avisos: Array.isArray(raw.avisos) ? raw.avisos : [],
+    agenda: Array.isArray(raw.agenda) ? raw.agenda : [],
+    tarefas: Array.isArray(raw.tarefas) ? raw.tarefas : [],
+    entregas: Array.isArray(raw.entregas) ? raw.entregas : [],
+    config: (raw.config && typeof raw.config==='object') ? raw.config : {},
     legado: Array.isArray(raw.legado) ? raw.legado : []
   };
 }
@@ -697,9 +714,10 @@ async function renderAdmin(){
      <div class="metric-card"><div class="metric-val" data-count="${d.usuarios.length}">0</div><div class="metric-lbl">Usuários criados</div></div>
      <div class="metric-card"><div class="metric-val" data-count="${ativos}">0</div><div class="metric-lbl">Acessos ativos</div></div>
      <div class="metric-card"><div class="metric-val" data-count="${pend}">0</div><div class="metric-lbl">Pendências</div></div>
-     <div class="metric-card"><div class="metric-val" data-count="${d.materiais.length}">0</div><div class="metric-lbl">Materiais publicados</div></div>`;
+     <div class="metric-card"><div class="metric-val" data-count="${d.materiais.length}">0</div><div class="metric-lbl">Materiais publicados</div></div>
+     <div class="metric-card"><div class="metric-val" data-count="${(d.entregas||[]).length}">0</div><div class="metric-lbl">Entregas de tarefas</div></div>`;
   animateMetrics();
-  await applyPaymentRules(d); renderCadastros(d); renderUsuarios(d); renderMensalidades(d); renderMateriaisAdmin(d); renderNovoUser(d);
+  await applyPaymentRules(d); renderCadastros(d); renderUsuarios(d); renderMensalidades(d); renderMateriaisAdmin(d); renderAvisosAdmin(d); renderAgendaAdmin(d); renderTarefasAdmin(d); renderNovoUser(d);
 }
 
 function renderCadastros(d){
@@ -735,9 +753,11 @@ async function createUser(){
 }
 
 function renderUsuarios(d){
-  const el=document.getElementById('admin-usuarios'); if(!d.usuarios.length){el.innerHTML=empty('Nenhum usuário criado ainda. Crie usuários a partir das anamneses recebidas ou na aba "Criar usuário".','👤');return}
-  let html='<div class="table-wrap"><table><thead><tr><th>Nome</th><th>Acesso</th><th>Status</th><th>Contato</th><th>Comprovante</th><th>Ações</th></tr></thead><tbody>';
-  d.usuarios.forEach(u=>{html+=`<tr><td><strong>${esc(u.nome)}</strong><br><span class="small">CPF: ${esc(u.cpf||'—')}</span></td><td><strong>${esc(u.usuario)}</strong><br><span class="small">Senha: ${esc(u.senha)}</span></td><td>${badgePay(u)} ${u.bloqueado?'<span class="badge badge-block">bloqueado</span>':''}<br><span class="small">Pago: ${formatDateBR(u.mensalidadeInicio)||'—'} até ${formatDateBR(u.mensalidadeFim)||'—'}</span></td><td>${esc(u.email||'—')}<br>${esc(u.whatsapp||'—')}</td><td>${u.ultimoComprovantePix?`<strong>${esc(u.ultimoComprovantePix)}</strong><br><span class="small">${esc(u.ultimoComprovanteEm||'')}</span><br><span class="small">${esc(u.ultimoComprovanteObs||'')}</span>`:'—'}</td><td><button class="btn btn-sm" onclick="togglePay(${u.id})">Alternar pagamento</button><br><button class="btn btn-sm" style="margin-top:6px" onclick="toggleBlock(${u.id})">Bloquear/liberar</button><br><button class="btn btn-sm btn-danger" style="margin-top:6px" onclick="deleteUser(${u.id})">Apagar</button></td></tr>`});
+  const el=document.getElementById('admin-usuarios');
+  if(!d.usuarios.length){el.innerHTML=certConfigCardHtml(d)+empty('Nenhum usuário criado ainda. Crie usuários a partir das anamneses recebidas ou na aba "Criar usuário".','👤');return}
+  let html=certConfigCardHtml(d);
+  html+='<div class="table-wrap"><table><thead><tr><th>Nome</th><th>Acesso</th><th>Status</th><th>Contato</th><th>Comprovante</th><th>Ações</th></tr></thead><tbody>';
+  d.usuarios.forEach(u=>{html+=`<tr><td><strong>${esc(u.nome)}</strong><br><span class="small">CPF: ${esc(u.cpf||'—')}</span>${u.certificadoLiberado?'<br><span class="badge badge-info">🎓 certificado liberado</span>':''}</td><td><strong>${esc(u.usuario)}</strong><br><span class="small">Senha: ${esc(u.senha)}</span></td><td>${badgePay(u)} ${u.bloqueado?'<span class="badge badge-block">bloqueado</span>':''}<br><span class="small">Pago: ${formatDateBR(u.mensalidadeInicio)||'—'} até ${formatDateBR(u.mensalidadeFim)||'—'}</span></td><td>${esc(u.email||'—')}<br>${esc(u.whatsapp||'—')}</td><td>${u.ultimoComprovantePix?`<strong>${esc(u.ultimoComprovantePix)}</strong><br><span class="small">${esc(u.ultimoComprovanteEm||'')}</span><br><span class="small">${esc(u.ultimoComprovanteObs||'')}</span>`:'—'}</td><td><button class="btn btn-sm" onclick="togglePay(${u.id})">Alternar pagamento</button><br><button class="btn btn-sm" style="margin-top:6px" onclick="toggleBlock(${u.id})">Bloquear/liberar</button><br><button class="btn btn-sm" style="margin-top:6px" onclick="toggleCertificado(${u.id})">${u.certificadoLiberado?'Revogar certificado':'🎓 Liberar certificado'}</button><br><button class="btn btn-sm btn-danger" style="margin-top:6px" onclick="deleteUser(${u.id})">Apagar</button></td></tr>`});
   html+='</tbody></table></div>'; el.innerHTML=html;
 }
 
@@ -952,6 +972,303 @@ async function moveMaterialDown(id){
   await saveData(d); renderMateriaisAdmin(d);
 }
 
+// ============================================================
+// MURAL DE AVISOS
+// ============================================================
+function avisoNovo(a){ return (Date.now() - (a.id||0)) < 7*24*60*60*1000; }
+function renderAvisosAdmin(d){
+  const el=document.getElementById('admin-avisos');
+  let form=`<div class="card"><h3 style="margin-bottom:14px;color:var(--purple-900);font-family:'Fraunces',serif;font-weight:600">📢 Publicar aviso</h3>
+    <div class="field"><label class="field-label">Título</label><input type="text" id="av-titulo" placeholder="Ex.: Mudança de horário do próximo encontro"></div>
+    <div class="field"><label class="field-label">Texto do aviso</label><textarea id="av-texto" placeholder="Escreva o recado para os participantes..."></textarea></div>
+    <label class="check-item" style="margin-bottom:16px;max-width:340px"><input type="checkbox" id="av-fixado"> 📌 Fixar no topo do mural</label>
+    <button class="btn btn-primary" onclick="addAviso()">Publicar aviso</button></div>`;
+  const avisos=(d.avisos||[]).slice().sort((a,b)=>((b.fixado?1:0)-(a.fixado?1:0))||(b.id-a.id));
+  let list=avisos.length?avisos.map(a=>`<div class="material-card">
+    <div class="material-top"><div style="width:100%">
+      <h3>${a.fixado?'📌 ':''}${esc(a.titulo)} ${avisoNovo(a)?'<span class="badge badge-info">novo</span>':''}</h3>
+      <div class="material-meta"><span>Publicado em ${esc(a.data)}</span></div>
+      <p style="white-space:pre-wrap">${esc(a.texto)}</p>
+    </div><div style="display:flex;flex-direction:column;gap:6px">
+      <button class="btn btn-sm" onclick="toggleFixarAviso(${a.id})">${a.fixado?'Desafixar':'📌 Fixar'}</button>
+      <button class="btn btn-danger btn-sm" onclick="deleteAviso(${a.id})">Apagar</button>
+    </div></div></div>`).join(''):empty('Nenhum aviso publicado. Os avisos aparecem em destaque na tela inicial dos participantes.','📢');
+  el.innerHTML=form+list;
+}
+async function addAviso(){
+  const titulo=val('av-titulo'), texto=val('av-texto');
+  if(!titulo||!texto){toast('Preencha o título e o texto do aviso.','warn');return}
+  const d=await getData();
+  d.avisos.push({id:Date.now(), titulo, texto, fixado:document.getElementById('av-fixado').checked, data:new Date().toLocaleString('pt-BR')});
+  await saveData(d); await renderAdmin(); toast('Aviso publicado!','ok');
+}
+async function toggleFixarAviso(id){const d=await getData();const a=d.avisos.find(x=>x.id===id);if(a){a.fixado=!a.fixado;await saveData(d);renderAvisosAdmin(d)}}
+async function deleteAviso(id){if(!confirm('Apagar este aviso?'))return;const d=await getData();d.avisos=d.avisos.filter(a=>a.id!==id);await saveData(d);await renderAdmin();toast('Aviso apagado.','info')}
+
+// ============================================================
+// AGENDA DE ENCONTROS
+// ============================================================
+function eventoPassado(e){ return isExpiredDate(e.dataISO); }
+function eventoDataTexto(e){
+  if(!e.dataISO) return '';
+  const dt=new Date(e.dataISO+'T12:00:00');
+  const semana=isNaN(dt.getTime())?'':dt.toLocaleDateString('pt-BR',{weekday:'long'});
+  return `${semana?semana.charAt(0).toUpperCase()+semana.slice(1)+', ':''}${formatDateBR(e.dataISO)}${e.hora?' às '+esc(e.hora):''}`;
+}
+function renderAgendaAdmin(d){
+  const el=document.getElementById('admin-agenda');
+  let form=`<div class="card"><h3 style="margin-bottom:14px;color:var(--purple-900);font-family:'Fraunces',serif;font-weight:600">🗓️ Agendar encontro</h3>
+    <div class="grid grid-2">
+      <div class="field"><label class="field-label">Título do encontro</label><input type="text" id="ev-titulo" placeholder="Ex.: Encontro 3 — IA para produtividade"></div>
+      <div class="field"><label class="field-label">Data</label><input type="date" id="ev-data"></div>
+      <div class="field"><label class="field-label">Horário</label><input type="text" id="ev-hora" placeholder="Ex.: 19h30"></div>
+      <div class="field"><label class="field-label">Local ou link (Meet, Zoom...)</label><input type="text" id="ev-local" placeholder="Ex.: https://meet.google.com/... ou Sala 2"></div>
+    </div>
+    <div class="field"><label class="field-label">Descrição / o que levar</label><textarea id="ev-desc" placeholder="Tema do encontro, materiais necessários..."></textarea></div>
+    <button class="btn btn-primary" onclick="addEvento()">Agendar encontro</button></div>`;
+  const evs=(d.agenda||[]).slice().sort((a,b)=>String(a.dataISO).localeCompare(String(b.dataISO)));
+  const futuros=evs.filter(e=>!eventoPassado(e)), passados=evs.filter(e=>eventoPassado(e)).reverse();
+  const cardEv=e=>`<div class="material-card"><div class="material-top"><div style="width:100%">
+      <h3>${esc(e.titulo)} ${eventoPassado(e)?'<span class="badge badge-block">realizado</span>':'<span class="badge badge-ok">próximo</span>'}</h3>
+      <div class="material-meta"><span>📅 ${eventoDataTexto(e)}</span>${e.local?`<span>· 📍 ${e.local.startsWith('http')?`<a class="linkish" href="${esc(e.local)}" target="_blank" rel="noopener">Acessar link</a>`:esc(e.local)}</span>`:''}</div>
+      ${e.descricao?`<p style="white-space:pre-wrap">${esc(e.descricao)}</p>`:''}
+    </div><div><button class="btn btn-danger btn-sm" onclick="deleteEvento(${e.id})">Apagar</button></div></div></div>`;
+  let list='';
+  if(!evs.length) list=empty('Nenhum encontro agendado. Os próximos encontros aparecem na tela inicial dos participantes.','🗓️');
+  else{
+    if(futuros.length) list+=`<div class="cat-header"><div class="cat-icon">📅</div><h3>Próximos encontros</h3><span class="small">${futuros.length}</span></div>`+futuros.map(cardEv).join('');
+    if(passados.length) list+=`<div class="cat-header"><div class="cat-icon">✔️</div><h3>Encontros realizados</h3><span class="small">${passados.length}</span></div>`+passados.map(cardEv).join('');
+  }
+  el.innerHTML=form+list;
+}
+async function addEvento(){
+  const titulo=val('ev-titulo'), dataISO=val('ev-data');
+  if(!titulo||!dataISO){toast('Preencha pelo menos o título e a data do encontro.','warn');return}
+  const d=await getData();
+  d.agenda.push({id:Date.now(), titulo, dataISO, hora:val('ev-hora'), local:val('ev-local'), descricao:val('ev-desc')});
+  await saveData(d); await renderAdmin(); toast('Encontro agendado!','ok');
+}
+async function deleteEvento(id){if(!confirm('Apagar este encontro da agenda?'))return;const d=await getData();d.agenda=d.agenda.filter(e=>e.id!==id);await saveData(d);await renderAdmin();toast('Encontro removido.','info')}
+
+// ============================================================
+// TAREFAS COM ENTREGA
+// ============================================================
+function prazoBadge(t){
+  if(!t.prazoISO) return '<span class="badge badge-info">sem prazo</span>';
+  const dias=diasRestantes(t.prazoISO);
+  if(dias===null) return '';
+  if(dias<0) return `<span class="badge badge-late">prazo encerrado (${formatDateBR(t.prazoISO)})</span>`;
+  if(dias<=3) return `<span class="badge badge-block">vence em ${dias} dia${dias===1?'':'s'} (${formatDateBR(t.prazoISO)})</span>`;
+  return `<span class="badge badge-ok">prazo: ${formatDateBR(t.prazoISO)}</span>`;
+}
+function renderTarefasAdmin(d){
+  const el=document.getElementById('admin-tarefas');
+  let form=`<div class="card"><h3 style="margin-bottom:14px;color:var(--purple-900);font-family:'Fraunces',serif;font-weight:600">📝 Criar tarefa</h3>
+    <div class="grid grid-2">
+      <div class="field"><label class="field-label">Título da tarefa</label><input type="text" id="tf-titulo" placeholder="Ex.: Crie 3 prompts para o seu trabalho"></div>
+      <div class="field"><label class="field-label">Prazo de entrega</label><input type="date" id="tf-prazo"></div>
+    </div>
+    <div class="field"><label class="field-label">Enunciado / orientações</label><textarea id="tf-desc" placeholder="Explique o que o participante deve fazer e como entregar..."></textarea></div>
+    <button class="btn btn-primary" onclick="addTarefa()">Publicar tarefa</button></div>`;
+  const ts=(d.tarefas||[]).slice().reverse();
+  let list=ts.length?ts.map(t=>{
+    const ents=(d.entregas||[]).filter(e=>e.tarefaId===t.id);
+    const entsHtml=ents.length?ents.map(e=>`
+      <div style="border:1px solid var(--border);border-radius:12px;padding:14px;margin-top:10px;background:var(--gray-50)">
+        <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center">
+          <strong>👤 ${esc(e.nome)}</strong>
+          <span class="small">Entregue em ${esc(e.enviadaEm)} ${e.avaliadaEm?'<span class="badge badge-ok">avaliada</span>':'<span class="badge badge-block">aguardando avaliação</span>'}</span>
+        </div>
+        ${e.texto?`<p style="white-space:pre-wrap;margin-top:8px">${esc(e.texto)}</p>`:''}
+        ${e.link?`<p style="margin-top:6px"><a class="linkish" href="${esc(e.link)}" target="_blank" rel="noopener">🔗 Abrir link entregue ↗</a></p>`:''}
+        <div class="grid grid-2" style="gap:8px;margin-top:10px">
+          <div><label class="field-label">Feedback para o participante</label><textarea id="fb-txt-${e.id}" style="min-height:70px" placeholder="Escreva o feedback...">${esc(e.feedback||'')}</textarea></div>
+          <div><label class="field-label">Nota / conceito (opcional)</label><input type="text" id="fb-nota-${e.id}" value="${esc(e.nota||'')}" placeholder="Ex.: 9,0 ou Ótimo"><br><button class="btn btn-sm btn-primary" style="margin-top:8px" onclick="salvarFeedback(${e.id})">Salvar avaliação</button></div>
+        </div>
+      </div>`).join(''):'<div class="small" style="margin-top:8px">Nenhuma entrega recebida ainda.</div>';
+    return `<div class="material-card"><div class="material-top"><div style="width:100%">
+      <h3>${esc(t.titulo)}</h3>
+      <div class="material-meta">${prazoBadge(t)} <span>· ${ents.length} entrega${ents.length===1?'':'s'}</span> <span>· Criada em ${esc(t.criadaEm||'')}</span></div>
+      ${t.descricao?`<p style="white-space:pre-wrap">${esc(t.descricao)}</p>`:''}
+      ${entsHtml}
+    </div><div><button class="btn btn-danger btn-sm" onclick="deleteTarefa(${t.id})">Apagar</button></div></div></div>`;
+  }).join(''):empty('Nenhuma tarefa criada. As tarefas aparecem em uma aba própria para os participantes, que respondem por texto ou link.','📝');
+  el.innerHTML=form+list;
+}
+async function addTarefa(){
+  const titulo=val('tf-titulo');
+  if(!titulo){toast('Informe o título da tarefa.','warn');return}
+  const d=await getData();
+  d.tarefas.push({id:Date.now(), titulo, descricao:val('tf-desc'), prazoISO:val('tf-prazo'), criadaEm:new Date().toLocaleDateString('pt-BR')});
+  await saveData(d); await renderAdmin(); toast('Tarefa publicada!','ok');
+}
+async function deleteTarefa(id){
+  if(!confirm('Apagar esta tarefa? As entregas dela também serão apagadas.'))return;
+  const d=await getData();
+  d.tarefas=d.tarefas.filter(t=>t.id!==id);
+  d.entregas=(d.entregas||[]).filter(e=>e.tarefaId!==id);
+  await saveData(d); await renderAdmin(); toast('Tarefa apagada.','info');
+}
+async function salvarFeedback(entregaId){
+  const d=await getData();
+  const e=(d.entregas||[]).find(x=>x.id===entregaId); if(!e){toast('Entrega não encontrada.','err');return}
+  e.feedback=document.getElementById('fb-txt-'+entregaId).value.trim();
+  e.nota=document.getElementById('fb-nota-'+entregaId).value.trim();
+  e.avaliadaEm=new Date().toLocaleString('pt-BR');
+  await saveData(d); renderTarefasAdmin(d); toast('Avaliação salva! O participante verá o feedback na aba Tarefas.','ok');
+}
+
+// ===== Tarefas: lado do participante =====
+function renderTarefasUsuario(d){
+  const el=document.getElementById('user-tarefas'); if(!el)return;
+  const ts=(d.tarefas||[]).slice().reverse();
+  if(!ts.length){el.innerHTML=empty('Nenhuma tarefa publicada ainda. Quando o administrador criar uma tarefa, ela aparecerá aqui.','📝');return}
+  el.innerHTML=ts.map(t=>{
+    const ent=(d.entregas||[]).find(e=>e.tarefaId===t.id&&e.usuarioId===currentUser.id);
+    let bloco='';
+    if(ent && (ent.feedback||ent.nota)){
+      bloco=`<div style="border:1px solid rgba(15,110,86,.25);background:var(--teal-50);border-radius:12px;padding:14px;margin-top:12px">
+        <strong style="color:var(--teal-600)">✓ Entrega avaliada</strong>
+        <div class="small" style="margin:4px 0 8px">Você entregou em ${esc(ent.enviadaEm)}</div>
+        ${ent.texto?`<p style="white-space:pre-wrap;font-size:13px;color:var(--muted)"><strong>Sua resposta:</strong> ${esc(ent.texto)}</p>`:''}
+        ${ent.link?`<p class="small"><a class="linkish" href="${esc(ent.link)}" target="_blank" rel="noopener">🔗 Link que você entregou ↗</a></p>`:''}
+        ${ent.nota?`<p style="margin-top:8px"><strong>Nota/conceito:</strong> ${esc(ent.nota)}</p>`:''}
+        ${ent.feedback?`<p style="margin-top:6px;white-space:pre-wrap"><strong>Feedback:</strong> ${esc(ent.feedback)}</p>`:''}
+      </div>`;
+    }else{
+      bloco=`${ent?`<div class="notice" style="margin-top:12px"><strong>✓ Entrega enviada em ${esc(ent.enviadaEm)}.</strong> Você pode reenviar abaixo até que ela seja avaliada.</div>`:''}
+      <div style="margin-top:12px">
+        <div class="field"><label class="field-label">Sua resposta</label><textarea id="ent-txt-${t.id}" placeholder="Escreva sua resposta aqui...">${esc(ent?ent.texto||'':'')}</textarea></div>
+        <div class="field"><label class="field-label">Ou cole um link (documento, imagem, vídeo...)</label><input type="text" id="ent-link-${t.id}" value="${esc(ent?ent.link||'':'')}" placeholder="https://..."></div>
+        <button class="btn btn-primary" onclick="enviarEntrega(${t.id})">${ent?'Reenviar entrega':'Enviar entrega'}</button>
+      </div>`;
+    }
+    return `<div class="material-card">
+      <h3>${esc(t.titulo)}</h3>
+      <div class="material-meta">${prazoBadge(t)}</div>
+      ${t.descricao?`<p style="white-space:pre-wrap">${esc(t.descricao)}</p>`:''}
+      ${bloco}
+    </div>`;
+  }).join('');
+}
+async function enviarEntrega(tarefaId){
+  if(!currentUser){toast('Faça login novamente.','warn');return}
+  const texto=document.getElementById('ent-txt-'+tarefaId).value.trim();
+  const link=document.getElementById('ent-link-'+tarefaId).value.trim();
+  if(!texto&&!link){toast('Escreva uma resposta ou cole um link antes de enviar.','warn');return}
+  const d=await getData();
+  let e=(d.entregas||[]).find(x=>x.tarefaId===tarefaId&&x.usuarioId===currentUser.id);
+  if(e && (e.feedback||e.nota)){toast('Esta entrega já foi avaliada e não pode ser alterada.','warn');return}
+  if(e){ e.texto=texto; e.link=link; e.enviadaEm=new Date().toLocaleString('pt-BR'); }
+  else d.entregas.push({id:Date.now(), tarefaId, usuarioId:currentUser.id, nome:currentUser.nome, texto, link, enviadaEm:new Date().toLocaleString('pt-BR'), feedback:'', nota:''});
+  await saveData(d); cachedUserData=d; renderTarefasUsuario(d);
+  toast('Entrega enviada! O administrador poderá avaliar e deixar um feedback.','ok',4500);
+}
+
+// ============================================================
+// DASHBOARD DO PARTICIPANTE (avisos + próximos encontros)
+// ============================================================
+function renderDashboardWidgets(d){
+  const el=document.getElementById('user-dashboard'); if(!el)return;
+  if(!usuarioPodeVerMateriais(currentUser)){el.innerHTML='';return}
+  const avisos=(d.avisos||[]).slice().sort((a,b)=>((b.fixado?1:0)-(a.fixado?1:0))||(b.id-a.id)).slice(0,3);
+  const prox=(d.agenda||[]).filter(e=>!eventoPassado(e)).sort((a,b)=>String(a.dataISO).localeCompare(String(b.dataISO))).slice(0,3);
+  if(!avisos.length&&!prox.length){el.innerHTML='';return}
+  const avisosHtml=avisos.length?avisos.map(a=>`<div style="padding:10px 0;border-bottom:1px solid var(--border)">
+      <strong>${a.fixado?'📌 ':''}${esc(a.titulo)}</strong> ${avisoNovo(a)?'<span class="badge badge-info">novo</span>':''}
+      <div class="small">${esc(a.data)}</div>
+      <p style="font-size:13px;white-space:pre-wrap;margin-top:4px">${esc(a.texto)}</p>
+    </div>`).join(''):'<div class="small">Nenhum aviso no momento.</div>';
+  const agendaHtml=prox.length?prox.map(e=>`<div style="padding:10px 0;border-bottom:1px solid var(--border)">
+      <strong>${esc(e.titulo)}</strong>
+      <div class="small">📅 ${eventoDataTexto(e)}</div>
+      ${e.local?`<div class="small">📍 ${e.local.startsWith('http')?`<a class="linkish" href="${esc(e.local)}" target="_blank" rel="noopener">Acessar link do encontro ↗</a>`:esc(e.local)}</div>`:''}
+      ${e.descricao?`<p style="font-size:13px;white-space:pre-wrap;margin-top:4px">${esc(e.descricao)}</p>`:''}
+    </div>`).join(''):'<div class="small">Nenhum encontro agendado por enquanto.</div>';
+  el.innerHTML=`<div class="grid grid-2" style="margin-bottom:20px">
+    <div class="card" style="margin-bottom:0"><h3 style="font-family:'Fraunces',serif;font-weight:600;color:var(--purple-900);margin-bottom:8px">📢 Mural de avisos</h3>${avisosHtml}</div>
+    <div class="card" style="margin-bottom:0"><h3 style="font-family:'Fraunces',serif;font-weight:600;color:var(--purple-900);margin-bottom:8px">🗓️ Próximos encontros</h3>${agendaHtml}</div>
+  </div>`;
+}
+
+// ============================================================
+// CERTIFICADO DE CONCLUSÃO
+// ============================================================
+async function toggleCertificado(id){
+  const d=await getData(); const u=d.usuarios.find(x=>x.id===id); if(!u)return;
+  u.certificadoLiberado=!u.certificadoLiberado;
+  if(u.certificadoLiberado) u.certificadoEm=new Date().toLocaleDateString('pt-BR');
+  await saveData(d); await renderAdmin();
+  toast(u.certificadoLiberado?`Certificado de ${u.nome.split(' ')[0]} liberado! 🎓`:`Certificado de ${u.nome.split(' ')[0]} revogado.`, u.certificadoLiberado?'ok':'info');
+}
+async function salvarCertConfig(){
+  const d=await getData();
+  d.config=d.config||{};
+  d.config.cursoNome=val('cert-curso')||'Introdução à Inteligência Artificial';
+  d.config.cargaHoraria=val('cert-horas')||'20 horas';
+  d.config.assinatura=val('cert-assina')||'Coordenação do curso';
+  await saveData(d); toast('Configuração do certificado salva.','ok');
+}
+function certConfigCardHtml(d){
+  const c=d.config||{};
+  return `<div class="card"><h3 style="margin-bottom:6px;color:var(--purple-900);font-family:'Fraunces',serif;font-weight:600">🎓 Configuração do certificado</h3>
+    <p class="small" style="margin-bottom:14px">Esses dados aparecem no certificado que os participantes liberados podem gerar. Libere o certificado de cada participante pelo botão na tabela abaixo.</p>
+    <div class="grid grid-3">
+      <div class="field"><label class="field-label">Nome do curso</label><input type="text" id="cert-curso" value="${esc(c.cursoNome||'Introdução à Inteligência Artificial')}"></div>
+      <div class="field"><label class="field-label">Carga horária</label><input type="text" id="cert-horas" value="${esc(c.cargaHoraria||'20 horas')}"></div>
+      <div class="field"><label class="field-label">Assinatura / responsável</label><input type="text" id="cert-assina" value="${esc(c.assinatura||'Coordenação do curso')}"></div>
+    </div>
+    <button class="btn btn-sm btn-primary" onclick="salvarCertConfig()">Salvar configuração</button></div>`;
+}
+function gerarCertificado(){
+  if(!currentUser||!currentUser.certificadoLiberado){toast('Seu certificado ainda não foi liberado pelo administrador.','warn');return}
+  const c=(cachedUserData&&cachedUserData.config)||{};
+  const nomeCurso=c.cursoNome||'Introdução à Inteligência Artificial';
+  const horas=c.cargaHoraria||'20 horas';
+  const assina=c.assinatura||'Coordenação do curso';
+  const dataTxt=new Date().toLocaleDateString('pt-BR',{day:'numeric',month:'long',year:'numeric'});
+  const w=window.open('','_blank');
+  if(!w){toast('O navegador bloqueou a janela do certificado. Libere pop-ups para este site.','warn',6000);return}
+  w.document.write(`<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>Certificado — ${esc(currentUser.nome)}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=DM+Sans:opsz,wght@9..40,400;9..40,600&display=swap" rel="stylesheet">
+  <style>
+    @page{size:A4 landscape;margin:0}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'DM Sans',sans-serif;background:#ECEAF6;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px}
+    .cert{background:#fff;width:1050px;max-width:100%;aspect-ratio:1.414;padding:14px;border-radius:6px;box-shadow:0 20px 60px rgba(36,31,85,.25);position:relative}
+    .frame{border:3px solid transparent;border-radius:4px;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:48px 70px;background:linear-gradient(#fff,#fff) padding-box,linear-gradient(120deg,#7C5CFF,#C94FD6 55%,#4FB8D6) border-box;position:relative}
+    .star{font-size:34px;background:linear-gradient(120deg,#7C5CFF,#C94FD6);-webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:14px}
+    .eyebrow{font-size:13px;letter-spacing:.35em;text-transform:uppercase;color:#948FA8;font-weight:600;margin-bottom:18px}
+    h1{font-family:'Fraunces',serif;font-weight:600;font-size:46px;color:#241F55;letter-spacing:-1px;margin-bottom:26px}
+    .conferimos{font-size:15px;color:#5A5670;margin-bottom:10px}
+    .nome{font-family:'Fraunces',serif;font-style:italic;font-weight:500;font-size:40px;color:#3C3489;border-bottom:2px solid #DCD9FB;padding:0 36px 10px;margin-bottom:24px}
+    .texto{font-size:15px;color:#5A5670;max-width:640px;line-height:1.7}
+    .texto strong{color:#241F55}
+    .rodape{display:flex;gap:80px;margin-top:44px;align-items:flex-end}
+    .assin{border-top:1.5px solid #241F55;padding-top:8px;min-width:230px;font-size:13px;color:#241F55;font-weight:600}
+    .assin .small{font-weight:400;color:#948FA8;font-size:11px}
+    .data{font-size:13px;color:#5A5670}
+    .no-print{position:fixed;top:18px;right:18px;display:flex;gap:8px}
+    .no-print button{padding:11px 18px;border-radius:10px;border:none;background:#3C3489;color:#fff;font-family:'DM Sans',sans-serif;font-weight:600;font-size:14px;cursor:pointer}
+    @media print{body{background:#fff;padding:0}.cert{box-shadow:none;width:100%;border-radius:0}.no-print{display:none}}
+  </style></head><body>
+  <div class="no-print"><button onclick="window.print()">🖨️ Imprimir ou salvar PDF</button></div>
+  <div class="cert"><div class="frame">
+    <div class="star">✦</div>
+    <div class="eyebrow">Certificado de conclusão</div>
+    <h1>${esc(nomeCurso)}</h1>
+    <div class="conferimos">Conferimos o presente certificado a</div>
+    <div class="nome">${esc(currentUser.nome)}</div>
+    <div class="texto">pela participação e conclusão do curso <strong>${esc(nomeCurso)}</strong>, com carga horária total de <strong>${esc(horas)}</strong>, dedicado ao uso prático e consciente da Inteligência Artificial no cotidiano e no mundo do trabalho.</div>
+    <div class="rodape">
+      <div class="assin">${esc(assina)}<div class="small">Assinatura</div></div>
+      <div class="data">Emitido em ${esc(dataTxt)}</div>
+    </div>
+  </div></div>
+  </body></html>`);
+  w.document.close();
+}
+
 function userCanAccessMaterials(u){
   if(!u || u.bloqueado) return false;
   if(u.pagamento && u.pagamento!=='em dia') return false;
@@ -1066,11 +1383,35 @@ function renderUserArea(d){
   document.getElementById('user-pay-badge').innerHTML = badgePay(currentUser) + (currentUser.bloqueado ? ' <span class="badge badge-block">materiais bloqueados</span>' : '') + (vigencia ? `<div class="small" style="margin-top:8px">${vigencia}</div>` : '');
   document.getElementById('user-status-banner').innerHTML = statusBannerHtml(currentUser);
   document.getElementById('user-access-warning').innerHTML = '';
+  renderDashboardWidgets(d);
 
+  const certTab = currentUser.certificadoLiberado ? `<button class="tab" onclick="showTab('user-certificado',this)">🎓 Certificado</button>` : '';
   const tabs = document.querySelector('#screen-user .tabs');
   tabs.innerHTML = usuarioPodeVerMateriais(currentUser)
-    ? `<button class="tab active" onclick="showTab('user-materiais',this)">📚 Materiais</button><button class="tab" onclick="showTab('user-perfil',this)">Minha anamnese</button><button class="tab" onclick="showTab('user-regularizacao',this)">Pagamento</button><button class="tab" onclick="showTab('user-senha',this)">Alterar senha</button>`
-    : `<button class="tab active" onclick="showTab('user-regularizacao',this)">⚠️ Regularizar pagamento</button><button class="tab" onclick="showTab('user-perfil',this)">Minha anamnese</button><button class="tab" onclick="showTab('user-senha',this)">Alterar senha</button>`;
+    ? `<button class="tab active" onclick="showTab('user-materiais',this)">📚 Materiais</button><button class="tab" onclick="showTab('user-tarefas',this)">📝 Tarefas</button>${certTab}<button class="tab" onclick="showTab('user-perfil',this)">Minha anamnese</button><button class="tab" onclick="showTab('user-regularizacao',this)">Pagamento</button><button class="tab" onclick="showTab('user-senha',this)">Alterar senha</button>`
+    : `<button class="tab active" onclick="showTab('user-regularizacao',this)">⚠️ Regularizar pagamento</button>${certTab}<button class="tab" onclick="showTab('user-perfil',this)">Minha anamnese</button><button class="tab" onclick="showTab('user-senha',this)">Alterar senha</button>`;
+
+  let tarefasPanel=document.getElementById('user-tarefas');
+  if(!tarefasPanel){
+    tarefasPanel=document.createElement('div');
+    tarefasPanel.id='user-tarefas';
+    tarefasPanel.className='tab-panel';
+    document.getElementById('user-perfil').before(tarefasPanel);
+  }
+  let certPanel=document.getElementById('user-certificado');
+  if(!certPanel){
+    certPanel=document.createElement('div');
+    certPanel.id='user-certificado';
+    certPanel.className='tab-panel';
+    document.getElementById('user-perfil').before(certPanel);
+  }
+  certPanel.innerHTML = currentUser.certificadoLiberado ? `
+    <div class="card" style="text-align:center;padding:44px 24px">
+      <div class="success-icon" style="background:var(--purple-50);color:var(--purple-800)">🎓</div>
+      <h3 style="font-family:'Fraunces',serif;font-weight:600;font-size:26px;color:var(--purple-900);margin-bottom:8px">Parabéns, ${esc(currentUser.nome.split(' ')[0])}!</h3>
+      <p style="color:var(--muted);max-width:480px;margin:0 auto 20px">Seu certificado de conclusão foi liberado${currentUser.certificadoEm?` em ${esc(currentUser.certificadoEm)}`:''}. Gere abaixo e use o botão de imprimir para salvar em PDF.</p>
+      <button class="btn btn-grad" onclick="gerarCertificado()">🎓 Gerar meu certificado</button>
+    </div>` : '';
 
   let regularizacao = `
     <div class="card">
@@ -1124,7 +1465,9 @@ function renderUserArea(d){
     document.getElementById('user-materiais').classList.add('active');
     regPanel.innerHTML=regularizacao;
     renderMateriaisUsuario(d);
+    renderTarefasUsuario(d);
   } else {
+    tarefasPanel.innerHTML=empty('Tarefas disponíveis após a regularização do pagamento.','🔒');
     regPanel.classList.add('active');
     regPanel.innerHTML=regularizacao;
     document.getElementById('user-materiais').innerHTML=empty('Materiais bloqueados até a regularização do pagamento.','🔒');
@@ -1243,7 +1586,7 @@ async function alterarSenhaUsuario(){
 }
 
 function logoutAll(){currentUser=null;document.getElementById('btn-logout').classList.add('hidden');showScreen('screen-home');toast('Você saiu da plataforma. Até logo!','info')}
-async function resetPlatform(){if(!confirm('Apagar cadastros, usuários e materiais da plataforma? O legado antigo em respostas.legado será preservado.'))return;const d=await getData();d.cadastros=[];d.usuarios=[];d.materiais=[];await saveData(d);await renderAdmin();toast('Dados da plataforma limpos.','info')}
+async function resetPlatform(){if(!confirm('Apagar cadastros, usuários e materiais da plataforma? O legado antigo em respostas.legado será preservado.'))return;const d=await getData();d.cadastros=[];d.usuarios=[];d.materiais=[];d.avisos=[];d.agenda=[];d.tarefas=[];d.entregas=[];await saveData(d);await renderAdmin();toast('Dados da plataforma limpos.','info')}
 
 // Carrega o banco uma vez ao abrir, sem alterar os dados antigos.
 getData();
