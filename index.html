@@ -50,7 +50,7 @@ nav{background:rgba(251,250,248,.85);backdrop-filter:blur(14px);border-bottom:1p
 .btn-primary{background:var(--purple-800);border-color:var(--purple-800);color:#fff;box-shadow:0 4px 14px rgba(60,52,137,.28)}
 .btn-primary:hover{background:var(--purple-600);border-color:var(--purple-600);color:#fff;box-shadow:0 6px 18px rgba(91,79,214,.38)}
 .btn-grad{background:var(--grad);border:none;color:#fff;box-shadow:0 6px 20px rgba(124,92,255,.35)}
-.btn-grad:hover{filter:brightness(1.07);color:#fff;box-shadow:0 8px 26px rgba(124,92,255,.45)}
+.btn-grad:hover{background:var(--grad);filter:brightness(1.07);color:#fff;box-shadow:0 8px 26px rgba(124,92,255,.45)}
 .btn-danger{color:#B03A2E;border-color:#F3C7C2;background:#fff}
 .btn-danger:hover{background:#FBEAE8;border-color:#B03A2E}
 .btn-ghost{border-color:transparent;background:transparent}
@@ -357,26 +357,10 @@ tr:last-child td{border-bottom:none}
     </div>
   </div>
 
-  <div class="form-section">
-    <div class="form-section-title"><span class="num">2</span><h3>Pagamento via Pix</h3></div>
-    <div style="background:var(--gray-50);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:16px;">
-      <div style="font-size:13px;color:var(--muted);margin-bottom:10px;">
-        Realize o pagamento usando a chave Pix abaixo. Depois, anexe o comprovante no campo seguinte.
-      </div>
-      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-        <input type="text" id="pix-chave" value="38756702809" readonly style="flex:1;min-width:220px;font-size:16px;font-weight:700;letter-spacing:1px;background:white;">
-        <button type="button" class="btn btn-primary" onclick="copiarPix()">📋 Copiar chave Pix</button>
-      </div>
-      <div id="pix-copy-msg" style="display:none;margin-top:10px;color:var(--teal-600);font-size:13px;font-weight:700;">✓ Chave Pix copiada!</div>
-    </div>
-    <div class="grid grid-2">
-      <div class="field"><label class="field-label">Comprovante Pix</label><input type="file" id="cad-pix-file" accept="image/*,.pdf"></div>
-      <div class="field"><label class="field-label">Observações sobre o pagamento</label><input type="text" id="cad-observacoes" placeholder="Ex.: pago em nome de outra pessoa, data do Pix..."></div>
-    </div>
-  </div>
+  <div class="notice">💳 O pagamento é feito na próxima tela: depois de enviar seus dados, você gera uma cobrança Pix e o acesso é confirmado automaticamente assim que o pagamento cair.</div>
 
   <div class="form-section">
-    <div class="form-section-title"><span class="num">3</span><h3>Sua relação com a IA</h3></div>
+    <div class="form-section-title"><span class="num">2</span><h3>Sua relação com a IA</h3></div>
     <div class="field"><label class="field-label">O que você já conhece de Inteligência Artificial?</label><textarea id="cad-conhece" placeholder="Conte experiências, ferramentas que já usou, dúvidas ou receios."></textarea></div>
     <div class="field"><label class="field-label">O que gostaria de aprender?</label><textarea id="cad-aprender" placeholder="Ex.: ChatGPT, imagens, produtividade, automação, pesquisa, trabalho..."></textarea></div>
     <div class="field"><label class="field-label">O que você espera acelerar ou melhorar com o uso de IA?</label><textarea id="cad-acelerar" placeholder="Ex.: relatórios, planejamento, estudos, organização, criação de conteúdo..."></textarea></div>
@@ -397,7 +381,9 @@ tr:last-child td{border-bottom:none}
 </section>
 
 <section class="screen narrow" id="screen-success">
-  <div class="success-wrap"><div class="success-icon">✓</div><h2>Anamnese enviada!</h2><p>Seu cadastro foi registrado. O administrador poderá criar seu usuário e senha para acesso aos materiais do curso.</p><div class="btn-row" style="justify-content:center"><button class="btn btn-primary" onclick="showScreen('screen-home')">Voltar ao início</button></div></div>
+  <div class="success-wrap"><div class="success-icon">✓</div><h2>Anamnese enviada!</h2><p>Seu cadastro foi registrado. O administrador poderá criar seu usuário e senha para acesso aos materiais do curso.</p></div>
+  <div id="success-pix-block"></div>
+  <div class="btn-row" style="justify-content:center"><button class="btn" onclick="showScreen('screen-home')">Voltar ao início</button></div>
 </section>
 
 <section class="screen narrow" id="screen-login">
@@ -498,10 +484,6 @@ const JSONBIN_BIN_ID  = '69fbc777250b1311c313d5f9';
 const JSONBIN_API_KEY = '$2a$10$27rhUeaoctLDffTbCTjq7OjFhxqxihlBKPnf5UKFpy1FBs7BrHXW.';
 const API_BASE = 'https://api.jsonbin.io/v3/b/' + JSONBIN_BIN_ID;
 const HEADERS  = { 'Content-Type': 'application/json', 'X-Master-Key': JSONBIN_API_KEY };
-
-// URL do Google Apps Script publicado como Web App para enviar o comprovante por e-mail.
-// Troque pelo link /exec gerado no Apps Script.
-const PIX_EMAIL_WEBAPP_URL = 'https://script.google.com/macros/library/d/1hW-ZBBHAFChy23B-Zs83QWlpr3HjYbDQBd1VJB2dAhbq1G1NT7S5zFK0/1';
 
 let currentUser = null;
 let latestRecord = { respostas: initialData() };
@@ -626,84 +608,131 @@ function empty(msg,icon='📭'){return `<div class="empty-state"><span class="em
 function esc(s){return String(s||'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
 
 function startAnamnese(){
-  ['cad-nome','cad-cpf','cad-email','cad-whatsapp','cad-profissao','cad-conhece','cad-aprender','cad-acelerar','cad-observacoes'].forEach(id=>document.getElementById(id).value=''); document.getElementById('cad-pix-file').value='';
+  ['cad-nome','cad-cpf','cad-email','cad-whatsapp','cad-profissao','cad-conhece','cad-aprender','cad-acelerar'].forEach(id=>document.getElementById(id).value='');
   document.querySelectorAll('.cad-area').forEach(c=>c.checked=false);
   document.getElementById('cad-error').style.display='none';
   showScreen('screen-anamnese');
-}
-
-function copiarPix(){
-  const input = document.getElementById('pix-chave');
-  if(!input) return;
-  const chave = input.value;
-  if(navigator.clipboard && navigator.clipboard.writeText){
-    navigator.clipboard.writeText(chave);
-  }else{
-    input.select();
-    document.execCommand('copy');
-  }
-  const msg = document.getElementById('pix-copy-msg');
-  if(msg){
-    msg.style.display = 'block';
-    setTimeout(()=>{ msg.style.display = 'none'; }, 2500);
-  }
-  toast('Chave Pix copiada!','ok',2200);
-}
-
-function fileToBase64(file){
-  return new Promise((resolve,reject)=>{
-    const reader=new FileReader();
-    reader.onload=()=>resolve(String(reader.result).split(',')[1]);
-    reader.onerror=reject;
-    reader.readAsDataURL(file);
-  });
-}
-
-async function sendPixEmail(cadastro, file){
-  if(!file) return {enviado:false, motivo:'sem arquivo'};
-  if(!PIX_EMAIL_WEBAPP_URL || PIX_EMAIL_WEBAPP_URL.includes('COLE_AQUI')) return {enviado:false, motivo:'apps script não configurado'};
-  const base64=await fileToBase64(file);
-  const payload={
-    nome:cadastro.nome,
-    cpf:cadastro.cpf,
-    email:cadastro.email,
-    whatsapp:cadastro.whatsapp,
-    profissao:cadastro.profissao,
-    fileName:file.name,
-    mimeType:file.type || 'application/octet-stream',
-    base64
-  };
-  await fetch(PIX_EMAIL_WEBAPP_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});
-  return {enviado:true, fileName:file.name};
 }
 
 async function submitAnamnese(){
   const nome=val('cad-nome'),cpf=val('cad-cpf'),email=val('cad-email'),whatsapp=val('cad-whatsapp');
   if(!nome||!cpf||!email||!whatsapp){document.getElementById('cad-error').style.display='block';toast('Preencha nome, CPF, e-mail e WhatsApp.','warn');return}
   setBusy('btn-enviar-anamnese',true);
-  const file=document.getElementById('cad-pix-file').files[0] || null;
   const cadastro={
     id:Date.now(), ts:new Date().toLocaleString('pt-BR'), nome, cpf, email, whatsapp,
     profissao:val('cad-profissao'), conhece:val('cad-conhece'), aprender:val('cad-aprender'), acelerar:val('cad-acelerar'),
     areas:Array.from(document.querySelectorAll('.cad-area:checked')).map(c=>c.value),
-    pix:file ? file.name : 'Não enviado', observacoes:val('cad-observacoes'), usuarioCriado:false,
-    comprovanteEmail:{enviado:false, fileName:file ? file.name : '', atualizadoEm:new Date().toLocaleString('pt-BR')}
+    usuarioCriado:false
   };
-  try{
-    cadastro.comprovanteEmail = await sendPixEmail(cadastro,file);
-  }catch(e){
-    cadastro.comprovanteEmail = {enviado:false, fileName:file ? file.name : '', motivo:'erro no envio por e-mail'};
-  }
   try{
     const d=await getData();
     d.cadastros.push(cadastro);
     await saveData(d);
     showScreen('screen-success');
+    renderSuccessPixBlock(cadastro, d.config);
   }catch(e){
     toast('Não foi possível salvar a anamnese. Verifique a internet e tente novamente.','err',6000);
   }finally{
     setBusy('btn-enviar-anamnese',false);
   }
+}
+
+// ============================================================
+// PAGAMENTO AUTOMÁTICO VIA PIX (Mercado Pago)
+// Veja apps-script/mercado-pago-webapp.gs.js para o backend que
+// cria as cobranças e confirma os pagamentos automaticamente.
+// ============================================================
+async function criarCobrancaMP({valor, referencia, nome, email, webAppUrl}){
+  const url=`${webAppUrl}?action=criarPix&valor=${encodeURIComponent(valor)}&referencia=${encodeURIComponent(referencia)}&nome=${encodeURIComponent(nome||'')}&email=${encodeURIComponent(email||'')}`;
+  const res=await fetch(url);
+  if(!res.ok) throw new Error('Falha ao chamar o Apps Script');
+  return res.json();
+}
+async function consultarStatusMP(paymentId, webAppUrl){
+  const url=`${webAppUrl}?action=statusPix&paymentId=${encodeURIComponent(paymentId)}`;
+  const res=await fetch(url);
+  if(!res.ok) throw new Error('Falha ao consultar status');
+  return res.json();
+}
+function renderPixCobrancaResultado(elId, resp){
+  const el=document.getElementById(elId); if(!el)return;
+  el.innerHTML=`<div style="text-align:center">
+    ${resp.qrCodeBase64?`<img src="data:image/png;base64,${resp.qrCodeBase64}" alt="QR Code Pix" style="width:220px;height:220px;margin:0 auto 14px;display:block;border:1px solid var(--border);border-radius:12px;padding:8px;background:#fff">`:''}
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+      <input type="text" readonly value="${esc(resp.qrCode||'')}" id="pix-copia-cola-${resp.paymentId}" style="flex:1;font-size:12px">
+      <button type="button" class="btn btn-sm" onclick="copiarTextoInput('pix-copia-cola-${resp.paymentId}')">📋 Copiar</button>
+    </div>
+    <div class="small" id="pix-status-${resp.paymentId}">⏳ Aguardando pagamento... (atualiza sozinho)</div>
+  </div>`;
+}
+function copiarTextoInput(id){
+  const input=document.getElementById(id); if(!input)return;
+  input.select();
+  if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(input.value);
+  else document.execCommand('copy');
+  toast('Código Pix copiado!','ok',2200);
+}
+const pollingPixAtivo={};
+function iniciarPollingPix(paymentId, webAppUrl, onConfirmado){
+  if(pollingPixAtivo[paymentId]) return;
+  pollingPixAtivo[paymentId]=setInterval(async ()=>{
+    try{
+      const status=await consultarStatusMP(paymentId, webAppUrl);
+      const statusEl=document.getElementById('pix-status-'+paymentId);
+      if(status.status==='approved'){
+        clearInterval(pollingPixAtivo[paymentId]); delete pollingPixAtivo[paymentId];
+        if(statusEl) statusEl.textContent='✓ Pagamento aprovado!';
+        onConfirmado && await onConfirmado();
+      } else if(status.status==='rejected' || status.status==='cancelled'){
+        clearInterval(pollingPixAtivo[paymentId]); delete pollingPixAtivo[paymentId];
+        if(statusEl) statusEl.textContent='✕ Pagamento não aprovado. Gere uma nova cobrança.';
+      }
+    }catch(e){ /* falha temporária de rede: tenta de novo no próximo ciclo */ }
+  }, 4000);
+}
+
+function renderSuccessPixBlock(cadastro, config){
+  const el=document.getElementById('success-pix-block'); if(!el)return;
+  const valor=Number(config && config.mpValorMensalidade)||0;
+  const webAppUrl=(config && config.mpWebAppUrl)||'';
+  if(!webAppUrl || !valor){
+    el.innerHTML=`<div class="warning">Pagamento automático ainda não configurado pelo administrador. Aguarde as instruções de pagamento por outro canal.</div>`;
+    return;
+  }
+  el.innerHTML=`<div class="card" style="text-align:left">
+    <h3 style="color:var(--purple-900);font-family:'Fraunces',serif;font-weight:600;margin-bottom:8px">💳 Falta só o pagamento</h3>
+    <p style="color:var(--muted);margin-bottom:14px">Gere sua cobrança Pix de <strong>R$ ${valor.toFixed(2).replace('.',',')}</strong>. Assim que o pagamento for confirmado, esta tela atualiza sozinha.</p>
+    <button class="btn btn-grad" id="btn-gerar-pix-cadastro" onclick="gerarPixCadastro(${cadastro.id})">Gerar cobrança Pix</button>
+    <div id="pix-cadastro-resultado" style="margin-top:16px"></div>
+  </div>`;
+}
+async function gerarPixCadastro(cadastroId){
+  const d=await getData();
+  const config=d.config||{};
+  const cadastro=d.cadastros.find(c=>c.id===cadastroId);
+  if(!cadastro){toast('Cadastro não encontrado.','err');return}
+  setBusy('btn-gerar-pix-cadastro',true);
+  try{
+    const resp=await criarCobrancaMP({valor:config.mpValorMensalidade, referencia:`cadastro-${cadastroId}`, nome:cadastro.nome, email:cadastro.email, webAppUrl:config.mpWebAppUrl});
+    if(!resp || !resp.ok){toast('Não foi possível gerar a cobrança Pix. Tente novamente em instantes.','err',5500);return}
+    renderPixCobrancaResultado('pix-cadastro-resultado', resp);
+    iniciarPollingPix(resp.paymentId, config.mpWebAppUrl, ()=>confirmarPagamentoCadastro(cadastroId));
+  }catch(e){
+    toast('Erro ao gerar a cobrança Pix. Confira a URL do Apps Script configurada pelo administrador.','err',5500);
+  }finally{
+    setBusy('btn-gerar-pix-cadastro',false);
+  }
+}
+async function confirmarPagamentoCadastro(cadastroId){
+  const d=await getData();
+  const cadastro=d.cadastros.find(c=>c.id===cadastroId); if(!cadastro)return;
+  if(!cadastro.pagamentoConfirmadoMP){
+    cadastro.pagamentoConfirmadoMP={confirmadoEm:new Date().toLocaleString('pt-BR')};
+    await saveData(d);
+  }
+  const el=document.getElementById('pix-cadastro-resultado');
+  if(el) el.innerHTML=`<div class="notice" style="margin-top:0"><strong>✓ Pagamento confirmado!</strong> Agora é só aguardar o administrador liberar seu usuário e senha.</div>`;
+  toast('Pagamento confirmado! 🎉','ok',5000);
 }
 
 function showAdminLogin(){document.getElementById('admin-pwd').value='';document.getElementById('admin-error').style.display='none';showScreen('screen-admin-login')}
@@ -792,8 +821,8 @@ async function renderAdmin(){
 function renderCadastros(d){
   const el=document.getElementById('admin-cadastros');
   if(!d.cadastros.length){el.innerHTML=empty('Nenhuma anamnese recebida ainda. Quando alguém preencher o formulário de inscrição, ela aparecerá aqui.','📝');return}
-  let html='<div class="table-wrap"><table><thead><tr><th>Participante</th><th>Contato</th><th>Conhece / quer aprender</th><th>Pix</th><th>Ações</th></tr></thead><tbody>';
-  d.cadastros.slice().reverse().forEach(c=>{html+=`<tr><td><strong>${esc(c.nome)}</strong>${c.usuarioCriado?' <span class="badge badge-ok">usuário criado</span>':' <span class="badge badge-info">aguardando usuário</span>'}<br><span class="small">CPF: ${esc(c.cpf)}<br>${esc(c.profissao||'Profissão não informada')}</span></td><td>${esc(c.email)}<br>${esc(c.whatsapp)}<br><span class="small">${esc(c.ts)}</span></td><td><strong>Conhece:</strong> ${esc(c.conhece||'—')}<br><strong>Quer aprender:</strong> ${esc(c.aprender||'—')}<br><strong>Acelerar:</strong> ${esc(c.acelerar||'—')}</td><td>${esc(c.pix||'—')}${c.comprovanteEmail&&c.comprovanteEmail.enviado?'<br><span class="badge badge-ok">e-mail enviado</span>':(c.pix&&c.pix!=='Não enviado'?'<br><span class="badge badge-late">e-mail não confirmado</span>':'')}${c.observacoes?`<br><span class="small">${esc(c.observacoes)}</span>`:''}</td><td><button class="btn btn-sm btn-primary" onclick="prefillUser(${c.id})">Criar usuário</button><br><button class="btn btn-sm btn-danger" style="margin-top:6px" onclick="deleteCadastro(${c.id})">Apagar</button></td></tr>`});
+  let html='<div class="table-wrap"><table><thead><tr><th>Participante</th><th>Contato</th><th>Conhece / quer aprender</th><th>Pagamento</th><th>Ações</th></tr></thead><tbody>';
+  d.cadastros.slice().reverse().forEach(c=>{html+=`<tr><td><strong>${esc(c.nome)}</strong>${c.usuarioCriado?' <span class="badge badge-ok">usuário criado</span>':' <span class="badge badge-info">aguardando usuário</span>'}<br><span class="small">CPF: ${esc(c.cpf)}<br>${esc(c.profissao||'Profissão não informada')}</span></td><td>${esc(c.email)}<br>${esc(c.whatsapp)}<br><span class="small">${esc(c.ts)}</span></td><td><strong>Conhece:</strong> ${esc(c.conhece||'—')}<br><strong>Quer aprender:</strong> ${esc(c.aprender||'—')}<br><strong>Acelerar:</strong> ${esc(c.acelerar||'—')}</td><td>${c.pagamentoConfirmadoMP?`<span class="badge badge-ok">✓ pago via Pix</span><br><span class="small">${esc(c.pagamentoConfirmadoMP.confirmadoEm||'')}</span>`:'<span class="badge badge-late">pagamento pendente</span>'}</td><td><button class="btn btn-sm btn-primary" onclick="prefillUser(${c.id})">Criar usuário</button><br><button class="btn btn-sm btn-danger" style="margin-top:6px" onclick="deleteCadastro(${c.id})">Apagar</button></td></tr>`});
   html+='</tbody></table></div>'; el.innerHTML=html;
 }
 
@@ -825,8 +854,8 @@ function renderUsuarios(d){
   const el=document.getElementById('admin-usuarios');
   if(!d.usuarios.length){el.innerHTML=certConfigCardHtml(d)+empty('Nenhum usuário criado ainda. Crie usuários a partir das anamneses recebidas ou na aba "Criar usuário".','👤');return}
   let html=certConfigCardHtml(d);
-  html+='<div class="table-wrap"><table><thead><tr><th>Nome</th><th>Acesso</th><th>Status</th><th>Contato</th><th>Comprovante</th><th>Ações</th></tr></thead><tbody>';
-  d.usuarios.forEach(u=>{html+=`<tr><td><strong>${esc(u.nome)}</strong><br><span class="small">CPF: ${esc(u.cpf||'—')}</span>${u.certificadoLiberado?'<br><span class="badge badge-info">🎓 certificado liberado</span>':''}</td><td><strong>${esc(u.usuario)}</strong><br><span class="small">Senha: ${esc(u.senha)}</span></td><td>${badgePay(u)} ${u.bloqueado?'<span class="badge badge-block">bloqueado</span>':''}<br><span class="small">Pago: ${formatDateBR(u.mensalidadeInicio)||'—'} até ${formatDateBR(u.mensalidadeFim)||'—'}</span></td><td>${esc(u.email||'—')}<br>${esc(u.whatsapp||'—')}</td><td>${u.ultimoComprovantePix?`<strong>${esc(u.ultimoComprovantePix)}</strong><br><span class="small">${esc(u.ultimoComprovanteEm||'')}</span><br><span class="small">${esc(u.ultimoComprovanteObs||'')}</span>`:'—'}</td><td><button class="btn btn-sm" onclick="togglePay(${u.id})">Alternar pagamento</button><br><button class="btn btn-sm" style="margin-top:6px" onclick="toggleBlock(${u.id})">Bloquear/liberar</button><br><button class="btn btn-sm" style="margin-top:6px" onclick="toggleCertificado(${u.id})">${u.certificadoLiberado?'Revogar certificado':'🎓 Liberar certificado'}</button><br><button class="btn btn-sm btn-danger" style="margin-top:6px" onclick="deleteUser(${u.id})">Apagar</button></td></tr>`});
+  html+='<div class="table-wrap"><table><thead><tr><th>Nome</th><th>Acesso</th><th>Status</th><th>Contato</th><th>Último pagamento</th><th>Ações</th></tr></thead><tbody>';
+  d.usuarios.forEach(u=>{html+=`<tr><td><strong>${esc(u.nome)}</strong><br><span class="small">CPF: ${esc(u.cpf||'—')}</span>${u.certificadoLiberado?'<br><span class="badge badge-info">🎓 certificado liberado</span>':''}</td><td><strong>${esc(u.usuario)}</strong><br><span class="small">Senha: ${esc(u.senha)}</span></td><td>${badgePay(u)} ${u.bloqueado?'<span class="badge badge-block">bloqueado</span>':''}<br><span class="small">Pago: ${formatDateBR(u.mensalidadeInicio)||'—'} até ${formatDateBR(u.mensalidadeFim)||'—'}</span></td><td>${esc(u.email||'—')}<br>${esc(u.whatsapp||'—')}</td><td>${u.ultimoPagamentoMP?`<span class="badge badge-ok">✓ via Pix (Mercado Pago)</span><br><span class="small">${esc(u.ultimoPagamentoMP.confirmadoEm||'')}</span>`:'—'}</td><td><button class="btn btn-sm" onclick="togglePay(${u.id})">Alternar pagamento</button><br><button class="btn btn-sm" style="margin-top:6px" onclick="toggleBlock(${u.id})">Bloquear/liberar</button><br><button class="btn btn-sm" style="margin-top:6px" onclick="toggleCertificado(${u.id})">${u.certificadoLiberado?'Revogar certificado':'🎓 Liberar certificado'}</button><br><button class="btn btn-sm btn-danger" style="margin-top:6px" onclick="deleteUser(${u.id})">Apagar</button></td></tr>`});
   html+='</tbody></table></div>'; el.innerHTML=html;
 }
 
@@ -849,16 +878,36 @@ async function deleteUser(id){if(!confirm('Apagar este usuário?'))return;const 
 async function deleteCadastro(id){if(!confirm('Apagar esta anamnese?'))return;const d=await getData();d.cadastros=d.cadastros.filter(c=>c.id!==id);await saveData(d);await renderAdmin();toast('Anamnese apagada.','info')}
 
 
+function mpConfigCardHtml(d){
+  const c=d.config||{};
+  const configurado=c.mpWebAppUrl && c.mpValorMensalidade;
+  return `<div class="card"><h3 style="margin-bottom:6px;color:var(--purple-900);font-family:'Fraunces',serif;font-weight:600">🔌 Integração Mercado Pago (Pix automático) ${configurado?'<span class="badge badge-ok">configurado</span>':'<span class="badge badge-block">pendente</span>'}</h3>
+    <p class="small" style="margin-bottom:14px">Quando configurado, participantes geram uma cobrança Pix dentro da plataforma e o acesso é liberado sozinho assim que o pagamento é confirmado. Veja o guia em <code>apps-script/mercado-pago-webapp.gs.js</code>.</p>
+    <div class="grid grid-2">
+      <div class="field"><label class="field-label">Valor da mensalidade (R$)</label><input type="text" id="mp-valor" value="${esc(c.mpValorMensalidade||'')}" placeholder="Ex.: 150.00"></div>
+      <div class="field"><label class="field-label">URL do Apps Script Web App</label><input type="text" id="mp-webapp-url" value="${esc(c.mpWebAppUrl||'')}" placeholder="https://script.google.com/macros/s/.../exec"></div>
+    </div>
+    <button class="btn btn-sm btn-primary" onclick="salvarConfigMP()">Salvar configuração</button></div>`;
+}
+async function salvarConfigMP(){
+  const d=await getData();
+  d.config=d.config||{};
+  const valor=parseFloat(val('mp-valor').replace(',','.'));
+  if(!valor || valor<=0){toast('Informe um valor de mensalidade válido.','warn');return}
+  d.config.mpValorMensalidade=valor;
+  d.config.mpWebAppUrl=val('mp-webapp-url');
+  await saveData(d); await renderAdmin(); toast('Configuração do Mercado Pago salva.','ok');
+}
 function renderMensalidades(d){
   const el=document.getElementById('admin-mensalidades');
-  if(!d.usuarios.length){el.innerHTML=empty('Nenhum usuário criado ainda.','💳');return}
-  let html='<div class="notice"><strong>Controle automático:</strong> quando a data “pago até” vence, o participante fica em atraso, o acesso é bloqueado e a aba de materiais deixa de aparecer para ele.</div>';
-  html+='<div class="table-wrap"><table><thead><tr><th>Participante</th><th>Vigência da mensalidade</th><th>Status</th><th>Comprovantes</th><th>Ações</th></tr></thead><tbody>';
+  const configCard=mpConfigCardHtml(d);
+  if(!d.usuarios.length){el.innerHTML=configCard+empty('Nenhum usuário criado ainda.','💳');return}
+  let html=configCard+'<div class="notice"><strong>Controle automático:</strong> quando a data “pago até” vence, o participante fica em atraso, o acesso é bloqueado e a aba de materiais deixa de aparecer para ele.</div>';
+  html+='<div class="table-wrap"><table><thead><tr><th>Participante</th><th>Vigência da mensalidade</th><th>Status</th><th>Último pagamento</th><th>Ações</th></tr></thead><tbody>';
   d.usuarios.forEach(u=>{
     const dias=diasRestantes(u.mensalidadeFim);
     const diasTxt=(dias===null)?'':(dias<0?`<span class="badge badge-late">vencida há ${Math.abs(dias)} dia(s)</span>`:(dias<=5?`<span class="badge badge-block">vence em ${dias} dia(s)</span>`:`<span class="small">${dias} dia(s) restantes</span>`));
-    const comps=(u.comprovantes||[]).slice().reverse().map(c=>`<div class="small">${esc(c.data||'')} · ${esc(c.fileName||'comprovante')} ${c.enviado?'<span class="badge badge-ok">e-mail enviado</span>':'<span class="badge badge-late">pendente</span>'}</div>`).join('') || '<span class="small">Nenhum comprovante complementar.</span>';
-    const ultimoComp=u.ultimoComprovantePix?`<div class="small" style="margin-top:4px"><strong>Último enviado:</strong> ${esc(u.ultimoComprovantePix)}<br>${esc(u.ultimoComprovanteEm||'')}</div>`:'';
+    const ultimoPag=u.ultimoPagamentoMP?`<span class="badge badge-ok">✓ via Pix</span><div class="small" style="margin-top:4px">${esc(u.ultimoPagamentoMP.confirmadoEm||'')}</div>`:'<span class="small">Nenhum pagamento automático ainda.</span>';
     html+=`<tr>
       <td><strong>${esc(u.nome)}</strong><br><span class="small">${esc(u.usuario)} · ${esc(u.email||'')}</span></td>
       <td>
@@ -869,7 +918,7 @@ function renderMensalidades(d){
         <div style="margin-top:6px">${diasTxt}</div>
       </td>
       <td>${badgePay(u)} ${u.bloqueado?'<span class="badge badge-block">bloqueado</span>':''}</td>
-      <td>${comps}${ultimoComp}</td>
+      <td>${ultimoPag}</td>
       <td>
         <button class="btn btn-sm btn-primary" onclick="savePaymentPeriod(${u.id})">Salvar vigência</button><br>
         <button class="btn btn-sm" style="margin-top:6px" onclick="renewOneMonth(${u.id})">Renovar +1 mês</button><br>
@@ -1667,9 +1716,9 @@ function statusBannerHtml(u){
       <div class="status-icon">⚠️</div>
       <div class="status-body">
         <h3>Você tem uma pendência de pagamento</h3>
-        <p>Seu acesso aos materiais está bloqueado. Para voltar a acessar, faça o Pix, envie o comprovante na aba abaixo e aguarde a liberação pelo administrador.</p>
+        <p>Seu acesso aos materiais está bloqueado. Gere uma cobrança Pix na aba abaixo — o acesso é liberado automaticamente assim que o pagamento é confirmado.</p>
         ${fimTxt?`<span class="status-chip">Vigência encerrada em ${fimTxt}</span>`:''}
-        ${u.ultimoComprovantePix?`<span class="status-chip">📎 Comprovante enviado em ${esc(u.ultimoComprovanteEm||'')} — em análise</span>`:''}
+        ${u.ultimoPagamentoMP?`<span class="status-chip">✓ Último pagamento em ${esc(u.ultimoPagamentoMP.confirmadoEm||'')}</span>`:''}
         <br><button class="btn btn-primary" onclick="irParaRegularizacao()">Regularizar pagamento agora</button>
       </div>
     </div>`;
@@ -1820,23 +1869,18 @@ function renderUserArea(d){
       <button class="btn btn-grad" onclick="gerarCertificado()">🎓 Gerar meu certificado</button>
     </div>` : '';
 
+  const mpConfig = d.config||{};
+  const mpValorTxt = mpConfig.mpValorMensalidade ? ` de R$ ${Number(mpConfig.mpValorMensalidade).toFixed(2).replace('.',',')}` : '';
+  const mpIndisponivel = !mpConfig.mpWebAppUrl || !mpConfig.mpValorMensalidade;
   let regularizacao = `
     <div class="card">
       <h3 style="color:var(--purple-900);margin-bottom:10px;font-family:'Fraunces',serif;font-weight:600">${usuarioPodeVerMateriais(currentUser)?'Pagamento e renovação':'Regularização de pagamento'}</h3>
-      <p style="color:var(--muted);margin-bottom:14px">${usuarioPodeVerMateriais(currentUser)?'Para renovar sua mensalidade, faça o Pix e anexe o comprovante abaixo. O administrador confirmará a renovação.':'Seu acesso aos materiais está bloqueado ou em atraso. Para regularizar, faça o Pix, anexe o comprovante abaixo e aguarde a liberação pelo administrador.'}</p>
-      <div style="background:var(--gray-50);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:16px;">
-        <div style="font-size:13px;color:var(--muted);margin-bottom:10px;">Chave Pix</div>
-        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-          <input type="text" id="pix-chave-user" value="38756702809" readonly style="flex:1;min-width:220px;font-size:16px;font-weight:700;letter-spacing:1px;background:white;">
-          <button type="button" class="btn btn-primary" onclick="copiarPixUsuario()">📋 Copiar chave Pix</button>
-        </div>
-        <div id="pix-copy-msg-user" style="display:none;margin-top:10px;color:var(--teal-600);font-size:13px;font-weight:700;">✓ Chave Pix copiada!</div>
-      </div>
-      <div class="field"><label class="field-label">Anexar novo comprovante Pix</label><input type="file" id="user-pix-file" accept="image/*,.pdf"></div>
-      <div class="field"><label class="field-label">Observações sobre o pagamento</label><input type="text" id="user-pix-obs" placeholder="Ex.: pago em nome de outra pessoa, data do Pix..."></div>
-      <button class="btn btn-primary" id="btn-enviar-comprovante" onclick="submitComprovanteUsuario()">Enviar comprovante para análise</button>
-      <div class="small" style="margin-top:10px">Depois do envio, o administrador precisará conferir e liberar seu acesso aos materiais.</div>
-      ${currentUser.ultimoComprovantePix?`<div class="notice" style="margin-top:14px;margin-bottom:0"><strong>Último comprovante enviado:</strong> ${esc(currentUser.ultimoComprovantePix)} em ${esc(currentUser.ultimoComprovanteEm||'')}. Aguardando conferência do administrador.</div>`:''}
+      <p style="color:var(--muted);margin-bottom:14px">Gere sua cobrança Pix${mpValorTxt} abaixo. O acesso é liberado automaticamente assim que o pagamento é confirmado, sem precisar de comprovante nem de aprovação manual.</p>
+      ${mpIndisponivel
+        ? `<div class="warning">Pagamento automático ainda não configurado pelo administrador.</div>`
+        : `<button class="btn btn-grad" id="btn-gerar-pix-usuario" onclick="gerarPixUsuario()">Gerar cobrança Pix${mpValorTxt}</button>
+           <div id="pix-usuario-resultado" style="margin-top:16px"></div>`}
+      ${currentUser.ultimoPagamentoMP?`<div class="notice" style="margin-top:14px;margin-bottom:0"><strong>✓ Último pagamento confirmado em ${esc(currentUser.ultimoPagamentoMP.confirmadoEm||'')}.</strong></div>`:''}
     </div>`;
 
   const regPanelId='user-regularizacao';
@@ -1891,60 +1935,36 @@ function renderUserArea(d){
 }
 
 
-function copiarPixUsuario(){
-  const input = document.getElementById('pix-chave-user');
-  if(!input) return;
-  const chave = input.value;
-  if(navigator.clipboard && navigator.clipboard.writeText){
-    navigator.clipboard.writeText(chave);
-  }else{
-    input.select();
-    document.execCommand('copy');
-  }
-  const msg = document.getElementById('pix-copy-msg-user');
-  if(msg){
-    msg.style.display = 'block';
-    setTimeout(()=>{ msg.style.display = 'none'; }, 2500);
-  }
-  toast('Chave Pix copiada!','ok',2200);
-}
-
-async function submitComprovanteUsuario(){
+async function gerarPixUsuario(){
   if(!currentUser){toast('Faça login novamente.','warn');return}
-  const fileEl=document.getElementById('user-pix-file');
-  const file=fileEl && fileEl.files ? fileEl.files[0] : null;
-  if(!file){toast('Anexe o comprovante Pix antes de enviar.','warn');return}
-  setBusy('btn-enviar-comprovante',true);
-  const obsEl=document.getElementById('user-pix-obs');
-  const cadastro={
-    nome: currentUser.nome,
-    cpf: currentUser.cpf || '',
-    email: currentUser.email || '',
-    whatsapp: currentUser.whatsapp || '',
-    profissao: currentUser.profissao || ''
-  };
-  let emailStatus={enviado:false,fileName:file.name,atualizadoEm:new Date().toLocaleString('pt-BR')};
-  try{
-    emailStatus=await sendPixEmail(cadastro,file);
-  }catch(e){
-    emailStatus={enviado:false,fileName:file.name,motivo:'erro no envio por e-mail',atualizadoEm:new Date().toLocaleString('pt-BR')};
-  }
   const d=await getData();
-  const u=d.usuarios.find(x=>x.id===currentUser.id);
-  if(u){
-    u.ultimoComprovantePix=file.name;
-    u.ultimoComprovanteObs=obsEl ? obsEl.value.trim() : '';
-    u.ultimoComprovanteEm=new Date().toLocaleString('pt-BR');
-    u.comprovanteEmail=emailStatus;
-    if(!Array.isArray(u.comprovantes)) u.comprovantes=[];
-    u.comprovantes.push({data:new Date().toLocaleString('pt-BR'), fileName:file.name, enviado:!!emailStatus.enviado, obs:obsEl?obsEl.value.trim():''});
-    u.pagamento='em atraso';
-    u.bloqueado=true;
-    currentUser={...u};
+  const config=d.config||{};
+  if(!config.mpWebAppUrl || !config.mpValorMensalidade){toast('Pagamento automático ainda não configurado pelo administrador.','warn');return}
+  setBusy('btn-gerar-pix-usuario',true);
+  try{
+    const resp=await criarCobrancaMP({valor:config.mpValorMensalidade, referencia:`usuario-${currentUser.id}`, nome:currentUser.nome, email:currentUser.email, webAppUrl:config.mpWebAppUrl});
+    if(!resp || !resp.ok){toast('Não foi possível gerar a cobrança Pix. Tente novamente em instantes.','err',5500);return}
+    renderPixCobrancaResultado('pix-usuario-resultado', resp);
+    iniciarPollingPix(resp.paymentId, config.mpWebAppUrl, confirmarPagamentoUsuario);
+  }catch(e){
+    toast('Erro ao gerar a cobrança Pix.','err',5500);
+  }finally{
+    setBusy('btn-gerar-pix-usuario',false);
   }
+}
+async function confirmarPagamentoUsuario(){
+  if(!currentUser)return;
+  const d=await getData();
+  const u=d.usuarios.find(x=>x.id===currentUser.id); if(!u)return;
+  if(u.pagamento!=='em dia' || u.bloqueado || isExpiredDate(u.mensalidadeFim)){
+    const inicio=new Date(); const fim=new Date(inicio); fim.setMonth(fim.getMonth()+1);
+    u.pagamento='em dia'; u.bloqueado=false;
+    u.mensalidadeInicio=toDateInput(inicio); u.mensalidadeFim=toDateInput(fim);
+  }
+  u.ultimoPagamentoMP={confirmadoEm:new Date().toLocaleString('pt-BR')};
   await saveData(d);
-  setBusy('btn-enviar-comprovante',false);
-  toast('Comprovante enviado! Aguarde o administrador conferir e liberar seu acesso.','ok',5000);
+  currentUser={...u};
+  toast('Pagamento confirmado! Acesso liberado. 🎉','ok',5500);
   renderUserArea(d);
 }
 
