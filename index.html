@@ -1271,22 +1271,49 @@ function enqueteResultadosHtml(e){
     return `<div class="poll-opt"><div class="poll-opt-label"><span>${esc(o.texto)}</span><span>${c} voto${c===1?'':'s'} · ${pct}%</span></div><div class="poll-bar-track"><div class="poll-bar-fill" style="width:${pct}%"></div></div></div>`;
   }).join('') + `<div class="small poll-total">${total} voto${total===1?'':'s'} no total</div>`;
 }
+let editingEnqueteId=null;
 function renderEnquetesAdmin(d){
   const el=document.getElementById('admin-enquetes'); if(!el)return;
-  let form=`<div class="card"><h3 style="margin-bottom:14px;color:var(--purple-900);font-family:'Fraunces',serif;font-weight:600">🗳️ Criar enquete</h3>
+  editingEnqueteId=null;
+  let form=`<div class="card"><h3 id="enq-form-titulo" style="margin-bottom:14px;color:var(--purple-900);font-family:'Fraunces',serif;font-weight:600">🗳️ Criar enquete</h3>
     <div class="field"><label class="field-label">Pergunta</label><input type="text" id="enq-pergunta" placeholder="Ex.: Qual tema você quer aprofundar no próximo encontro?"></div>
     <div class="field"><label class="field-label">Opções (uma por linha, pelo menos 2)</label><textarea id="enq-opcoes" placeholder="Ex.:&#10;Produtividade com IA&#10;Imagens e criatividade&#10;Ética e privacidade"></textarea></div>
-    <button class="btn btn-primary" onclick="addEnquete()">Publicar enquete</button></div>`;
+    <div class="btn-row"><button class="btn btn-primary" id="enq-submit-btn" onclick="submitEnqueteForm()">Publicar enquete</button><button class="btn hidden" id="enq-cancel-btn" onclick="cancelarEdicaoEnquete()">Cancelar edição</button></div></div>`;
   const es=(d.enquetes||[]).slice().reverse();
   let list=es.length?es.map(e=>`<div class="material-card"><div class="material-top"><div style="width:100%">
       <h3>${esc(e.pergunta)} ${e.ativa?'<span class="badge badge-ok">aberta</span>':'<span class="badge badge-block">encerrada</span>'}</h3>
       <div class="material-meta"><span>Criada em ${esc(e.criadaEm||'')}</span></div>
       <div style="margin-top:14px">${enqueteResultadosHtml(e)}</div>
     </div><div style="display:flex;flex-direction:column;gap:6px">
+      <button class="btn btn-sm" onclick="editarEnquete(${e.id})">✏️ Editar</button>
       <button class="btn btn-sm" onclick="toggleEnqueteAtiva(${e.id})">${e.ativa?'Encerrar':'Reabrir'}</button>
       <button class="btn btn-danger btn-sm" onclick="deleteEnquete(${e.id})">Apagar</button>
     </div></div></div>`).join(''):empty('Nenhuma enquete criada. As enquetes aparecem para os participantes votarem em tempo real.','🗳️');
   el.innerHTML=form+list;
+}
+function submitEnqueteForm(){
+  if(editingEnqueteId) salvarEdicaoEnquete(editingEnqueteId);
+  else addEnquete();
+}
+function editarEnquete(id){
+  if(!cachedAdminData)return;
+  const e=cachedAdminData.enquetes.find(x=>x.id===id); if(!e)return;
+  editingEnqueteId=id;
+  document.getElementById('enq-pergunta').value=e.pergunta;
+  document.getElementById('enq-opcoes').value=(e.opcoes||[]).map(o=>o.texto).join('\n');
+  document.getElementById('enq-form-titulo').textContent='✏️ Editar enquete';
+  document.getElementById('enq-submit-btn').textContent='Salvar alterações';
+  document.getElementById('enq-cancel-btn').classList.remove('hidden');
+  document.getElementById('enq-pergunta').scrollIntoView({behavior:'smooth', block:'start'});
+  toast('Editando enquete. Altere e clique em "Salvar alterações".','info');
+}
+function cancelarEdicaoEnquete(){
+  editingEnqueteId=null;
+  document.getElementById('enq-pergunta').value='';
+  document.getElementById('enq-opcoes').value='';
+  document.getElementById('enq-form-titulo').textContent='🗳️ Criar enquete';
+  document.getElementById('enq-submit-btn').textContent='Publicar enquete';
+  document.getElementById('enq-cancel-btn').classList.add('hidden');
 }
 async function addEnquete(){
   const pergunta=val('enq-pergunta');
@@ -1295,6 +1322,20 @@ async function addEnquete(){
   const d=await getData();
   d.enquetes.push({id:Date.now(), pergunta, opcoes:opcoesTexto.map((texto,i)=>({id:Date.now()+i, texto})), votos:[], ativa:true, criadaEm:new Date().toLocaleString('pt-BR')});
   await saveData(d); await renderAdmin(); toast('Enquete publicada!','ok');
+}
+async function salvarEdicaoEnquete(id){
+  const pergunta=val('enq-pergunta');
+  const opcoesTexto=document.getElementById('enq-opcoes').value.split('\n').map(s=>s.trim()).filter(Boolean);
+  if(!pergunta||opcoesTexto.length<2){toast('Informe a pergunta e pelo menos 2 opções.','warn');return}
+  const d=await getData();
+  const e=d.enquetes.find(x=>x.id===id); if(!e){toast('Enquete não encontrada.','err');return}
+  const opcoesAntigas=e.opcoes||[];
+  const novasOpcoes=opcoesTexto.map((texto,i)=> opcoesAntigas[i] ? {id:opcoesAntigas[i].id, texto} : {id:Date.now()+i, texto});
+  const idsValidos=new Set(novasOpcoes.map(o=>o.id));
+  e.pergunta=pergunta;
+  e.opcoes=novasOpcoes;
+  e.votos=(e.votos||[]).filter(v=>idsValidos.has(v.opcaoId));
+  await saveData(d); await renderAdmin(); toast('Enquete atualizada!','ok');
 }
 async function toggleEnqueteAtiva(id){const d=await getData();const e=d.enquetes.find(x=>x.id===id);if(e){e.ativa=!e.ativa;await saveData(d);await renderAdmin();toast(e.ativa?'Enquete reaberta.':'Enquete encerrada.','info')}}
 async function deleteEnquete(id){if(!confirm('Apagar esta enquete e todos os votos?'))return;const d=await getData();d.enquetes=d.enquetes.filter(e=>e.id!==id);await saveData(d);await renderAdmin();toast('Enquete apagada.','info')}
