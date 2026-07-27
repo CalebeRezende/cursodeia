@@ -1299,6 +1299,14 @@ async function addEnquete(){
 async function toggleEnqueteAtiva(id){const d=await getData();const e=d.enquetes.find(x=>x.id===id);if(e){e.ativa=!e.ativa;await saveData(d);await renderAdmin();toast(e.ativa?'Enquete reaberta.':'Enquete encerrada.','info')}}
 async function deleteEnquete(id){if(!confirm('Apagar esta enquete e todos os votos?'))return;const d=await getData();d.enquetes=d.enquetes.filter(e=>e.id!==id);await saveData(d);await renderAdmin();toast('Enquete apagada.','info')}
 
+function pendingEnquetesUsuario(d){
+  if(!currentUser) return [];
+  return (d.enquetes||[]).filter(e=>e.ativa && !(e.votos||[]).some(v=>v.usuarioId===currentUser.id));
+}
+function enqueteVotacaoHtml(e){
+  const opcoesHtml=(e.opcoes||[]).map(o=>`<label class="poll-radio-item"><input type="radio" name="enq-${e.id}" value="${o.id}"> ${esc(o.texto)}</label>`).join('');
+  return `<div class="material-card"><h3>🗳️ ${esc(e.pergunta)}</h3><div style="margin-top:10px">${opcoesHtml}</div><button class="btn btn-primary" style="margin-top:12px" onclick="votarEnquete(${e.id})">Votar</button></div>`;
+}
 function renderEnquetesUsuario(d){
   const el=document.getElementById('user-enquetes'); if(!el)return;
   const es=(d.enquetes||[]).slice().reverse();
@@ -1308,8 +1316,7 @@ function renderEnquetesUsuario(d){
     if(!e.ativa || meuVoto){
       return `<div class="material-card"><h3>${esc(e.pergunta)} ${!e.ativa?'<span class="badge badge-block">encerrada</span>':'<span class="badge badge-ok">seu voto registrado</span>'}</h3><div style="margin-top:14px">${enqueteResultadosHtml(e)}</div></div>`;
     }
-    const opcoesHtml=(e.opcoes||[]).map(o=>`<label class="poll-radio-item"><input type="radio" name="enq-${e.id}" value="${o.id}"> ${esc(o.texto)}</label>`).join('');
-    return `<div class="material-card"><h3>${esc(e.pergunta)}</h3><div style="margin-top:10px">${opcoesHtml}</div><button class="btn btn-primary" style="margin-top:12px" onclick="votarEnquete(${e.id})">Votar</button></div>`;
+    return enqueteVotacaoHtml(e);
   }).join('');
 }
 async function votarEnquete(enqueteId){
@@ -1320,8 +1327,9 @@ async function votarEnquete(enqueteId){
   const e=d.enquetes.find(x=>x.id===enqueteId); if(!e){toast('Enquete não encontrada.','err');return}
   if((e.votos||[]).some(v=>v.usuarioId===currentUser.id)){toast('Você já votou nesta enquete.','warn');return}
   e.votos.push({usuarioId:currentUser.id, opcaoId:Number(escolhido.value), data:new Date().toLocaleString('pt-BR')});
-  await saveData(d); cachedUserData=d; renderEnquetesUsuario(d);
+  await saveData(d); cachedUserData=d;
   toast('Voto registrado! Obrigado por participar.','ok');
+  renderUserArea(d);
 }
 
 // ============================================================
@@ -1650,6 +1658,14 @@ function irParaRegularizacao(){
   if(panel) panel.scrollIntoView({behavior:'smooth',block:'start'});
 }
 
+function irParaEnquetes(){
+  const btn=Array.from(document.querySelectorAll('#screen-user .tab')).find(t=>t.textContent.includes('Enquetes'));
+  if(btn){showTab('user-enquetes',btn);}
+  else{showTab('user-enquetes',null);}
+  const panel=document.getElementById('user-enquetes');
+  if(panel) panel.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
 function setMatFilterUser(f){
   matFilterUser=f;
   if(cachedUserData) renderMateriaisUsuario(cachedUserData);
@@ -1660,6 +1676,11 @@ function setMatSearchUser(v){
 }
 function renderMateriaisUsuario(d, keepSearchFocus=false){
   const el=document.getElementById('user-materiais');
+  const pendentes=pendingEnquetesUsuario(d);
+  if(pendentes.length){
+    el.innerHTML=`<div class="warning"><strong>🗳️ Responda ${pendentes.length>1?'as enquetes pendentes':'a enquete pendente'} abaixo para liberar o acesso aos materiais do curso.</strong></div>` + pendentes.map(e=>enqueteVotacaoHtml(e)).join('');
+    return;
+  }
   if(!d.materiais.length){el.innerHTML=empty('Ainda não há materiais publicados. Eles aparecerão aqui conforme os encontros do curso acontecerem.','📚');return}
   const searchHtml=`<input class="mat-search" type="text" placeholder="🔍 Buscar material..." value="${esc(matSearchUser)}" oninput="setMatSearchUser(this.value)" aria-label="Buscar material">`;
   let html=buildFilterBar(d.materiais, matFilterUser, 'setMatFilterUser', searchHtml);
@@ -1702,13 +1723,17 @@ function renderUserArea(d){
   const vigencia = vencimentoTexto(currentUser);
   document.getElementById('user-pay-badge').innerHTML = badgePay(currentUser) + (currentUser.bloqueado ? ' <span class="badge badge-block">materiais bloqueados</span>' : '') + (vigencia ? `<div class="small" style="margin-top:8px">${vigencia}</div>` : '');
   document.getElementById('user-status-banner').innerHTML = statusBannerHtml(currentUser);
-  document.getElementById('user-access-warning').innerHTML = '';
+  const pendentesGlobal = usuarioPodeVerMateriais(currentUser) ? pendingEnquetesUsuario(d) : [];
+  document.getElementById('user-access-warning').innerHTML = pendentesGlobal.length
+    ? `<div class="warning"><strong>🗳️ Você tem ${pendentesGlobal.length} enquete${pendentesGlobal.length===1?'':'s'} pendente${pendentesGlobal.length===1?'':'s'}.</strong> Responda para liberar o acesso aos materiais do curso. <br><button class="btn btn-sm btn-primary" style="margin-top:8px" onclick="irParaEnquetes()">Responder agora</button></div>`
+    : '';
   renderDashboardWidgets(d);
 
   const certTab = currentUser.certificadoLiberado ? `<button class="tab" onclick="showTab('user-certificado',this)">🎓 Certificado</button>` : '';
+  const materiaisTabLabel = pendentesGlobal.length ? '📚 Materiais 🔒' : '📚 Materiais';
   const tabs = document.querySelector('#screen-user .tabs');
   tabs.innerHTML = usuarioPodeVerMateriais(currentUser)
-    ? `<button class="tab active" onclick="showTab('user-materiais',this)">📚 Materiais</button><button class="tab" onclick="showTab('user-tarefas',this)">📝 Tarefas</button><button class="tab" onclick="showTab('user-enquetes',this)">🗳️ Enquetes</button><button class="tab" onclick="showTab('user-mural-palavras',this)">☁️ Mural de palavras</button><button class="tab" onclick="showTab('user-mural-turma',this)">🖼️ Mural da turma</button>${certTab}<button class="tab" onclick="showTab('user-perfil',this)">Minha anamnese</button><button class="tab" onclick="showTab('user-regularizacao',this)">Pagamento</button><button class="tab" onclick="showTab('user-senha',this)">Alterar senha</button>`
+    ? `<button class="tab active" onclick="showTab('user-materiais',this)">${materiaisTabLabel}</button><button class="tab" onclick="showTab('user-tarefas',this)">📝 Tarefas</button><button class="tab" onclick="showTab('user-enquetes',this)">🗳️ Enquetes</button><button class="tab" onclick="showTab('user-mural-palavras',this)">☁️ Mural de palavras</button><button class="tab" onclick="showTab('user-mural-turma',this)">🖼️ Mural da turma</button>${certTab}<button class="tab" onclick="showTab('user-perfil',this)">Minha anamnese</button><button class="tab" onclick="showTab('user-regularizacao',this)">Pagamento</button><button class="tab" onclick="showTab('user-senha',this)">Alterar senha</button>`
     : `<button class="tab active" onclick="showTab('user-regularizacao',this)">⚠️ Regularizar pagamento</button>${certTab}<button class="tab" onclick="showTab('user-perfil',this)">Minha anamnese</button><button class="tab" onclick="showTab('user-senha',this)">Alterar senha</button>`;
 
   let tarefasPanel=document.getElementById('user-tarefas');
