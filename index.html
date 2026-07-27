@@ -234,7 +234,56 @@ tr:last-child td{border-bottom:none}
 @keyframes toastIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:none}}
 @keyframes toastOut{to{opacity:0;transform:translateY(12px)}}
 
+/* ===== Enquetes ===== */
+.poll-radio-item{display:flex;align-items:center;gap:10px;cursor:pointer;font-size:14px;border:1px solid var(--border);border-radius:var(--radius);padding:11px 13px;margin-bottom:8px;transition:border-color .15s,background .15s}
+.poll-radio-item:hover{border-color:var(--purple-200);background:var(--purple-50)}
+.poll-radio-item input{width:17px;height:17px;accent-color:var(--purple-600);flex-shrink:0}
+.poll-opt{margin-bottom:12px}
+.poll-opt-label{display:flex;justify-content:space-between;gap:10px;font-size:13px;font-weight:700;margin-bottom:6px;color:var(--text)}
+.poll-bar-track{background:var(--gray-100);border-radius:8px;height:14px;overflow:hidden}
+.poll-bar-fill{height:100%;background:var(--grad);border-radius:8px;transition:width .6s cubic-bezier(.22,.9,.35,1);min-width:2px}
+.poll-total{margin-top:6px}
+
+/* ===== Mural de palavras ===== */
+.wordcloud{display:flex;flex-wrap:wrap;gap:12px 16px;align-items:center;justify-content:center;padding:30px 20px;min-height:110px}
+.wordcloud .w{font-family:'Fraunces',serif;font-weight:700;line-height:1;transition:transform .2s;cursor:default}
+.wordcloud .w:hover{transform:scale(1.08) rotate(-2deg)}
+.word-input-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.word-input-row input{flex:1;min-width:200px}
+
+/* ===== Mural da turma (entregas) ===== */
+.mural-card{background:linear-gradient(180deg,#fff,var(--purple-50) 260%);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;margin-bottom:14px;box-shadow:var(--shadow-sm)}
+.mural-card .mural-autor{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.mural-avatar{width:36px;height:36px;border-radius:50%;background:var(--grad);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0}
+
+/* ===== Apresentação (tela cheia) ===== */
+#pres-overlay{position:fixed;inset:0;background:linear-gradient(135deg,#241F55,#3C3489 55%,#4A3FBC);z-index:400;display:none;align-items:center;justify-content:center;padding:50px 32px;color:#fff}
+#pres-overlay.on{display:flex}
+.pres-slide{max-width:860px;width:100%;text-align:center;animation:screenIn .5s ease both}
+.pres-eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.65);font-weight:700;margin-bottom:16px}
+.pres-slide h2{font-family:'Fraunces',serif;font-weight:600;font-size:clamp(26px,4vw,42px);margin-bottom:22px;letter-spacing:-.5px}
+.pres-big{font-size:clamp(52px,9vw,104px);font-family:'Fraunces',serif;font-weight:700;line-height:1}
+.pres-sub{font-size:16px;color:rgba(255,255,255,.8);margin-top:10px}
+.pres-tags{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:8px}
+.pres-tag{display:inline-flex;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.2);border-radius:20px;padding:8px 16px;font-size:14px;font-weight:600}
+.pres-quote{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:16px;padding:16px 20px;margin:10px 0;text-align:left;font-size:15px;line-height:1.5}
+.pres-quote b{color:#F4C2F0}
+.pres-bar-row{display:flex;align-items:center;gap:12px;margin-bottom:12px;text-align:left}
+.pres-bar-label{width:220px;flex-shrink:0;font-size:14px;font-weight:600;text-align:right}
+.pres-bar-track{flex:1;background:rgba(255,255,255,.15);border-radius:8px;height:16px;overflow:hidden}
+.pres-bar-fill{height:100%;background:linear-gradient(90deg,#C7BDFF,#F4C2F0);border-radius:8px}
+.pres-bar-count{width:34px;flex-shrink:0;font-size:13px;font-weight:700}
+.pres-nav{position:fixed;bottom:26px;left:0;right:0;display:flex;justify-content:center;gap:14px;align-items:center}
+.pres-nav button{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3);color:#fff}
+.pres-nav button:hover{background:rgba(255,255,255,.24)}
+.pres-dots{display:flex;gap:7px}
+.pres-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.35)}
+.pres-dot.active{background:#fff}
+.pres-close{position:fixed;top:22px;right:26px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3);color:#fff}
+.pres-close:hover{background:rgba(255,255,255,.24)}
+
 @media(max-width:720px){
+  .pres-bar-label{width:120px;font-size:12px}
   nav{padding:10px 16px;align-items:flex-start;gap:10px;flex-direction:column}
   .nav-actions{width:100%}
   .screen{padding:24px 16px 70px}
@@ -401,7 +450,7 @@ tr:last-child td{border-bottom:none}
 </section>
 
 <section class="screen" id="screen-admin">
-  <div class="admin-header"><h2>Painel administrativo</h2><div class="btn-row" style="margin-top:0"><button class="btn btn-sm" onclick="renderAdmin()">🔄 Atualizar</button><button class="btn btn-danger btn-sm" onclick="resetPlatform()">Limpar dados</button></div></div>
+  <div class="admin-header"><h2>Painel administrativo</h2><div class="btn-row" style="margin-top:0"><button class="btn btn-grad btn-sm" onclick="abrirApresentacao()">🎤 Apresentação com a turma</button><button class="btn btn-sm" onclick="renderAdmin()">🔄 Atualizar</button><button class="btn btn-danger btn-sm" onclick="resetPlatform()">Limpar dados</button></div></div>
   <div class="metrics-grid" id="admin-metrics"></div>
   <div class="tabs">
     <button class="tab active" onclick="showTab('admin-cadastros',this)">Anamneses</button>
@@ -411,6 +460,8 @@ tr:last-child td{border-bottom:none}
     <button class="tab" onclick="showTab('admin-avisos',this)">📢 Avisos</button>
     <button class="tab" onclick="showTab('admin-agenda',this)">🗓️ Agenda</button>
     <button class="tab" onclick="showTab('admin-tarefas',this)">📝 Tarefas</button>
+    <button class="tab" onclick="showTab('admin-enquetes',this)">🗳️ Enquetes</button>
+    <button class="tab" onclick="showTab('admin-mural-palavras',this)">☁️ Mural de palavras</button>
     <button class="tab" onclick="showTab('admin-novo-user',this)">Criar usuário</button>
   </div>
   <div class="tab-panel active" id="admin-cadastros"></div>
@@ -420,8 +471,20 @@ tr:last-child td{border-bottom:none}
   <div class="tab-panel" id="admin-avisos"></div>
   <div class="tab-panel" id="admin-agenda"></div>
   <div class="tab-panel" id="admin-tarefas"></div>
+  <div class="tab-panel" id="admin-enquetes"></div>
+  <div class="tab-panel" id="admin-mural-palavras"></div>
   <div class="tab-panel" id="admin-novo-user"></div>
 </section>
+
+<div id="pres-overlay">
+  <button class="btn pres-close" onclick="fecharApresentacao()">✕ Fechar</button>
+  <div class="pres-slide" id="pres-slide"></div>
+  <div class="pres-nav">
+    <button class="btn" onclick="presAnterior()">← Anterior</button>
+    <div class="pres-dots" id="pres-dots"></div>
+    <button class="btn" onclick="presProximo()">Próximo →</button>
+  </div>
+</div>
 
 <script>
 // ============================================================
@@ -496,6 +559,8 @@ function initialData(){
     agenda: [],
     tarefas: [],
     entregas: [],
+    enquetes: [],
+    muralPalavras: [],
     config: {},
     legado: []
   };
@@ -519,6 +584,8 @@ function normalizeRespostas(raw){
     agenda: Array.isArray(raw.agenda) ? raw.agenda : [],
     tarefas: Array.isArray(raw.tarefas) ? raw.tarefas : [],
     entregas: Array.isArray(raw.entregas) ? raw.entregas : [],
+    enquetes: Array.isArray(raw.enquetes) ? raw.enquetes.map(e=>({...e, opcoes:Array.isArray(e.opcoes)?e.opcoes:[], votos:Array.isArray(e.votos)?e.votos:[]})) : [],
+    muralPalavras: Array.isArray(raw.muralPalavras) ? raw.muralPalavras.map(m=>({...m, respostas:Array.isArray(m.respostas)?m.respostas:[]})) : [],
     config: (raw.config && typeof raw.config==='object') ? raw.config : {},
     legado: Array.isArray(raw.legado) ? raw.legado : []
   };
@@ -715,9 +782,11 @@ async function renderAdmin(){
      <div class="metric-card"><div class="metric-val" data-count="${ativos}">0</div><div class="metric-lbl">Acessos ativos</div></div>
      <div class="metric-card"><div class="metric-val" data-count="${pend}">0</div><div class="metric-lbl">Pendências</div></div>
      <div class="metric-card"><div class="metric-val" data-count="${d.materiais.length}">0</div><div class="metric-lbl">Materiais publicados</div></div>
-     <div class="metric-card"><div class="metric-val" data-count="${(d.entregas||[]).length}">0</div><div class="metric-lbl">Entregas de tarefas</div></div>`;
+     <div class="metric-card"><div class="metric-val" data-count="${(d.entregas||[]).length}">0</div><div class="metric-lbl">Entregas de tarefas</div></div>
+     <div class="metric-card"><div class="metric-val" data-count="${(d.enquetes||[]).length}">0</div><div class="metric-lbl">Enquetes criadas</div></div>
+     <div class="metric-card"><div class="metric-val" data-count="${(d.muralPalavras||[]).length}">0</div><div class="metric-lbl">Murais de palavras</div></div>`;
   animateMetrics();
-  await applyPaymentRules(d); renderCadastros(d); renderUsuarios(d); renderMensalidades(d); renderMateriaisAdmin(d); renderAvisosAdmin(d); renderAgendaAdmin(d); renderTarefasAdmin(d); renderNovoUser(d);
+  await applyPaymentRules(d); renderCadastros(d); renderUsuarios(d); renderMensalidades(d); renderMateriaisAdmin(d); renderAvisosAdmin(d); renderAgendaAdmin(d); renderTarefasAdmin(d); renderEnquetesAdmin(d); renderMuralPalavrasAdmin(d); renderNovoUser(d);
 }
 
 function renderCadastros(d){
@@ -1077,7 +1146,7 @@ function renderTarefasAdmin(d){
       <div style="border:1px solid var(--border);border-radius:12px;padding:14px;margin-top:10px;background:var(--gray-50)">
         <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center">
           <strong>👤 ${esc(e.nome)}</strong>
-          <span class="small">Entregue em ${esc(e.enviadaEm)} ${e.avaliadaEm?'<span class="badge badge-ok">avaliada</span>':'<span class="badge badge-block">aguardando avaliação</span>'}</span>
+          <span class="small">Entregue em ${esc(e.enviadaEm)} ${e.avaliadaEm?'<span class="badge badge-ok">avaliada</span>':'<span class="badge badge-block">aguardando avaliação</span>'} ${e.publicarMural?'<span class="badge badge-info">🖼️ no mural da turma</span>':''}</span>
         </div>
         ${e.texto?`<p style="white-space:pre-wrap;margin-top:8px">${esc(e.texto)}</p>`:''}
         ${e.link?`<p style="margin-top:6px"><a class="linkish" href="${esc(e.link)}" target="_blank" rel="noopener">🔗 Abrir link entregue ↗</a></p>`:''}
@@ -1085,6 +1154,7 @@ function renderTarefasAdmin(d){
           <div><label class="field-label">Feedback para o participante</label><textarea id="fb-txt-${e.id}" style="min-height:70px" placeholder="Escreva o feedback...">${esc(e.feedback||'')}</textarea></div>
           <div><label class="field-label">Nota / conceito (opcional)</label><input type="text" id="fb-nota-${e.id}" value="${esc(e.nota||'')}" placeholder="Ex.: 9,0 ou Ótimo"><br><button class="btn btn-sm btn-primary" style="margin-top:8px" onclick="salvarFeedback(${e.id})">Salvar avaliação</button></div>
         </div>
+        <button class="btn btn-sm" style="margin-top:10px" onclick="togglePublicarMural(${e.id})">${e.publicarMural?'Remover do mural da turma':'🖼️ Publicar no mural da turma'}</button>
       </div>`).join(''):'<div class="small" style="margin-top:8px">Nenhuma entrega recebida ainda.</div>';
     return `<div class="material-card"><div class="material-top"><div style="width:100%">
       <h3>${esc(t.titulo)}</h3>
@@ -1116,6 +1186,29 @@ async function salvarFeedback(entregaId){
   e.nota=document.getElementById('fb-nota-'+entregaId).value.trim();
   e.avaliadaEm=new Date().toLocaleString('pt-BR');
   await saveData(d); renderTarefasAdmin(d); toast('Avaliação salva! O participante verá o feedback na aba Tarefas.','ok');
+}
+
+async function togglePublicarMural(entregaId){
+  const d=await getData();
+  const e=(d.entregas||[]).find(x=>x.id===entregaId); if(!e){toast('Entrega não encontrada.','err');return}
+  e.publicarMural=!e.publicarMural;
+  await saveData(d); renderTarefasAdmin(d);
+  toast(e.publicarMural?'Entrega publicada no mural da turma!':'Entrega removida do mural da turma.', e.publicarMural?'ok':'info');
+}
+function renderMuralTurma(d){
+  const el=document.getElementById('user-mural-turma'); if(!el)return;
+  const publicadas=(d.entregas||[]).filter(e=>e.publicarMural).slice().reverse();
+  if(!publicadas.length){el.innerHTML=empty('Ainda não há entregas publicadas no mural da turma. Quando o administrador destacar uma entrega, ela aparecerá aqui para todos verem.','🖼️');return}
+  el.innerHTML=publicadas.map(e=>{
+    const tarefa=(d.tarefas||[]).find(t=>t.id===e.tarefaId);
+    const iniciais=(e.nome||'?').trim().split(/\s+/).slice(0,2).map(p=>p[0]).join('').toUpperCase();
+    return `<div class="mural-card">
+      <div class="mural-autor"><div class="mural-avatar">${esc(iniciais)}</div><div><strong>${esc(e.nome)}</strong><div class="small">${esc(e.enviadaEm)}</div></div></div>
+      <div class="small" style="margin-bottom:6px"><strong>Tarefa:</strong> ${esc(tarefa?tarefa.titulo:'—')}</div>
+      ${e.texto?`<p style="white-space:pre-wrap">${esc(e.texto)}</p>`:''}
+      ${e.link?`<p style="margin-top:8px"><a class="btn btn-sm btn-primary" href="${esc(e.link)}" target="_blank" rel="noopener">Ver entrega ↗</a></p>`:''}
+    </div>`;
+  }).join('');
 }
 
 // ===== Tarefas: lado do participante =====
@@ -1163,6 +1256,147 @@ async function enviarEntrega(tarefaId){
   else d.entregas.push({id:Date.now(), tarefaId, usuarioId:currentUser.id, nome:currentUser.nome, texto, link, enviadaEm:new Date().toLocaleString('pt-BR'), feedback:'', nota:''});
   await saveData(d); cachedUserData=d; renderTarefasUsuario(d);
   toast('Entrega enviada! O administrador poderá avaliar e deixar um feedback.','ok',4500);
+}
+
+// ============================================================
+// ENQUETES
+// ============================================================
+function enqueteTotalVotos(e){ return (e.votos||[]).length; }
+function enqueteContagem(e, opcaoId){ return (e.votos||[]).filter(v=>v.opcaoId===opcaoId).length; }
+function enqueteResultadosHtml(e){
+  const total=enqueteTotalVotos(e);
+  return (e.opcoes||[]).map(o=>{
+    const c=enqueteContagem(e,o.id);
+    const pct=total?Math.round((c/total)*100):0;
+    return `<div class="poll-opt"><div class="poll-opt-label"><span>${esc(o.texto)}</span><span>${c} voto${c===1?'':'s'} · ${pct}%</span></div><div class="poll-bar-track"><div class="poll-bar-fill" style="width:${pct}%"></div></div></div>`;
+  }).join('') + `<div class="small poll-total">${total} voto${total===1?'':'s'} no total</div>`;
+}
+function renderEnquetesAdmin(d){
+  const el=document.getElementById('admin-enquetes'); if(!el)return;
+  let form=`<div class="card"><h3 style="margin-bottom:14px;color:var(--purple-900);font-family:'Fraunces',serif;font-weight:600">🗳️ Criar enquete</h3>
+    <div class="field"><label class="field-label">Pergunta</label><input type="text" id="enq-pergunta" placeholder="Ex.: Qual tema você quer aprofundar no próximo encontro?"></div>
+    <div class="field"><label class="field-label">Opções (uma por linha, pelo menos 2)</label><textarea id="enq-opcoes" placeholder="Ex.:&#10;Produtividade com IA&#10;Imagens e criatividade&#10;Ética e privacidade"></textarea></div>
+    <button class="btn btn-primary" onclick="addEnquete()">Publicar enquete</button></div>`;
+  const es=(d.enquetes||[]).slice().reverse();
+  let list=es.length?es.map(e=>`<div class="material-card"><div class="material-top"><div style="width:100%">
+      <h3>${esc(e.pergunta)} ${e.ativa?'<span class="badge badge-ok">aberta</span>':'<span class="badge badge-block">encerrada</span>'}</h3>
+      <div class="material-meta"><span>Criada em ${esc(e.criadaEm||'')}</span></div>
+      <div style="margin-top:14px">${enqueteResultadosHtml(e)}</div>
+    </div><div style="display:flex;flex-direction:column;gap:6px">
+      <button class="btn btn-sm" onclick="toggleEnqueteAtiva(${e.id})">${e.ativa?'Encerrar':'Reabrir'}</button>
+      <button class="btn btn-danger btn-sm" onclick="deleteEnquete(${e.id})">Apagar</button>
+    </div></div></div>`).join(''):empty('Nenhuma enquete criada. As enquetes aparecem para os participantes votarem em tempo real.','🗳️');
+  el.innerHTML=form+list;
+}
+async function addEnquete(){
+  const pergunta=val('enq-pergunta');
+  const opcoesTexto=document.getElementById('enq-opcoes').value.split('\n').map(s=>s.trim()).filter(Boolean);
+  if(!pergunta||opcoesTexto.length<2){toast('Informe a pergunta e pelo menos 2 opções.','warn');return}
+  const d=await getData();
+  d.enquetes.push({id:Date.now(), pergunta, opcoes:opcoesTexto.map((texto,i)=>({id:Date.now()+i, texto})), votos:[], ativa:true, criadaEm:new Date().toLocaleString('pt-BR')});
+  await saveData(d); await renderAdmin(); toast('Enquete publicada!','ok');
+}
+async function toggleEnqueteAtiva(id){const d=await getData();const e=d.enquetes.find(x=>x.id===id);if(e){e.ativa=!e.ativa;await saveData(d);await renderAdmin();toast(e.ativa?'Enquete reaberta.':'Enquete encerrada.','info')}}
+async function deleteEnquete(id){if(!confirm('Apagar esta enquete e todos os votos?'))return;const d=await getData();d.enquetes=d.enquetes.filter(e=>e.id!==id);await saveData(d);await renderAdmin();toast('Enquete apagada.','info')}
+
+function renderEnquetesUsuario(d){
+  const el=document.getElementById('user-enquetes'); if(!el)return;
+  const es=(d.enquetes||[]).slice().reverse();
+  if(!es.length){el.innerHTML=empty('Nenhuma enquete publicada no momento.','🗳️');return}
+  el.innerHTML=es.map(e=>{
+    const meuVoto=(e.votos||[]).find(v=>v.usuarioId===currentUser.id);
+    if(!e.ativa || meuVoto){
+      return `<div class="material-card"><h3>${esc(e.pergunta)} ${!e.ativa?'<span class="badge badge-block">encerrada</span>':'<span class="badge badge-ok">seu voto registrado</span>'}</h3><div style="margin-top:14px">${enqueteResultadosHtml(e)}</div></div>`;
+    }
+    const opcoesHtml=(e.opcoes||[]).map(o=>`<label class="poll-radio-item"><input type="radio" name="enq-${e.id}" value="${o.id}"> ${esc(o.texto)}</label>`).join('');
+    return `<div class="material-card"><h3>${esc(e.pergunta)}</h3><div style="margin-top:10px">${opcoesHtml}</div><button class="btn btn-primary" style="margin-top:12px" onclick="votarEnquete(${e.id})">Votar</button></div>`;
+  }).join('');
+}
+async function votarEnquete(enqueteId){
+  if(!currentUser){toast('Faça login novamente.','warn');return}
+  const escolhido=document.querySelector(`input[name="enq-${enqueteId}"]:checked`);
+  if(!escolhido){toast('Selecione uma opção antes de votar.','warn');return}
+  const d=await getData();
+  const e=d.enquetes.find(x=>x.id===enqueteId); if(!e){toast('Enquete não encontrada.','err');return}
+  if((e.votos||[]).some(v=>v.usuarioId===currentUser.id)){toast('Você já votou nesta enquete.','warn');return}
+  e.votos.push({usuarioId:currentUser.id, opcaoId:Number(escolhido.value), data:new Date().toLocaleString('pt-BR')});
+  await saveData(d); cachedUserData=d; renderEnquetesUsuario(d);
+  toast('Voto registrado! Obrigado por participar.','ok');
+}
+
+// ============================================================
+// MURAL DE PALAVRAS
+// ============================================================
+function normalizarPalavra(s){ return String(s||'').trim().toLowerCase(); }
+function wordCloudHtml(mural){
+  const freq={};
+  (mural.respostas||[]).forEach(r=>{
+    const k=normalizarPalavra(r.texto); if(!k)return;
+    freq[k]=(freq[k]||0)+1;
+  });
+  const entradas=Object.entries(freq).sort((a,b)=>b[1]-a[1]);
+  if(!entradas.length) return empty('Nenhuma palavra enviada ainda.','☁️');
+  const max=entradas[0][1], min=entradas[entradas.length-1][1];
+  const cores=['var(--purple-800)','var(--magenta)','var(--teal-600)','var(--coral-600)','var(--blue-600)','var(--amber-600)'];
+  return `<div class="wordcloud">${entradas.map(([palavra,n],i)=>{
+    const size=max===min?26:14+Math.round(((n-min)/(max-min))*34);
+    return `<span class="w" style="font-size:${size}px;color:${cores[i%cores.length]}" title="${n} envio${n===1?'':'s'}">${esc(palavra)}</span>`;
+  }).join('')}</div>`;
+}
+function renderMuralPalavrasAdmin(d){
+  const el=document.getElementById('admin-mural-palavras'); if(!el)return;
+  let form=`<div class="card"><h3 style="margin-bottom:14px;color:var(--purple-900);font-family:'Fraunces',serif;font-weight:600">☁️ Criar mural de palavras</h3>
+    <div class="field"><label class="field-label">Pergunta ou tema</label><input type="text" id="mp-titulo" placeholder="Ex.: Em uma palavra, o que é Inteligência Artificial para você?"></div>
+    <button class="btn btn-primary" onclick="addMuralPalavras()">Criar mural</button></div>`;
+  const ms=(d.muralPalavras||[]).slice().reverse();
+  let list=ms.length?ms.map(m=>`<div class="material-card"><div class="material-top"><div style="width:100%">
+      <h3>${esc(m.titulo)} ${m.ativa?'<span class="badge badge-ok">aberto</span>':'<span class="badge badge-block">encerrado</span>'}</h3>
+      <div class="material-meta"><span>Criado em ${esc(m.criadaEm||'')}</span> <span>· ${(m.respostas||[]).length} palavra(s) enviada(s)</span></div>
+      ${wordCloudHtml(m)}
+    </div><div style="display:flex;flex-direction:column;gap:6px">
+      <button class="btn btn-sm" onclick="toggleMuralPalavrasAtivo(${m.id})">${m.ativa?'Encerrar':'Reabrir'}</button>
+      <button class="btn btn-sm" onclick="limparMuralPalavras(${m.id})">Limpar palavras</button>
+      <button class="btn btn-danger btn-sm" onclick="deleteMuralPalavras(${m.id})">Apagar</button>
+    </div></div></div>`).join(''):empty('Nenhum mural de palavras criado. Crie um tema e acompanhe a nuvem de palavras em tempo real.','☁️');
+  el.innerHTML=form+list;
+}
+async function addMuralPalavras(){
+  const titulo=val('mp-titulo');
+  if(!titulo){toast('Informe a pergunta ou tema do mural.','warn');return}
+  const d=await getData();
+  d.muralPalavras.push({id:Date.now(), titulo, ativa:true, respostas:[], criadaEm:new Date().toLocaleString('pt-BR')});
+  await saveData(d); await renderAdmin(); toast('Mural de palavras criado!','ok');
+}
+async function toggleMuralPalavrasAtivo(id){const d=await getData();const m=d.muralPalavras.find(x=>x.id===id);if(m){m.ativa=!m.ativa;await saveData(d);await renderAdmin();toast(m.ativa?'Mural reaberto.':'Mural encerrado.','info')}}
+async function limparMuralPalavras(id){if(!confirm('Apagar todas as palavras enviadas neste mural?'))return;const d=await getData();const m=d.muralPalavras.find(x=>x.id===id);if(m)m.respostas=[];await saveData(d);await renderAdmin();toast('Palavras removidas.','info')}
+async function deleteMuralPalavras(id){if(!confirm('Apagar este mural de palavras?'))return;const d=await getData();d.muralPalavras=d.muralPalavras.filter(m=>m.id!==id);await saveData(d);await renderAdmin();toast('Mural apagado.','info')}
+
+function renderMuralPalavrasUsuario(d){
+  const el=document.getElementById('user-mural-palavras'); if(!el)return;
+  const ms=(d.muralPalavras||[]).slice().reverse();
+  if(!ms.length){el.innerHTML=empty('Nenhum mural de palavras no momento.','☁️');return}
+  el.innerHTML=ms.map(m=>{
+    const minha=(m.respostas||[]).find(r=>r.usuarioId===currentUser.id);
+    const envio=(m.ativa)?`<div class="word-input-row" style="margin-top:12px"><input type="text" id="mp-resp-${m.id}" maxlength="28" placeholder="Escreva uma palavra..." value="${esc(minha?minha.texto:'')}"><button class="btn btn-primary" onclick="enviarPalavraMural(${m.id})">${minha?'Alterar minha palavra':'Enviar palavra'}</button></div>`:'';
+    return `<div class="material-card"><h3>${esc(m.titulo)} ${!m.ativa?'<span class="badge badge-block">encerrado</span>':''}</h3>
+      ${envio}
+      ${wordCloudHtml(m)}
+    </div>`;
+  }).join('');
+}
+async function enviarPalavraMural(muralId){
+  if(!currentUser){toast('Faça login novamente.','warn');return}
+  const input=document.getElementById('mp-resp-'+muralId);
+  const texto=input.value.trim();
+  if(!texto){toast('Escreva uma palavra antes de enviar.','warn');return}
+  const d=await getData();
+  const m=d.muralPalavras.find(x=>x.id===muralId); if(!m){toast('Mural não encontrado.','err');return}
+  if(!m.ativa){toast('Este mural está encerrado.','warn');return}
+  let r=(m.respostas||[]).find(x=>x.usuarioId===currentUser.id);
+  if(r){ r.texto=texto; r.data=new Date().toLocaleString('pt-BR'); }
+  else m.respostas.push({usuarioId:currentUser.id, nome:currentUser.nome, texto, data:new Date().toLocaleString('pt-BR')});
+  await saveData(d); cachedUserData=d; renderMuralPalavrasUsuario(d);
+  toast('Palavra enviada! Veja a nuvem se formar.','ok');
 }
 
 // ============================================================
@@ -1267,6 +1501,92 @@ function gerarCertificado(){
   </div></div>
   </body></html>`);
   w.document.close();
+}
+
+// ============================================================
+// APRESENTAÇÃO COM A TURMA (slides a partir das anamneses)
+// ============================================================
+let presSlides=[];
+let presIndex=0;
+function shuffleArr(a){ const arr=a.slice(); for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]];} return arr; }
+function freqMap(list){
+  const map=new Map();
+  list.forEach(raw=>{
+    const k=String(raw||'').trim(); if(!k) return;
+    const norm=k.toLowerCase();
+    if(!map.has(norm)) map.set(norm,{label:k,count:0});
+    map.get(norm).count++;
+  });
+  return Array.from(map.values()).sort((a,b)=>b.count-a.count);
+}
+function presQuotesSlide(cadastros, campo, titulo, eyebrow){
+  const quotes=cadastros.map(c=>({nome:(c.nome||'').split(' ')[0]||'Participante', texto:(c[campo]||'').trim()})).filter(q=>q.texto);
+  const amostra=shuffleArr(quotes).slice(0,4);
+  const corpo=amostra.length
+    ? amostra.map(q=>`<div class="pres-quote"><b>${esc(q.nome)}:</b> "${esc(q.texto)}"</div>`).join('')
+    : `<div class="pres-quote">Nenhum depoimento registrado ainda para este tema.</div>`;
+  return `<div class="pres-eyebrow">${esc(eyebrow)}</div><h2>${esc(titulo)}</h2>${corpo}`;
+}
+function buildPresentationSlides(d){
+  const cadastros=d.cadastros||[];
+  const cursoNome=(d.config&&d.config.cursoNome)||'Introdução à Inteligência Artificial';
+  const slides=[];
+
+  slides.push(`<div class="pres-eyebrow">${esc(cursoNome)}</div><div class="pres-big">${cadastros.length}</div><div class="pres-sub">participante${cadastros.length===1?'':'s'} inscrito${cadastros.length===1?'':'s'} até agora</div><h2 style="margin-top:26px">Vamos conhecer a turma?</h2>`);
+
+  const profFreq=freqMap(cadastros.map(c=>c.profissao)).slice(0,14);
+  const profHtml=profFreq.length
+    ? `<div class="pres-tags">${profFreq.map(p=>`<span class="pres-tag">${esc(p.label)}${p.count>1?` · ${p.count}`:''}</span>`).join('')}</div>`
+    : `<div class="pres-quote">Nenhuma profissão informada ainda.</div>`;
+  slides.push(`<div class="pres-eyebrow">Quem são os participantes</div><h2>Profissões da turma</h2>${profHtml}`);
+
+  const areasFlat=[]; cadastros.forEach(c=>(c.areas||[]).forEach(a=>areasFlat.push(a)));
+  const areasFreq=freqMap(areasFlat);
+  const maxArea=areasFreq.length?areasFreq[0].count:0;
+  const areasHtml=areasFreq.length
+    ? areasFreq.map(a=>`<div class="pres-bar-row"><div class="pres-bar-label">${esc(a.label)}</div><div class="pres-bar-track"><div class="pres-bar-fill" style="width:${maxArea?Math.round((a.count/maxArea)*100):0}%"></div></div><div class="pres-bar-count">${a.count}</div></div>`).join('')
+    : `<div class="pres-quote">Nenhuma área de interesse marcada ainda.</div>`;
+  slides.push(`<div class="pres-eyebrow">Interesses da turma</div><h2>O que mais desperta interesse</h2>${areasHtml}`);
+
+  slides.push(presQuotesSlide(cadastros,'conhece','O que a turma já conhece de IA','Bagagem da turma'));
+  slides.push(presQuotesSlide(cadastros,'aprender','O que a turma quer aprender','Expectativas'));
+  slides.push(presQuotesSlide(cadastros,'acelerar','O que a turma espera acelerar com IA','Objetivos práticos'));
+
+  const fechamentoTags=[
+    `📚 ${(d.materiais||[]).length} materiais publicados`,
+    `📝 ${(d.tarefas||[]).length} tarefas · ${(d.entregas||[]).length} entregas`,
+    `🗳️ ${(d.enquetes||[]).length} enquetes`,
+    `☁️ ${(d.muralPalavras||[]).length} murais de palavras`,
+    `🗓️ ${(d.agenda||[]).filter(e=>!eventoPassado(e)).length} próximos encontros`
+  ];
+  slides.push(`<div class="pres-eyebrow">Resumo da plataforma</div><h2>Estamos construindo isso juntos</h2><div class="pres-tags">${fechamentoTags.map(t=>`<span class="pres-tag">${t}</span>`).join('')}</div>`);
+
+  return slides.map(html=>({html}));
+}
+function abrirApresentacao(){
+  const d=cachedAdminData;
+  if(!d){toast('Aguarde o painel carregar antes de iniciar a apresentação.','warn');return}
+  presSlides=buildPresentationSlides(d);
+  presIndex=0;
+  document.getElementById('pres-overlay').classList.add('on');
+  renderPresSlide();
+  document.addEventListener('keydown', presKeyHandler);
+}
+function fecharApresentacao(){
+  document.getElementById('pres-overlay').classList.remove('on');
+  document.removeEventListener('keydown', presKeyHandler);
+}
+function presKeyHandler(e){
+  if(e.key==='ArrowRight') presProximo();
+  else if(e.key==='ArrowLeft') presAnterior();
+  else if(e.key==='Escape') fecharApresentacao();
+}
+function presProximo(){ if(presIndex<presSlides.length-1){presIndex++; renderPresSlide();} }
+function presAnterior(){ if(presIndex>0){presIndex--; renderPresSlide();} }
+function renderPresSlide(){
+  const slide=presSlides[presIndex]; if(!slide)return;
+  document.getElementById('pres-slide').innerHTML=slide.html;
+  document.getElementById('pres-dots').innerHTML=presSlides.map((_,i)=>`<span class="pres-dot ${i===presIndex?'active':''}"></span>`).join('');
 }
 
 function userCanAccessMaterials(u){
@@ -1388,7 +1708,7 @@ function renderUserArea(d){
   const certTab = currentUser.certificadoLiberado ? `<button class="tab" onclick="showTab('user-certificado',this)">🎓 Certificado</button>` : '';
   const tabs = document.querySelector('#screen-user .tabs');
   tabs.innerHTML = usuarioPodeVerMateriais(currentUser)
-    ? `<button class="tab active" onclick="showTab('user-materiais',this)">📚 Materiais</button><button class="tab" onclick="showTab('user-tarefas',this)">📝 Tarefas</button>${certTab}<button class="tab" onclick="showTab('user-perfil',this)">Minha anamnese</button><button class="tab" onclick="showTab('user-regularizacao',this)">Pagamento</button><button class="tab" onclick="showTab('user-senha',this)">Alterar senha</button>`
+    ? `<button class="tab active" onclick="showTab('user-materiais',this)">📚 Materiais</button><button class="tab" onclick="showTab('user-tarefas',this)">📝 Tarefas</button><button class="tab" onclick="showTab('user-enquetes',this)">🗳️ Enquetes</button><button class="tab" onclick="showTab('user-mural-palavras',this)">☁️ Mural de palavras</button><button class="tab" onclick="showTab('user-mural-turma',this)">🖼️ Mural da turma</button>${certTab}<button class="tab" onclick="showTab('user-perfil',this)">Minha anamnese</button><button class="tab" onclick="showTab('user-regularizacao',this)">Pagamento</button><button class="tab" onclick="showTab('user-senha',this)">Alterar senha</button>`
     : `<button class="tab active" onclick="showTab('user-regularizacao',this)">⚠️ Regularizar pagamento</button>${certTab}<button class="tab" onclick="showTab('user-perfil',this)">Minha anamnese</button><button class="tab" onclick="showTab('user-senha',this)">Alterar senha</button>`;
 
   let tarefasPanel=document.getElementById('user-tarefas');
@@ -1397,6 +1717,27 @@ function renderUserArea(d){
     tarefasPanel.id='user-tarefas';
     tarefasPanel.className='tab-panel';
     document.getElementById('user-perfil').before(tarefasPanel);
+  }
+  let enquetesPanel=document.getElementById('user-enquetes');
+  if(!enquetesPanel){
+    enquetesPanel=document.createElement('div');
+    enquetesPanel.id='user-enquetes';
+    enquetesPanel.className='tab-panel';
+    document.getElementById('user-perfil').before(enquetesPanel);
+  }
+  let muralPalavrasPanel=document.getElementById('user-mural-palavras');
+  if(!muralPalavrasPanel){
+    muralPalavrasPanel=document.createElement('div');
+    muralPalavrasPanel.id='user-mural-palavras';
+    muralPalavrasPanel.className='tab-panel';
+    document.getElementById('user-perfil').before(muralPalavrasPanel);
+  }
+  let muralTurmaPanel=document.getElementById('user-mural-turma');
+  if(!muralTurmaPanel){
+    muralTurmaPanel=document.createElement('div');
+    muralTurmaPanel.id='user-mural-turma';
+    muralTurmaPanel.className='tab-panel';
+    document.getElementById('user-perfil').before(muralTurmaPanel);
   }
   let certPanel=document.getElementById('user-certificado');
   if(!certPanel){
@@ -1466,8 +1807,14 @@ function renderUserArea(d){
     regPanel.innerHTML=regularizacao;
     renderMateriaisUsuario(d);
     renderTarefasUsuario(d);
+    renderEnquetesUsuario(d);
+    renderMuralPalavrasUsuario(d);
+    renderMuralTurma(d);
   } else {
     tarefasPanel.innerHTML=empty('Tarefas disponíveis após a regularização do pagamento.','🔒');
+    enquetesPanel.innerHTML=empty('Enquetes disponíveis após a regularização do pagamento.','🔒');
+    muralPalavrasPanel.innerHTML=empty('Mural de palavras disponível após a regularização do pagamento.','🔒');
+    muralTurmaPanel.innerHTML=empty('Mural da turma disponível após a regularização do pagamento.','🔒');
     regPanel.classList.add('active');
     regPanel.innerHTML=regularizacao;
     document.getElementById('user-materiais').innerHTML=empty('Materiais bloqueados até a regularização do pagamento.','🔒');
