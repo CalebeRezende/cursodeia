@@ -1485,21 +1485,45 @@ async function toggleCertificado(id){
   toast(u.certificadoLiberado?`Certificado de ${u.nome.split(' ')[0]} liberado! 🎓`:`Certificado de ${u.nome.split(' ')[0]} revogado.`, u.certificadoLiberado?'ok':'info');
 }
 async function salvarCertConfig(){
+  const fileInput=document.getElementById('cert-assina-img');
+  const file=fileInput&&fileInput.files[0];
+  if(file&&file.size>80*1024){toast('Imagem muito grande. Use um PNG leve, de preferência abaixo de 50KB.','warn',6000);return}
   const d=await getData();
   d.config=d.config||{};
   d.config.cursoNome=val('cert-curso')||'Introdução à Inteligência Artificial';
   d.config.cargaHoraria=val('cert-horas')||'20 horas';
   d.config.assinatura=val('cert-assina')||'Coordenação do curso';
-  await saveData(d); toast('Configuração do certificado salva.','ok');
+  if(file){
+    d.config.assinaturaImagem=await fileToBase64(file);
+    d.config.assinaturaImagemTipo=file.type||'image/png';
+  }
+  await saveData(d); await renderAdmin(); toast('Configuração do certificado salva.','ok');
+}
+async function removerAssinaturaImg(){
+  const d=await getData();
+  d.config=d.config||{};
+  delete d.config.assinaturaImagem;
+  delete d.config.assinaturaImagemTipo;
+  await saveData(d); await renderAdmin(); toast('Imagem da assinatura removida.','info');
 }
 function certConfigCardHtml(d){
   const c=d.config||{};
+  const previewHtml=c.assinaturaImagem
+    ?`<div style="margin-top:8px;display:flex;align-items:center;gap:12px">
+        <img src="data:${c.assinaturaImagemTipo||'image/png'};base64,${c.assinaturaImagem}" style="height:44px;background:#F4F3FB;padding:6px 10px;border-radius:6px">
+        <button type="button" class="btn btn-sm" onclick="removerAssinaturaImg()">Remover imagem</button>
+      </div>`
+    :`<p class="small" style="margin-top:6px">Nenhuma imagem enviada ainda — o certificado usa só o nome em texto acima da linha.</p>`;
   return `<div class="card"><h3 style="margin-bottom:6px;color:var(--purple-900);font-family:'Fraunces',serif;font-weight:600">🎓 Configuração do certificado</h3>
     <p class="small" style="margin-bottom:14px">Esses dados aparecem no certificado que os participantes liberados podem gerar. Libere o certificado de cada participante pelo botão na tabela abaixo.</p>
     <div class="grid grid-3">
       <div class="field"><label class="field-label">Nome do curso</label><input type="text" id="cert-curso" value="${esc(c.cursoNome||'Introdução à Inteligência Artificial')}"></div>
       <div class="field"><label class="field-label">Carga horária</label><input type="text" id="cert-horas" value="${esc(c.cargaHoraria||'20 horas')}"></div>
       <div class="field"><label class="field-label">Assinatura / responsável</label><input type="text" id="cert-assina" value="${esc(c.assinatura||'Coordenação do curso')}"></div>
+    </div>
+    <div class="field" style="margin-top:10px"><label class="field-label">Imagem da assinatura (PNG, opcional)</label>
+      <input type="file" id="cert-assina-img" accept="image/png,image/jpeg">
+      ${previewHtml}
     </div>
     <button class="btn btn-sm btn-primary" onclick="salvarCertConfig()">Salvar configuração</button></div>`;
 }
@@ -1509,6 +1533,7 @@ function gerarCertificado(){
   const nomeCurso=c.cursoNome||'Introdução à Inteligência Artificial';
   const horas=c.cargaHoraria||'20 horas';
   const assina=c.assinatura||'Coordenação do curso';
+  const assinaImgTag=c.assinaturaImagem?`<img src="data:${c.assinaturaImagemTipo||'image/png'};base64,${c.assinaturaImagem}" class="assin-img">`:'';
   const dataTxt=new Date().toLocaleDateString('pt-BR',{day:'numeric',month:'long',year:'numeric'});
   const w=window.open('','_blank');
   if(!w){toast('O navegador bloqueou a janela do certificado. Libere pop-ups para este site.','warn',6000);return}
@@ -1528,7 +1553,9 @@ function gerarCertificado(){
     .texto{font-size:15px;color:#5A5670;max-width:640px;line-height:1.7}
     .texto strong{color:#241F55}
     .rodape{display:flex;gap:80px;margin-top:44px;align-items:flex-end}
-    .assin{border-top:1.5px solid #241F55;padding-top:8px;min-width:230px;font-size:13px;color:#241F55;font-weight:600}
+    .assin-block{display:flex;flex-direction:column;align-items:center}
+    .assin-img{height:50px;object-fit:contain;margin-bottom:2px}
+    .assin{border-top:1.5px solid #241F55;padding-top:8px;min-width:230px;font-size:13px;color:#241F55;font-weight:600;text-align:center}
     .assin .small{font-weight:400;color:#948FA8;font-size:11px}
     .data{font-size:13px;color:#5A5670}
     .no-print{position:fixed;top:18px;right:18px;display:flex;gap:8px}
@@ -1544,7 +1571,7 @@ function gerarCertificado(){
     <div class="nome">${esc(currentUser.nome)}</div>
     <div class="texto">pela participação e conclusão do curso <strong>${esc(nomeCurso)}</strong>, com carga horária total de <strong>${esc(horas)}</strong>, dedicado ao uso prático e consciente da Inteligência Artificial no cotidiano e no mundo do trabalho.</div>
     <div class="rodape">
-      <div class="assin">${esc(assina)}<div class="small">Assinatura</div></div>
+      <div class="assin-block">${assinaImgTag}<div class="assin">${esc(assina)}<div class="small">Assinatura</div></div></div>
       <div class="data">Emitido em ${esc(dataTxt)}</div>
     </div>
   </div></div>
