@@ -612,7 +612,14 @@ async function saveData(d){
   try{
     const recordToSave = { ...(latestRecord || {}), respostas: d };
     const res = await fetch(API_BASE, { method:'PUT', headers: HEADERS, body: JSON.stringify(recordToSave) });
-    if(!res.ok) throw new Error('Erro ao salvar no JSONBin');
+    if(!res.ok){
+      const body = await res.json().catch(()=>({}));
+      const excedeuLimite = res.status===403 && /100\s*kb/i.test(body.message||'');
+      toast(excedeuLimite
+        ? 'Não foi possível salvar: os dados excederam o limite de 100KB do banco gratuito. Use uma imagem de assinatura menor.'
+        : 'Não foi possível salvar as alterações. Verifique a internet e tente novamente.', 'err', 7000);
+      throw new Error(body.message || 'Erro ao salvar no JSONBin');
+    }
     latestRecord = recordToSave;
   }finally{
     progressDone();
@@ -826,7 +833,7 @@ function renderUsuarios(d){
   if(!d.usuarios.length){el.innerHTML=certConfigCardHtml(d)+empty('Nenhum usuário criado ainda. Crie usuários a partir das anamneses recebidas ou na aba "Criar usuário".','👤');return}
   let html=certConfigCardHtml(d);
   html+='<div class="table-wrap"><table><thead><tr><th>Nome</th><th>Acesso</th><th>Status</th><th>Contato</th><th>Comprovante</th><th>Ações</th></tr></thead><tbody>';
-  d.usuarios.forEach(u=>{html+=`<tr><td><strong>${esc(u.nome)}</strong><br><span class="small">CPF: ${esc(u.cpf||'—')}</span>${u.certificadoLiberado?'<br><span class="badge badge-info">🎓 certificado liberado</span>':''}</td><td><strong>${esc(u.usuario)}</strong><br><span class="small">Senha: ${esc(u.senha)}</span></td><td>${badgePay(u)} ${u.bloqueado?'<span class="badge badge-block">bloqueado</span>':''}<br><span class="small">Pago: ${formatDateBR(u.mensalidadeInicio)||'—'} até ${formatDateBR(u.mensalidadeFim)||'—'}</span></td><td>${esc(u.email||'—')}<br>${esc(u.whatsapp||'—')}</td><td>${u.ultimoComprovantePix?`<strong>${esc(u.ultimoComprovantePix)}</strong><br><span class="small">${esc(u.ultimoComprovanteEm||'')}</span><br><span class="small">${esc(u.ultimoComprovanteObs||'')}</span>`:'—'}</td><td><button class="btn btn-sm" onclick="togglePay(${u.id})">Alternar pagamento</button><br><button class="btn btn-sm" style="margin-top:6px" onclick="toggleBlock(${u.id})">Bloquear/liberar</button><br><button class="btn btn-sm" style="margin-top:6px" onclick="toggleCertificado(${u.id})">${u.certificadoLiberado?'Revogar certificado':'🎓 Liberar certificado'}</button><br><button class="btn btn-sm btn-danger" style="margin-top:6px" onclick="deleteUser(${u.id})">Apagar</button></td></tr>`});
+  d.usuarios.forEach(u=>{html+=`<tr><td><input type="text" id="user-nome-${u.id}" value="${esc(u.nome)}" style="min-width:170px;margin-bottom:4px"><br><button class="btn btn-sm" onclick="salvarNomeUsuario(${u.id})">Salvar nome</button><br><span class="small">CPF: ${esc(u.cpf||'—')}</span>${u.certificadoLiberado?'<br><span class="badge badge-info">🎓 certificado liberado</span>':''}</td><td><strong>${esc(u.usuario)}</strong><br><span class="small">Senha: ${esc(u.senha)}</span></td><td>${badgePay(u)} ${u.bloqueado?'<span class="badge badge-block">bloqueado</span>':''}<br><span class="small">Pago: ${formatDateBR(u.mensalidadeInicio)||'—'} até ${formatDateBR(u.mensalidadeFim)||'—'}</span></td><td>${esc(u.email||'—')}<br>${esc(u.whatsapp||'—')}</td><td>${u.ultimoComprovantePix?`<strong>${esc(u.ultimoComprovantePix)}</strong><br><span class="small">${esc(u.ultimoComprovanteEm||'')}</span><br><span class="small">${esc(u.ultimoComprovanteObs||'')}</span>`:'—'}</td><td><button class="btn btn-sm" onclick="togglePay(${u.id})">Alternar pagamento</button><br><button class="btn btn-sm" style="margin-top:6px" onclick="toggleBlock(${u.id})">Bloquear/liberar</button><br><button class="btn btn-sm" style="margin-top:6px" onclick="toggleCertificado(${u.id})">${u.certificadoLiberado?'Revogar certificado':'🎓 Liberar certificado'}</button><br><button class="btn btn-sm btn-danger" style="margin-top:6px" onclick="deleteUser(${u.id})">Apagar</button></td></tr>`});
   html+='</tbody></table></div>'; el.innerHTML=html;
 }
 
@@ -843,6 +850,13 @@ function vencimentoTexto(u){
 }
 
 function badgePay(u){return u.pagamento==='em dia'?'<span class="badge badge-ok">em dia</span>':'<span class="badge badge-late">em atraso</span>'}
+async function salvarNomeUsuario(id){
+  const novoNome=val('user-nome-'+id);
+  if(!novoNome){toast('O nome não pode ficar em branco.','warn');return}
+  const d=await getData(); const u=d.usuarios.find(x=>x.id===id); if(!u)return;
+  u.nome=novoNome;
+  await saveData(d); await renderAdmin(); toast('Nome atualizado.','ok');
+}
 async function togglePay(id){const d=await getData();const u=d.usuarios.find(x=>x.id===id);if(u){u.pagamento=u.pagamento==='em dia'?'em atraso':'em dia';await saveData(d);await renderAdmin();toast(`Pagamento de ${u.nome.split(' ')[0]} alterado para "${u.pagamento}".`,'info')}}
 async function toggleBlock(id){const d=await getData();const u=d.usuarios.find(x=>x.id===id);if(u){u.bloqueado=!u.bloqueado;await saveData(d);await renderAdmin();toast(u.bloqueado?`Acesso de ${u.nome.split(' ')[0]} bloqueado.`:`Acesso de ${u.nome.split(' ')[0]} liberado.`,u.bloqueado?'warn':'ok')}}
 async function deleteUser(id){if(!confirm('Apagar este usuário?'))return;const d=await getData();d.usuarios=d.usuarios.filter(u=>u.id!==id);await saveData(d);await renderAdmin();toast('Usuário apagado.','info')}
@@ -1487,7 +1501,7 @@ async function toggleCertificado(id){
 async function salvarCertConfig(){
   const fileInput=document.getElementById('cert-assina-img');
   const file=fileInput&&fileInput.files[0];
-  if(file&&file.size>80*1024){toast('Imagem muito grande. Use um PNG leve, de preferência abaixo de 50KB.','warn',6000);return}
+  if(file&&file.size>35*1024){toast('Imagem muito grande. O banco de dados gratuito tem limite de 100KB no total — use um PNG bem leve, de preferência abaixo de 30KB (recorte a imagem e comprima).','warn',7000);return}
   const d=await getData();
   d.config=d.config||{};
   d.config.cursoNome=val('cert-curso')||'Introdução à Inteligência Artificial';
@@ -1523,6 +1537,7 @@ function certConfigCardHtml(d){
     </div>
     <div class="field" style="margin-top:10px"><label class="field-label">Imagem da assinatura (PNG, opcional)</label>
       <input type="file" id="cert-assina-img" accept="image/png,image/jpeg">
+      <p class="small" style="margin-top:4px">Use uma imagem bem leve (abaixo de 30KB, fundo transparente e bem recortada) — o banco de dados gratuito tem limite de 100KB no total.</p>
       ${previewHtml}
     </div>
     <button class="btn btn-sm btn-primary" onclick="salvarCertConfig()">Salvar configuração</button></div>`;
