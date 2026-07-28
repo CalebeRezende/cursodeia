@@ -833,7 +833,7 @@ function renderUsuarios(d){
   if(!d.usuarios.length){el.innerHTML=certConfigCardHtml(d)+empty('Nenhum usuário criado ainda. Crie usuários a partir das anamneses recebidas ou na aba "Criar usuário".','👤');return}
   let html=certConfigCardHtml(d);
   html+='<div class="table-wrap"><table><thead><tr><th>Nome</th><th>Acesso</th><th>Status</th><th>Contato</th><th>Comprovante</th><th>Ações</th></tr></thead><tbody>';
-  d.usuarios.forEach(u=>{html+=`<tr><td><input type="text" id="user-nome-${u.id}" value="${esc(u.nome)}" style="min-width:170px;margin-bottom:4px"><br><button class="btn btn-sm" onclick="salvarNomeUsuario(${u.id})">Salvar nome</button><br><span class="small">CPF: ${esc(u.cpf||'—')}</span>${u.certificadoLiberado?'<br><span class="badge badge-info">🎓 certificado liberado</span>':''}</td><td><strong>${esc(u.usuario)}</strong><br><span class="small">Senha: ${esc(u.senha)}</span></td><td>${badgePay(u)} ${u.bloqueado?'<span class="badge badge-block">bloqueado</span>':''}<br><span class="small">Pago: ${formatDateBR(u.mensalidadeInicio)||'—'} até ${formatDateBR(u.mensalidadeFim)||'—'}</span></td><td>${esc(u.email||'—')}<br>${esc(u.whatsapp||'—')}</td><td>${u.ultimoComprovantePix?`<strong>${esc(u.ultimoComprovantePix)}</strong><br><span class="small">${esc(u.ultimoComprovanteEm||'')}</span><br><span class="small">${esc(u.ultimoComprovanteObs||'')}</span>`:'—'}</td><td><button class="btn btn-sm" onclick="togglePay(${u.id})">Alternar pagamento</button><br><button class="btn btn-sm" style="margin-top:6px" onclick="toggleBlock(${u.id})">Bloquear/liberar</button><br><button class="btn btn-sm" style="margin-top:6px" onclick="toggleCertificado(${u.id})">${u.certificadoLiberado?'Revogar certificado':'🎓 Liberar certificado'}</button><br><button class="btn btn-sm btn-danger" style="margin-top:6px" onclick="deleteUser(${u.id})">Apagar</button></td></tr>`});
+  d.usuarios.forEach(u=>{html+=`<tr><td><input type="text" id="user-nome-${u.id}" value="${esc(u.nome)}" style="min-width:170px;margin-bottom:4px"><br><button class="btn btn-sm" onclick="salvarNomeUsuario(${u.id})">Salvar nome</button><br><span class="small">CPF: ${esc(u.cpf||'—')}</span>${u.certificadoLiberado?'<br><span class="badge badge-info">🎓 certificado liberado</span>':''}</td><td><strong>${esc(u.usuario)}</strong><br><span class="small">Senha: ${esc(u.senha)}</span></td><td>${badgePay(u)} ${u.bloqueado?'<span class="badge badge-block">bloqueado</span>':''}<br><label class="field-label" style="display:block;margin-top:6px">Pago até</label><input type="date" id="user-vig-${u.id}" value="${esc(u.mensalidadeFim||'')}" style="min-width:150px"></td><td>${esc(u.email||'—')}<br>${esc(u.whatsapp||'—')}</td><td>${u.ultimoComprovantePix?`<strong>${esc(u.ultimoComprovantePix)}</strong><br><span class="small">${esc(u.ultimoComprovanteEm||'')}</span><br><span class="small">${esc(u.ultimoComprovanteObs||'')}</span>`:'—'}</td><td><button class="btn btn-sm" onclick="togglePay(${u.id})">Alternar pagamento</button><br><button class="btn btn-sm" style="margin-top:6px" onclick="toggleBlock(${u.id})">Bloquear/liberar</button><br><button class="btn btn-sm" style="margin-top:6px" onclick="toggleCertificado(${u.id})">${u.certificadoLiberado?'Revogar certificado':'🎓 Liberar certificado'}</button><br><button class="btn btn-sm btn-danger" style="margin-top:6px" onclick="deleteUser(${u.id})">Apagar</button></td></tr>`});
   html+='</tbody></table></div>'; el.innerHTML=html;
 }
 
@@ -857,8 +857,33 @@ async function salvarNomeUsuario(id){
   u.nome=novoNome;
   await saveData(d); await renderAdmin(); toast('Nome atualizado.','ok');
 }
-async function togglePay(id){const d=await getData();const u=d.usuarios.find(x=>x.id===id);if(u){u.pagamento=u.pagamento==='em dia'?'em atraso':'em dia';await saveData(d);await renderAdmin();toast(`Pagamento de ${u.nome.split(' ')[0]} alterado para "${u.pagamento}".`,'info')}}
-async function toggleBlock(id){const d=await getData();const u=d.usuarios.find(x=>x.id===id);if(u){u.bloqueado=!u.bloqueado;await saveData(d);await renderAdmin();toast(u.bloqueado?`Acesso de ${u.nome.split(' ')[0]} bloqueado.`:`Acesso de ${u.nome.split(' ')[0]} liberado.`,u.bloqueado?'warn':'ok')}}
+function aplicarVigenciaEditada(u,id){
+  const vigInput=document.getElementById('user-vig-'+id);
+  const novaData=vigInput&&vigInput.value;
+  if(novaData) u.mensalidadeFim=novaData;
+}
+async function togglePay(id){
+  const d=await getData();const u=d.usuarios.find(x=>x.id===id); if(!u)return;
+  if(u.pagamento!=='em dia'){
+    aplicarVigenciaEditada(u,id);
+    if(!u.mensalidadeFim||isExpiredDate(u.mensalidadeFim)){toast('Defina uma data futura no campo "Pago até" antes de marcar como em dia.','warn',6000);return}
+    u.pagamento='em dia'; u.bloqueado=false;
+  }else{
+    u.pagamento='em atraso'; u.bloqueado=true;
+  }
+  await saveData(d);await renderAdmin();toast(`Pagamento de ${u.nome.split(' ')[0]} alterado para "${u.pagamento}".`,'info');
+}
+async function toggleBlock(id){
+  const d=await getData();const u=d.usuarios.find(x=>x.id===id); if(!u)return;
+  if(u.bloqueado){
+    aplicarVigenciaEditada(u,id);
+    if(!u.mensalidadeFim||isExpiredDate(u.mensalidadeFim)){toast('Defina uma data futura no campo "Pago até" antes de desbloquear.','warn',6000);return}
+    u.pagamento='em dia'; u.bloqueado=false;
+  }else{
+    u.bloqueado=true;
+  }
+  await saveData(d);await renderAdmin();toast(u.bloqueado?`Acesso de ${u.nome.split(' ')[0]} bloqueado.`:`Acesso de ${u.nome.split(' ')[0]} liberado.`,u.bloqueado?'warn':'ok');
+}
 async function deleteUser(id){if(!confirm('Apagar este usuário?'))return;const d=await getData();d.usuarios=d.usuarios.filter(u=>u.id!==id);await saveData(d);await renderAdmin();toast('Usuário apagado.','info')}
 async function deleteCadastro(id){if(!confirm('Apagar esta anamnese?'))return;const d=await getData();d.cadastros=d.cadastros.filter(c=>c.id!==id);await saveData(d);await renderAdmin();toast('Anamnese apagada.','info')}
 
