@@ -857,8 +857,25 @@ async function salvarNomeUsuario(id){
   u.nome=novoNome;
   await saveData(d); await renderAdmin(); toast('Nome atualizado.','ok');
 }
-async function togglePay(id){const d=await getData();const u=d.usuarios.find(x=>x.id===id);if(u){u.pagamento=u.pagamento==='em dia'?'em atraso':'em dia';await saveData(d);await renderAdmin();toast(`Pagamento de ${u.nome.split(' ')[0]} alterado para "${u.pagamento}".`,'info')}}
-async function toggleBlock(id){const d=await getData();const u=d.usuarios.find(x=>x.id===id);if(u){u.bloqueado=!u.bloqueado;await saveData(d);await renderAdmin();toast(u.bloqueado?`Acesso de ${u.nome.split(' ')[0]} bloqueado.`:`Acesso de ${u.nome.split(' ')[0]} liberado.`,u.bloqueado?'warn':'ok')}}
+function estenderVigenciaSeVencida(u){
+  if(!u.mensalidadeFim || isExpiredDate(u.mensalidadeFim)){
+    const start=new Date(); const end=new Date(start); end.setMonth(end.getMonth()+1);
+    u.mensalidadeInicio=toDateInput(start); u.mensalidadeFim=toDateInput(end);
+  }
+}
+async function togglePay(id){
+  const d=await getData();const u=d.usuarios.find(x=>x.id===id); if(!u)return;
+  u.pagamento=u.pagamento==='em dia'?'em atraso':'em dia';
+  if(u.pagamento==='em dia'){ u.bloqueado=false; estenderVigenciaSeVencida(u); }
+  else{ u.bloqueado=true; }
+  await saveData(d);await renderAdmin();toast(`Pagamento de ${u.nome.split(' ')[0]} alterado para "${u.pagamento}".`,'info');
+}
+async function toggleBlock(id){
+  const d=await getData();const u=d.usuarios.find(x=>x.id===id); if(!u)return;
+  u.bloqueado=!u.bloqueado;
+  if(!u.bloqueado){ u.pagamento='em dia'; estenderVigenciaSeVencida(u); }
+  await saveData(d);await renderAdmin();toast(u.bloqueado?`Acesso de ${u.nome.split(' ')[0]} bloqueado.`:`Acesso de ${u.nome.split(' ')[0]} liberado.`,u.bloqueado?'warn':'ok');
+}
 async function deleteUser(id){if(!confirm('Apagar este usuário?'))return;const d=await getData();d.usuarios=d.usuarios.filter(u=>u.id!==id);await saveData(d);await renderAdmin();toast('Usuário apagado.','info')}
 async function deleteCadastro(id){if(!confirm('Apagar esta anamnese?'))return;const d=await getData();d.cadastros=d.cadastros.filter(c=>c.id!==id);await saveData(d);await renderAdmin();toast('Anamnese apagada.','info')}
 
