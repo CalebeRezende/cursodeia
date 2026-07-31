@@ -1734,9 +1734,9 @@ function statusBannerHtml(u){
       <div class="status-icon">⚠️</div>
       <div class="status-body">
         <h3>Você tem uma pendência de pagamento</h3>
-        <p>Seu acesso aos materiais está bloqueado. Para voltar a acessar, faça o Pix, envie o comprovante na aba abaixo e aguarde a liberação pelo administrador.</p>
+        <p>Seu acesso aos materiais está bloqueado. Para voltar a acessar, faça o Pix e envie o comprovante na aba abaixo — seu acesso é liberado na hora.</p>
         ${fimTxt?`<span class="status-chip">Vigência encerrada em ${fimTxt}</span>`:''}
-        ${u.ultimoComprovantePix?`<span class="status-chip">📎 Comprovante enviado em ${esc(u.ultimoComprovanteEm||'')} — em análise</span>`:''}
+        ${u.ultimoComprovantePix?`<span class="status-chip">📎 Comprovante enviado em ${esc(u.ultimoComprovanteEm||'')}</span>`:''}
         <br><button class="btn btn-primary" onclick="irParaRegularizacao()">Regularizar pagamento agora</button>
       </div>
     </div>`;
@@ -1890,7 +1890,7 @@ function renderUserArea(d){
   let regularizacao = `
     <div class="card">
       <h3 style="color:var(--purple-900);margin-bottom:10px;font-family:'Fraunces',serif;font-weight:600">${usuarioPodeVerMateriais(currentUser)?'Pagamento e renovação':'Regularização de pagamento'}</h3>
-      <p style="color:var(--muted);margin-bottom:14px">${usuarioPodeVerMateriais(currentUser)?'Para renovar sua mensalidade, faça o Pix e anexe o comprovante abaixo. O administrador confirmará a renovação.':'Seu acesso aos materiais está bloqueado ou em atraso. Para regularizar, faça o Pix, anexe o comprovante abaixo e aguarde a liberação pelo administrador.'}</p>
+      <p style="color:var(--muted);margin-bottom:14px">${usuarioPodeVerMateriais(currentUser)?'Para renovar sua mensalidade, faça o Pix e anexe o comprovante abaixo. Seu acesso é renovado por mais 1 mês na hora.':'Seu acesso aos materiais está bloqueado ou em atraso. Para regularizar, faça o Pix e anexe o comprovante abaixo — seu acesso é liberado na hora.'}</p>
       <div style="background:var(--gray-50);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:16px;">
         <div style="font-size:13px;color:var(--muted);margin-bottom:10px;">Chave Pix</div>
         <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
@@ -1901,9 +1901,9 @@ function renderUserArea(d){
       </div>
       <div class="field"><label class="field-label">Anexar novo comprovante Pix</label><input type="file" id="user-pix-file" accept="image/*,.pdf"></div>
       <div class="field"><label class="field-label">Observações sobre o pagamento</label><input type="text" id="user-pix-obs" placeholder="Ex.: pago em nome de outra pessoa, data do Pix..."></div>
-      <button class="btn btn-primary" id="btn-enviar-comprovante" onclick="submitComprovanteUsuario()">Enviar comprovante para análise</button>
-      <div class="small" style="margin-top:10px">Depois do envio, o administrador precisará conferir e liberar seu acesso aos materiais.</div>
-      ${currentUser.ultimoComprovantePix?`<div class="notice" style="margin-top:14px;margin-bottom:0"><strong>Último comprovante enviado:</strong> ${esc(currentUser.ultimoComprovantePix)} em ${esc(currentUser.ultimoComprovanteEm||'')}. Aguardando conferência do administrador.</div>`:''}
+      <button class="btn btn-primary" id="btn-enviar-comprovante" onclick="submitComprovanteUsuario()">Enviar comprovante e liberar acesso</button>
+      <div class="small" style="margin-top:10px">Ao enviar, seu acesso é liberado automaticamente por mais 1 mês.</div>
+      ${currentUser.ultimoComprovantePix?`<div class="notice" style="margin-top:14px;margin-bottom:0"><strong>Último comprovante enviado:</strong> ${esc(currentUser.ultimoComprovantePix)} em ${esc(currentUser.ultimoComprovanteEm||'')}.</div>`:''}
     </div>`;
 
   const regPanelId='user-regularizacao';
@@ -2005,13 +2005,15 @@ async function submitComprovanteUsuario(){
     u.comprovanteEmail=emailStatus;
     if(!Array.isArray(u.comprovantes)) u.comprovantes=[];
     u.comprovantes.push({data:new Date().toLocaleString('pt-BR'), fileName:file.name, enviado:!!emailStatus.enviado, obs:obsEl?obsEl.value.trim():''});
-    u.pagamento='em atraso';
-    u.bloqueado=true;
+    const start=new Date(); const end=new Date(start); end.setMonth(end.getMonth()+1);
+    u.mensalidadeInicio=toDateInput(start); u.mensalidadeFim=toDateInput(end);
+    u.pagamento='em dia';
+    u.bloqueado=false;
     currentUser={...u};
   }
   await saveData(d);
   setBusy('btn-enviar-comprovante',false);
-  toast('Comprovante enviado! Aguarde o administrador conferir e liberar seu acesso.','ok',5000);
+  toast('Comprovante recebido! Seu acesso foi liberado por mais 1 mês.','ok',5000);
   renderUserArea(d);
 }
 
