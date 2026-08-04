@@ -514,6 +514,7 @@ let matFilterUser  = 'todos';
 let matSearchUser  = '';
 let cachedAdminData = null;
 let cachedUserData  = null;
+let adminTurmaFiltro = '';
 
 // ===== UI: toasts, barra de progresso, senha, botão ocupado =====
 function toast(msg, type='ok', ms=3800){
@@ -642,6 +643,20 @@ function turmaSelectOptions(turmas, selectedId=''){ return (turmas||[]).map(t=>`
 function turmaSelectComTodas(turmas, selectedId=''){ return `<option value="">Todas as turmas</option>`+turmaSelectOptions(turmas, selectedId); }
 function turmaBadgeHtml(turmaId, turmas){ return turmaId ? `<span class="badge badge-info">🏫 ${esc(turmaNome(turmaId,turmas)||'turma removida')}</span>` : `<span class="badge badge-info">Todas as turmas</span>`; }
 function itemVisivelParaTurma(item, usuario){ return !item.turmaId || item.turmaId===(usuario&&usuario.turmaId); }
+function itemVisivelNoFiltroAdmin(item){ return !adminTurmaFiltro || itemVisivelParaTurma(item, {turmaId:adminTurmaFiltro}); }
+function turmaFiltroBarHtml(d){
+  return `<div class="card" style="margin-bottom:16px"><label class="field-label">Gerenciando conteúdo da turma</label><select onchange="setAdminTurmaFiltro(this.value)">${turmaSelectComTodas(d.turmas, adminTurmaFiltro)}</select><div class="small" style="margin-top:6px">Escolha uma turma para focar a lista e já publicar direto para ela, ou deixe em "Todas as turmas" para ver tudo.</div></div>`;
+}
+function setAdminTurmaFiltro(v){
+  adminTurmaFiltro = v ? Number(v) : '';
+  if(!cachedAdminData) return;
+  renderMateriaisAdmin(cachedAdminData);
+  renderAvisosAdmin(cachedAdminData);
+  renderAgendaAdmin(cachedAdminData);
+  renderTarefasAdmin(cachedAdminData);
+  renderEnquetesAdmin(cachedAdminData);
+  renderMuralPalavrasAdmin(cachedAdminData);
+}
 
 function startAnamnese(){
   ['cad-nome','cad-cpf','cad-email','cad-whatsapp','cad-profissao','cad-conhece','cad-aprender','cad-acelerar','cad-observacoes'].forEach(id=>document.getElementById(id).value=''); document.getElementById('cad-pix-file').value='';
@@ -1101,14 +1116,16 @@ function setMatFilterAdmin(f){
 function renderMateriaisAdmin(d){
   cachedAdminData=d;
   const el=document.getElementById('admin-materiais');
-  let form=`<div class="card"><h3 style="margin-bottom:14px;color:var(--purple-900);font-family:'Fraunces',serif;font-weight:600">Adicionar material</h3><div class="notice"><strong>Como funciona:</strong> você pode colar o link de um arquivo do Google Drive. O participante verá o conteúdo incorporado dentro da plataforma, sem precisar entrar manualmente no Drive. Para funcionar bem, deixe o arquivo como “qualquer pessoa com o link pode visualizar”.</div><div class="grid grid-2"><div class="field"><label class="field-label">Tipo</label><select id="mat-tipo"><option>Artigo</option><option>Slide</option><option>Podcast</option><option>Imagem</option><option>Vídeo</option><option>Link</option><option>Atividade</option><option>PDF</option></select></div><div class="field"><label class="field-label">Como exibir na plataforma</label><select id="mat-display"><option value="auto">Detectar automaticamente</option><option value="pdf">PDF / Slides em visualizador</option><option value="image">Imagem dentro da página</option><option value="audio">Áudio / podcast dentro da página</option><option value="video">Vídeo dentro da página</option><option value="link">Card com link</option></select></div></div><div class="field"><label class="field-label">Título</label><input type="text" id="mat-titulo"></div><div class="field"><label class="field-label">Descrição/orientação</label><textarea id="mat-desc"></textarea></div><div class="field"><label class="field-label">Link do arquivo no Drive, YouTube, áudio, PDF ou outro material</label><input type="text" id="mat-link" placeholder="https://drive.google.com/file/d/... ou outro link"></div><div class="field"><label class="field-label">Turma</label><select id="mat-turma">${turmaSelectComTodas(d.turmas)}</select></div><button class="btn btn-primary" onclick="addMaterial()">Publicar material</button></div>`;
+  let form=`<div class="card"><h3 style="margin-bottom:14px;color:var(--purple-900);font-family:'Fraunces',serif;font-weight:600">Adicionar material</h3><div class="notice"><strong>Como funciona:</strong> você pode colar o link de um arquivo do Google Drive. O participante verá o conteúdo incorporado dentro da plataforma, sem precisar entrar manualmente no Drive. Para funcionar bem, deixe o arquivo como “qualquer pessoa com o link pode visualizar”.</div><div class="grid grid-2"><div class="field"><label class="field-label">Tipo</label><select id="mat-tipo"><option>Artigo</option><option>Slide</option><option>Podcast</option><option>Imagem</option><option>Vídeo</option><option>Link</option><option>Atividade</option><option>PDF</option></select></div><div class="field"><label class="field-label">Como exibir na plataforma</label><select id="mat-display"><option value="auto">Detectar automaticamente</option><option value="pdf">PDF / Slides em visualizador</option><option value="image">Imagem dentro da página</option><option value="audio">Áudio / podcast dentro da página</option><option value="video">Vídeo dentro da página</option><option value="link">Card com link</option></select></div></div><div class="field"><label class="field-label">Título</label><input type="text" id="mat-titulo"></div><div class="field"><label class="field-label">Descrição/orientação</label><textarea id="mat-desc"></textarea></div><div class="field"><label class="field-label">Link do arquivo no Drive, YouTube, áudio, PDF ou outro material</label><input type="text" id="mat-link" placeholder="https://drive.google.com/file/d/... ou outro link"></div><div class="field"><label class="field-label">Turma</label><select id="mat-turma">${turmaSelectComTodas(d.turmas, adminTurmaFiltro)}</select></div><button class="btn btn-primary" onclick="addMaterial()">Publicar material</button></div>`;
+  form=turmaFiltroBarHtml(d)+form;
 
+  const materiaisTurma=d.materiais.filter(itemVisivelNoFiltroAdmin);
   let list='';
-  if(!d.materiais.length){
-    list=empty('Nenhum material publicado. Use o formulário acima para publicar o primeiro material do curso.','📚');
+  if(!materiaisTurma.length){
+    list=empty('Nenhum material publicado nessa turma. Use o formulário acima para publicar o primeiro material.','📚');
   }else{
-    list+=buildFilterBar(d.materiais, matFilterAdmin, 'setMatFilterAdmin');
-    const filtrados=filtrarMateriais(d.materiais, matFilterAdmin);
+    list+=buildFilterBar(materiaisTurma, matFilterAdmin, 'setMatFilterAdmin');
+    const filtrados=filtrarMateriais(materiaisTurma, matFilterAdmin);
     if(!filtrados.length){
       list+=empty('Nenhum material nessa categoria.','🔍');
     }else{
@@ -1151,9 +1168,10 @@ function renderAvisosAdmin(d){
     <div class="field"><label class="field-label">Título</label><input type="text" id="av-titulo" placeholder="Ex.: Mudança de horário do próximo encontro"></div>
     <div class="field"><label class="field-label">Texto do aviso</label><textarea id="av-texto" placeholder="Escreva o recado para os participantes..."></textarea></div>
     <label class="check-item" style="margin-bottom:16px;max-width:340px"><input type="checkbox" id="av-fixado"> 📌 Fixar no topo do mural</label>
-    <div class="field"><label class="field-label">Turma</label><select id="av-turma">${turmaSelectComTodas(d.turmas)}</select></div>
+    <div class="field"><label class="field-label">Turma</label><select id="av-turma">${turmaSelectComTodas(d.turmas, adminTurmaFiltro)}</select></div>
     <button class="btn btn-primary" onclick="addAviso()">Publicar aviso</button></div>`;
-  const avisos=(d.avisos||[]).slice().sort((a,b)=>((b.fixado?1:0)-(a.fixado?1:0))||(b.id-a.id));
+  form=turmaFiltroBarHtml(d)+form;
+  const avisos=(d.avisos||[]).filter(itemVisivelNoFiltroAdmin).sort((a,b)=>((b.fixado?1:0)-(a.fixado?1:0))||(b.id-a.id));
   let list=avisos.length?avisos.map(a=>`<div class="material-card">
     <div class="material-top"><div style="width:100%">
       <h3>${a.fixado?'📌 ':''}${esc(a.titulo)} ${avisoNovo(a)?'<span class="badge badge-info">novo</span>':''}</h3>
@@ -1196,9 +1214,10 @@ function renderAgendaAdmin(d){
       <div class="field"><label class="field-label">Local ou link (Meet, Zoom...)</label><input type="text" id="ev-local" placeholder="Ex.: https://meet.google.com/... ou Sala 2"></div>
     </div>
     <div class="field"><label class="field-label">Descrição / o que levar</label><textarea id="ev-desc" placeholder="Tema do encontro, materiais necessários..."></textarea></div>
-    <div class="field"><label class="field-label">Turma</label><select id="ev-turma">${turmaSelectComTodas(d.turmas)}</select></div>
+    <div class="field"><label class="field-label">Turma</label><select id="ev-turma">${turmaSelectComTodas(d.turmas, adminTurmaFiltro)}</select></div>
     <button class="btn btn-primary" onclick="addEvento()">Agendar encontro</button></div>`;
-  const evs=(d.agenda||[]).slice().sort((a,b)=>String(a.dataISO).localeCompare(String(b.dataISO)));
+  form=turmaFiltroBarHtml(d)+form;
+  const evs=(d.agenda||[]).filter(itemVisivelNoFiltroAdmin).sort((a,b)=>String(a.dataISO).localeCompare(String(b.dataISO)));
   const futuros=evs.filter(e=>!eventoPassado(e)), passados=evs.filter(e=>eventoPassado(e)).reverse();
   const cardEv=e=>`<div class="material-card"><div class="material-top"><div style="width:100%">
       <h3>${esc(e.titulo)} ${eventoPassado(e)?'<span class="badge badge-block">realizado</span>':'<span class="badge badge-ok">próximo</span>'}</h3>
@@ -1242,9 +1261,10 @@ function renderTarefasAdmin(d){
       <div class="field"><label class="field-label">Prazo de entrega</label><input type="date" id="tf-prazo"></div>
     </div>
     <div class="field"><label class="field-label">Enunciado / orientações</label><textarea id="tf-desc" placeholder="Explique o que o participante deve fazer e como entregar..."></textarea></div>
-    <div class="field"><label class="field-label">Turma</label><select id="tf-turma">${turmaSelectComTodas(d.turmas)}</select></div>
+    <div class="field"><label class="field-label">Turma</label><select id="tf-turma">${turmaSelectComTodas(d.turmas, adminTurmaFiltro)}</select></div>
     <button class="btn btn-primary" onclick="addTarefa()">Publicar tarefa</button></div>`;
-  const ts=(d.tarefas||[]).slice().reverse();
+  form=turmaFiltroBarHtml(d)+form;
+  const ts=(d.tarefas||[]).filter(itemVisivelNoFiltroAdmin).slice().reverse();
   let list=ts.length?ts.map(t=>{
     const ents=(d.entregas||[]).filter(e=>e.tarefaId===t.id);
     const entsHtml=ents.length?ents.map(e=>`
@@ -1384,9 +1404,10 @@ function renderEnquetesAdmin(d){
   let form=`<div class="card"><h3 id="enq-form-titulo" style="margin-bottom:14px;color:var(--purple-900);font-family:'Fraunces',serif;font-weight:600">🗳️ Criar enquete</h3>
     <div class="field"><label class="field-label">Pergunta</label><input type="text" id="enq-pergunta" placeholder="Ex.: Qual tema você quer aprofundar no próximo encontro?"></div>
     <div class="field"><label class="field-label">Opções (uma por linha, pelo menos 2)</label><textarea id="enq-opcoes" placeholder="Ex.:&#10;Produtividade com IA&#10;Imagens e criatividade&#10;Ética e privacidade"></textarea></div>
-    <div class="field"><label class="field-label">Turma</label><select id="enq-turma">${turmaSelectComTodas(d.turmas)}</select></div>
+    <div class="field"><label class="field-label">Turma</label><select id="enq-turma">${turmaSelectComTodas(d.turmas, adminTurmaFiltro)}</select></div>
     <div class="btn-row"><button class="btn btn-primary" id="enq-submit-btn" onclick="submitEnqueteForm()">Publicar enquete</button><button class="btn hidden" id="enq-cancel-btn" onclick="cancelarEdicaoEnquete()">Cancelar edição</button></div></div>`;
-  const es=(d.enquetes||[]).slice().reverse();
+  form=turmaFiltroBarHtml(d)+form;
+  const es=(d.enquetes||[]).filter(itemVisivelNoFiltroAdmin).slice().reverse();
   let list=es.length?es.map(e=>`<div class="material-card"><div class="material-top"><div style="width:100%">
       <h3>${esc(e.pergunta)} ${e.ativa?'<span class="badge badge-ok">aberta</span>':'<span class="badge badge-block">encerrada</span>'}</h3>
       <div class="material-meta">${turmaBadgeHtml(e.turmaId,d.turmas)} <span>Criada em ${esc(e.criadaEm||'')}</span></div>
@@ -1419,7 +1440,7 @@ function cancelarEdicaoEnquete(){
   editingEnqueteId=null;
   document.getElementById('enq-pergunta').value='';
   document.getElementById('enq-opcoes').value='';
-  document.getElementById('enq-turma').value='';
+  document.getElementById('enq-turma').value=adminTurmaFiltro||'';
   document.getElementById('enq-form-titulo').textContent='🗳️ Criar enquete';
   document.getElementById('enq-submit-btn').textContent='Publicar enquete';
   document.getElementById('enq-cancel-btn').classList.add('hidden');
@@ -1508,9 +1529,10 @@ function renderMuralPalavrasAdmin(d){
   const el=document.getElementById('admin-mural-palavras'); if(!el)return;
   let form=`<div class="card"><h3 style="margin-bottom:14px;color:var(--purple-900);font-family:'Fraunces',serif;font-weight:600">☁️ Criar mural de palavras</h3>
     <div class="field"><label class="field-label">Pergunta ou tema</label><input type="text" id="mp-titulo" placeholder="Ex.: Em uma palavra, o que é Inteligência Artificial para você?"></div>
-    <div class="field"><label class="field-label">Turma</label><select id="mp-turma">${turmaSelectComTodas(d.turmas)}</select></div>
+    <div class="field"><label class="field-label">Turma</label><select id="mp-turma">${turmaSelectComTodas(d.turmas, adminTurmaFiltro)}</select></div>
     <button class="btn btn-primary" onclick="addMuralPalavras()">Criar mural</button></div>`;
-  const ms=(d.muralPalavras||[]).slice().reverse();
+  form=turmaFiltroBarHtml(d)+form;
+  const ms=(d.muralPalavras||[]).filter(itemVisivelNoFiltroAdmin).slice().reverse();
   let list=ms.length?ms.map(m=>`<div class="material-card"><div class="material-top"><div style="width:100%">
       <h3>${esc(m.titulo)} ${m.ativa?'<span class="badge badge-ok">aberto</span>':'<span class="badge badge-block">encerrado</span>'}</h3>
       <div class="material-meta">${turmaBadgeHtml(m.turmaId,d.turmas)} <span>Criado em ${esc(m.criadaEm||'')}</span> <span>· ${(m.respostas||[]).length} palavra(s) enviada(s)</span></div>
