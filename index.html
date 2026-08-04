@@ -642,6 +642,7 @@ function turmaNome(turmaId, turmas){ const t=(turmas||[]).find(x=>x.id===turmaId
 function turmaSelectOptions(turmas, selectedId=''){ return (turmas||[]).map(t=>`<option value="${t.id}" ${t.id===selectedId?'selected':''}>${esc(t.nome)}</option>`).join(''); }
 function turmaSelectComTodas(turmas, selectedId=''){ return `<option value="">Todas as turmas</option>`+turmaSelectOptions(turmas, selectedId); }
 function turmaBadgeHtml(turmaId, turmas){ return turmaId ? `<span class="badge badge-info">🏫 ${esc(turmaNome(turmaId,turmas)||'turma removida')}</span>` : `<span class="badge badge-info">Todas as turmas</span>`; }
+function turmaEditSelectHtml(id, turmaId, turmas, fnName){ return `<select onchange="${fnName}(${id}, this.value)" style="padding:4px 8px;border-radius:8px;border:1px solid var(--border);font-size:12px;font-weight:700">${turmaSelectComTodas(turmas, turmaId)}</select>`; }
 function itemVisivelParaTurma(item, usuario){ return !item.turmaId || item.turmaId===(usuario&&usuario.turmaId); }
 function itemVisivelNoFiltroAdmin(item){ return !adminTurmaFiltro || itemVisivelParaTurma(item, {turmaId:adminTurmaFiltro}); }
 function turmaFiltroBarHtml(d){
@@ -1129,7 +1130,7 @@ function renderMateriaisAdmin(d){
     if(!filtrados.length){
       list+=empty('Nenhum material nessa categoria.','🔍');
     }else{
-      list+=filtrados.map(m=>`<div class="material-card"><div class="material-top"><div style="width:100%"><h3>${esc(m.titulo)}</h3><div class="material-meta">${matTypeBadge(m)} ${turmaBadgeHtml(m.turmaId,d.turmas)} <span>Publicado em ${esc(m.data)}</span></div><p>${esc(m.descricao||'')}</p>${embedButtonHtml(m,'admin')}</div><div style="display:flex;flex-direction:column;gap:6px">
+      list+=filtrados.map(m=>`<div class="material-card"><div class="material-top"><div style="width:100%"><h3>${esc(m.titulo)}</h3><div class="material-meta">${matTypeBadge(m)} ${turmaEditSelectHtml(m.id,m.turmaId,d.turmas,'alterarTurmaMaterial')} <span>Publicado em ${esc(m.data)}</span></div><p>${esc(m.descricao||'')}</p>${embedButtonHtml(m,'admin')}</div><div style="display:flex;flex-direction:column;gap:6px">
 <button class="btn btn-sm" onclick="moveMaterialUp(${m.id})" title="Mover para cima na lista">↑ Subir</button>
 <button class="btn btn-sm" onclick="moveMaterialDown(${m.id})" title="Mover para baixo na lista">↓ Descer</button>
 <button class="btn btn-danger btn-sm" onclick="deleteMaterial(${m.id})">Apagar</button>
@@ -1140,6 +1141,7 @@ function renderMateriaisAdmin(d){
 }
 async function addMaterial(){const titulo=val('mat-titulo');if(!titulo){toast('Informe o título do material.','warn');return}const d=await getData();const turmaV=val('mat-turma');d.materiais.push({id:Date.now(),tipo:document.getElementById('mat-tipo').value,titulo,descricao:val('mat-desc'),link:val('mat-link'),display:document.getElementById('mat-display').value,turmaId:turmaV?Number(turmaV):'',data:new Date().toLocaleDateString('pt-BR')});await saveData(d);await renderAdmin();toast('Material publicado!','ok')}
 async function deleteMaterial(id){if(!confirm('Apagar este material?'))return;const d=await getData();d.materiais=d.materiais.filter(m=>m.id!==id);await saveData(d);await renderAdmin();toast('Material apagado.','info')}
+async function alterarTurmaMaterial(id,v){const d=await getData();const m=d.materiais.find(x=>x.id===id);if(!m)return;m.turmaId=v?Number(v):'';await saveData(d);renderMateriaisAdmin(d);toast('Turma do material atualizada.','ok')}
 
 // A lista é exibida do mais novo para o mais antigo (array invertido).
 // "Subir" na tela = mover para mais perto do fim do array; "Descer" = mais perto do início.
@@ -1175,7 +1177,7 @@ function renderAvisosAdmin(d){
   let list=avisos.length?avisos.map(a=>`<div class="material-card">
     <div class="material-top"><div style="width:100%">
       <h3>${a.fixado?'📌 ':''}${esc(a.titulo)} ${avisoNovo(a)?'<span class="badge badge-info">novo</span>':''}</h3>
-      <div class="material-meta">${turmaBadgeHtml(a.turmaId,d.turmas)} <span>Publicado em ${esc(a.data)}</span></div>
+      <div class="material-meta">${turmaEditSelectHtml(a.id,a.turmaId,d.turmas,'alterarTurmaAviso')} <span>Publicado em ${esc(a.data)}</span></div>
       <p style="white-space:pre-wrap">${esc(a.texto)}</p>
     </div><div style="display:flex;flex-direction:column;gap:6px">
       <button class="btn btn-sm" onclick="toggleFixarAviso(${a.id})">${a.fixado?'Desafixar':'📌 Fixar'}</button>
@@ -1193,6 +1195,7 @@ async function addAviso(){
 }
 async function toggleFixarAviso(id){const d=await getData();const a=d.avisos.find(x=>x.id===id);if(a){a.fixado=!a.fixado;await saveData(d);renderAvisosAdmin(d)}}
 async function deleteAviso(id){if(!confirm('Apagar este aviso?'))return;const d=await getData();d.avisos=d.avisos.filter(a=>a.id!==id);await saveData(d);await renderAdmin();toast('Aviso apagado.','info')}
+async function alterarTurmaAviso(id,v){const d=await getData();const a=d.avisos.find(x=>x.id===id);if(!a)return;a.turmaId=v?Number(v):'';await saveData(d);renderAvisosAdmin(d);toast('Turma do aviso atualizada.','ok')}
 
 // ============================================================
 // AGENDA DE ENCONTROS
@@ -1221,7 +1224,7 @@ function renderAgendaAdmin(d){
   const futuros=evs.filter(e=>!eventoPassado(e)), passados=evs.filter(e=>eventoPassado(e)).reverse();
   const cardEv=e=>`<div class="material-card"><div class="material-top"><div style="width:100%">
       <h3>${esc(e.titulo)} ${eventoPassado(e)?'<span class="badge badge-block">realizado</span>':'<span class="badge badge-ok">próximo</span>'}</h3>
-      <div class="material-meta">${turmaBadgeHtml(e.turmaId,d.turmas)} <span>📅 ${eventoDataTexto(e)}</span>${e.local?`<span>· 📍 ${e.local.startsWith('http')?`<a class="linkish" href="${esc(e.local)}" target="_blank" rel="noopener">Acessar link</a>`:esc(e.local)}</span>`:''}</div>
+      <div class="material-meta">${turmaEditSelectHtml(e.id,e.turmaId,d.turmas,'alterarTurmaEvento')} <span>📅 ${eventoDataTexto(e)}</span>${e.local?`<span>· 📍 ${e.local.startsWith('http')?`<a class="linkish" href="${esc(e.local)}" target="_blank" rel="noopener">Acessar link</a>`:esc(e.local)}</span>`:''}</div>
       ${e.descricao?`<p style="white-space:pre-wrap">${esc(e.descricao)}</p>`:''}
     </div><div><button class="btn btn-danger btn-sm" onclick="deleteEvento(${e.id})">Apagar</button></div></div></div>`;
   let list='';
@@ -1241,6 +1244,7 @@ async function addEvento(){
   await saveData(d); await renderAdmin(); toast('Encontro agendado!','ok');
 }
 async function deleteEvento(id){if(!confirm('Apagar este encontro da agenda?'))return;const d=await getData();d.agenda=d.agenda.filter(e=>e.id!==id);await saveData(d);await renderAdmin();toast('Encontro removido.','info')}
+async function alterarTurmaEvento(id,v){const d=await getData();const e=d.agenda.find(x=>x.id===id);if(!e)return;e.turmaId=v?Number(v):'';await saveData(d);renderAgendaAdmin(d);toast('Turma do encontro atualizada.','ok')}
 
 // ============================================================
 // TAREFAS COM ENTREGA
@@ -1283,7 +1287,7 @@ function renderTarefasAdmin(d){
       </div>`).join(''):'<div class="small" style="margin-top:8px">Nenhuma entrega recebida ainda.</div>';
     return `<div class="material-card"><div class="material-top"><div style="width:100%">
       <h3>${esc(t.titulo)}</h3>
-      <div class="material-meta">${prazoBadge(t)} ${turmaBadgeHtml(t.turmaId,d.turmas)} <span>· ${ents.length} entrega${ents.length===1?'':'s'}</span> <span>· Criada em ${esc(t.criadaEm||'')}</span></div>
+      <div class="material-meta">${prazoBadge(t)} ${turmaEditSelectHtml(t.id,t.turmaId,d.turmas,'alterarTurmaTarefa')} <span>· ${ents.length} entrega${ents.length===1?'':'s'}</span> <span>· Criada em ${esc(t.criadaEm||'')}</span></div>
       ${t.descricao?`<p style="white-space:pre-wrap">${esc(t.descricao)}</p>`:''}
       ${entsHtml}
     </div><div><button class="btn btn-danger btn-sm" onclick="deleteTarefa(${t.id})">Apagar</button></div></div></div>`;
@@ -1305,6 +1309,7 @@ async function deleteTarefa(id){
   d.entregas=(d.entregas||[]).filter(e=>e.tarefaId!==id);
   await saveData(d); await renderAdmin(); toast('Tarefa apagada.','info');
 }
+async function alterarTurmaTarefa(id,v){const d=await getData();const t=d.tarefas.find(x=>x.id===id);if(!t)return;t.turmaId=v?Number(v):'';await saveData(d);renderTarefasAdmin(d);toast('Turma da tarefa atualizada.','ok')}
 async function salvarFeedback(entregaId){
   const d=await getData();
   const e=(d.entregas||[]).find(x=>x.id===entregaId); if(!e){toast('Entrega não encontrada.','err');return}
@@ -1535,7 +1540,7 @@ function renderMuralPalavrasAdmin(d){
   const ms=(d.muralPalavras||[]).filter(itemVisivelNoFiltroAdmin).slice().reverse();
   let list=ms.length?ms.map(m=>`<div class="material-card"><div class="material-top"><div style="width:100%">
       <h3>${esc(m.titulo)} ${m.ativa?'<span class="badge badge-ok">aberto</span>':'<span class="badge badge-block">encerrado</span>'}</h3>
-      <div class="material-meta">${turmaBadgeHtml(m.turmaId,d.turmas)} <span>Criado em ${esc(m.criadaEm||'')}</span> <span>· ${(m.respostas||[]).length} palavra(s) enviada(s)</span></div>
+      <div class="material-meta">${turmaEditSelectHtml(m.id,m.turmaId,d.turmas,'alterarTurmaMuralPalavras')} <span>Criado em ${esc(m.criadaEm||'')}</span> <span>· ${(m.respostas||[]).length} palavra(s) enviada(s)</span></div>
       ${wordCloudHtml(m)}
     </div><div style="display:flex;flex-direction:column;gap:6px">
       <button class="btn btn-sm" onclick="toggleMuralPalavrasAtivo(${m.id})">${m.ativa?'Encerrar':'Reabrir'}</button>
@@ -1555,6 +1560,7 @@ async function addMuralPalavras(){
 async function toggleMuralPalavrasAtivo(id){const d=await getData();const m=d.muralPalavras.find(x=>x.id===id);if(m){m.ativa=!m.ativa;await saveData(d);await renderAdmin();toast(m.ativa?'Mural reaberto.':'Mural encerrado.','info')}}
 async function limparMuralPalavras(id){if(!confirm('Apagar todas as palavras enviadas neste mural?'))return;const d=await getData();const m=d.muralPalavras.find(x=>x.id===id);if(m)m.respostas=[];await saveData(d);await renderAdmin();toast('Palavras removidas.','info')}
 async function deleteMuralPalavras(id){if(!confirm('Apagar este mural de palavras?'))return;const d=await getData();d.muralPalavras=d.muralPalavras.filter(m=>m.id!==id);await saveData(d);await renderAdmin();toast('Mural apagado.','info')}
+async function alterarTurmaMuralPalavras(id,v){const d=await getData();const m=d.muralPalavras.find(x=>x.id===id);if(!m)return;m.turmaId=v?Number(v):'';await saveData(d);renderMuralPalavrasAdmin(d);toast('Turma do mural atualizada.','ok')}
 
 function renderMuralPalavrasUsuario(d){
   const el=document.getElementById('user-mural-palavras'); if(!el)return;
