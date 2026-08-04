@@ -455,6 +455,7 @@ tr:last-child td{border-bottom:none}
   <div class="tabs">
     <button class="tab active" onclick="showTab('admin-cadastros',this)">Anamneses</button>
     <button class="tab" onclick="showTab('admin-usuarios',this)">Usuários</button>
+    <button class="tab" onclick="showTab('admin-turmas',this)">🏫 Turmas</button>
     <button class="tab" onclick="showTab('admin-mensalidades',this)">Mensalidades</button>
     <button class="tab" onclick="showTab('admin-materiais',this)">Materiais</button>
     <button class="tab" onclick="showTab('admin-avisos',this)">📢 Avisos</button>
@@ -466,6 +467,7 @@ tr:last-child td{border-bottom:none}
   </div>
   <div class="tab-panel active" id="admin-cadastros"></div>
   <div class="tab-panel" id="admin-usuarios"></div>
+  <div class="tab-panel" id="admin-turmas"></div>
   <div class="tab-panel" id="admin-mensalidades"></div>
   <div class="tab-panel" id="admin-materiais"></div>
   <div class="tab-panel" id="admin-avisos"></div>
@@ -551,6 +553,7 @@ function initialData(){
   return {
     cadastros: [],
     usuarios: [],
+    turmas: [],
     materiais: [
       {id: Date.now()-3, tipo:'Artigo', titulo:'Primeiro roteiro de estudo: o que é IA generativa?', descricao:'Material introdutório para começar a conversa sobre IA no cotidiano e no mundo do trabalho.', link:'', data:new Date().toLocaleDateString('pt-BR')},
       {id: Date.now()-2, tipo:'Slide', titulo:'Encontro 1 — Boas-vindas e usos práticos', descricao:'Espaço para disponibilizar a apresentação do primeiro encontro.', link:'', data:new Date().toLocaleDateString('pt-BR')}
@@ -574,11 +577,13 @@ function normalizeRespostas(raw){
     ...u,
     mensalidadeInicio: u.mensalidadeInicio || '',
     mensalidadeFim: u.mensalidadeFim || '',
-    comprovantes: Array.isArray(u.comprovantes) ? u.comprovantes : []
+    comprovantes: Array.isArray(u.comprovantes) ? u.comprovantes : [],
+    turmaId: u.turmaId || ''
   })) : [];
   return {
     cadastros: Array.isArray(raw.cadastros) ? raw.cadastros : [],
     usuarios,
+    turmas: Array.isArray(raw.turmas) ? raw.turmas : [],
     materiais: Array.isArray(raw.materiais) ? raw.materiais.map(m=>({...m, links:Array.isArray(m.links)?m.links:(m.link?[m.link]:[])})) : base.materiais,
     avisos: Array.isArray(raw.avisos) ? raw.avisos : [],
     agenda: Array.isArray(raw.agenda) ? raw.agenda : [],
@@ -631,6 +636,12 @@ function showTab(id,btn){document.querySelectorAll('.tab-panel').forEach(p=>p.cl
 function val(id){return document.getElementById(id).value.trim()}
 function empty(msg,icon='📭'){return `<div class="empty-state"><span class="empty-icon">${icon}</span>${msg}</div>`}
 function esc(s){return String(s||'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
+
+function turmaNome(turmaId, turmas){ const t=(turmas||[]).find(x=>x.id===turmaId); return t?t.nome:''; }
+function turmaSelectOptions(turmas, selectedId=''){ return (turmas||[]).map(t=>`<option value="${t.id}" ${t.id===selectedId?'selected':''}>${esc(t.nome)}</option>`).join(''); }
+function turmaSelectComTodas(turmas, selectedId=''){ return `<option value="">Todas as turmas</option>`+turmaSelectOptions(turmas, selectedId); }
+function turmaBadgeHtml(turmaId, turmas){ return turmaId ? `<span class="badge badge-info">🏫 ${esc(turmaNome(turmaId,turmas)||'turma removida')}</span>` : `<span class="badge badge-info">Todas as turmas</span>`; }
+function itemVisivelParaTurma(item, usuario){ return !item.turmaId || item.turmaId===(usuario&&usuario.turmaId); }
 
 function startAnamnese(){
   ['cad-nome','cad-cpf','cad-email','cad-whatsapp','cad-profissao','cad-conhece','cad-aprender','cad-acelerar','cad-observacoes'].forEach(id=>document.getElementById(id).value=''); document.getElementById('cad-pix-file').value='';
@@ -755,11 +766,15 @@ function isUserActive(u){
 }
 async function applyPaymentRules(d){
   let changed=false;
+  if(!Array.isArray(d.turmas)) d.turmas=[];
+  if(!d.turmas.length){ d.turmas.push({id:Date.now(), nome:'Turma A'}); changed=true; }
+  const turmaPadraoId=d.turmas[0].id;
   d.usuarios.forEach(u=>{
     if(isExpiredDate(u.mensalidadeFim)){
       if(u.pagamento !== 'em atraso'){ u.pagamento='em atraso'; changed=true; }
       if(!u.bloqueado){ u.bloqueado=true; changed=true; }
     }
+    if(!u.turmaId){ u.turmaId=turmaPadraoId; changed=true; }
     if(!Array.isArray(u.comprovantes)){ u.comprovantes=[]; changed=true; }
   });
   if(changed) await saveData(d);
@@ -793,7 +808,7 @@ async function renderAdmin(){
      <div class="metric-card"><div class="metric-val" data-count="${(d.enquetes||[]).length}">0</div><div class="metric-lbl">Enquetes criadas</div></div>
      <div class="metric-card"><div class="metric-val" data-count="${(d.muralPalavras||[]).length}">0</div><div class="metric-lbl">Murais de palavras</div></div>`;
   animateMetrics();
-  await applyPaymentRules(d); renderCadastros(d); renderUsuarios(d); renderMensalidades(d); renderMateriaisAdmin(d); renderAvisosAdmin(d); renderAgendaAdmin(d); renderTarefasAdmin(d); renderEnquetesAdmin(d); renderMuralPalavrasAdmin(d); renderNovoUser(d);
+  await applyPaymentRules(d); renderCadastros(d); renderUsuarios(d); renderTurmasAdmin(d); renderMensalidades(d); renderMateriaisAdmin(d); renderAvisosAdmin(d); renderAgendaAdmin(d); renderTarefasAdmin(d); renderEnquetesAdmin(d); renderMuralPalavrasAdmin(d); renderNovoUser(d);
 }
 
 function renderCadastros(d){
@@ -805,7 +820,7 @@ function renderCadastros(d){
 }
 
 function renderNovoUser(d){
-  document.getElementById('admin-novo-user').innerHTML=`<div class="card"><h3 style="margin-bottom:14px;color:var(--purple-900);font-family:'Fraunces',serif;font-weight:600">Criar novo usuário</h3><div class="grid grid-2"><div class="field"><label class="field-label">Nome completo</label><input type="text" id="new-nome"></div><div class="field"><label class="field-label">CPF</label><input type="text" id="new-cpf"></div><div class="field"><label class="field-label">E-mail</label><input type="email" id="new-email"></div><div class="field"><label class="field-label">WhatsApp</label><input type="text" id="new-whatsapp"></div><div class="field"><label class="field-label">Usuário</label><input type="text" id="new-user"></div><div class="field"><label class="field-label">Senha</label><input type="text" id="new-pass"></div><div class="field"><label class="field-label">Status de pagamento</label><select id="new-pay"><option value="em dia">Em dia</option><option value="em atraso">Em atraso</option></select></div><div class="field"><label class="field-label">Acesso</label><select id="new-block"><option value="false">Liberado</option><option value="true">Bloqueado</option></select></div><div class="field"><label class="field-label">Mensalidade paga de</label><input type="date" id="new-pay-start"></div><div class="field"><label class="field-label">Mensalidade paga até</label><input type="date" id="new-pay-end"></div></div><div class="btn-row"><button class="btn btn-primary" onclick="createUser()">Salvar usuário</button></div></div>`
+  document.getElementById('admin-novo-user').innerHTML=`<div class="card"><h3 style="margin-bottom:14px;color:var(--purple-900);font-family:'Fraunces',serif;font-weight:600">Criar novo usuário</h3><div class="grid grid-2"><div class="field"><label class="field-label">Nome completo</label><input type="text" id="new-nome"></div><div class="field"><label class="field-label">CPF</label><input type="text" id="new-cpf"></div><div class="field"><label class="field-label">E-mail</label><input type="email" id="new-email"></div><div class="field"><label class="field-label">WhatsApp</label><input type="text" id="new-whatsapp"></div><div class="field"><label class="field-label">Usuário</label><input type="text" id="new-user"></div><div class="field"><label class="field-label">Senha</label><input type="text" id="new-pass"></div><div class="field"><label class="field-label">Turma</label><select id="new-turma">${turmaSelectOptions(d.turmas)}</select></div><div class="field"><label class="field-label">Status de pagamento</label><select id="new-pay"><option value="em dia">Em dia</option><option value="em atraso">Em atraso</option></select></div><div class="field"><label class="field-label">Acesso</label><select id="new-block"><option value="false">Liberado</option><option value="true">Bloqueado</option></select></div><div class="field"><label class="field-label">Mensalidade paga de</label><input type="date" id="new-pay-start"></div><div class="field"><label class="field-label">Mensalidade paga até</label><input type="date" id="new-pay-end"></div></div><div class="btn-row"><button class="btn btn-primary" onclick="createUser()">Salvar usuário</button></div></div>`
 }
 
 async function prefillUser(id){
@@ -823,7 +838,7 @@ async function createUser(){
   const d=await getData(); const usuario=val('new-user'),senha=val('new-pass'),nome=val('new-nome');
   if(!usuario||!senha||!nome){toast('Preencha nome, usuário e senha.','warn');return}
   if(d.usuarios.some(u=>u.usuario===usuario)){toast('Já existe um usuário com esse login.','warn');return}
-  d.usuarios.push({id:Date.now(),nome,cpf:val('new-cpf'),email:val('new-email'),whatsapp:val('new-whatsapp'),usuario,senha,pagamento:document.getElementById('new-pay').value,bloqueado:document.getElementById('new-block').value==='true',mensalidadeInicio:val('new-pay-start'),mensalidadeFim:val('new-pay-end'),criadoEm:new Date().toLocaleString('pt-BR'),comprovantes:[]});
+  d.usuarios.push({id:Date.now(),nome,cpf:val('new-cpf'),email:val('new-email'),whatsapp:val('new-whatsapp'),usuario,senha,turmaId:Number(document.getElementById('new-turma').value),pagamento:document.getElementById('new-pay').value,bloqueado:document.getElementById('new-block').value==='true',mensalidadeInicio:val('new-pay-start'),mensalidadeFim:val('new-pay-end'),criadoEm:new Date().toLocaleString('pt-BR'),comprovantes:[]});
   const c=d.cadastros.find(x=>x.email===val('new-email')||x.cpf===val('new-cpf')); if(c)c.usuarioCriado=true;
   await saveData(d); await renderAdmin(); toast('Usuário criado com sucesso!','ok')
 }
@@ -832,9 +847,55 @@ function renderUsuarios(d){
   const el=document.getElementById('admin-usuarios');
   if(!d.usuarios.length){el.innerHTML=certConfigCardHtml(d)+empty('Nenhum usuário criado ainda. Crie usuários a partir das anamneses recebidas ou na aba "Criar usuário".','👤');return}
   let html=certConfigCardHtml(d);
-  html+='<div class="table-wrap"><table><thead><tr><th>Nome</th><th>Acesso</th><th>Status</th><th>Contato</th><th>Comprovante</th><th>Ações</th></tr></thead><tbody>';
-  d.usuarios.forEach(u=>{html+=`<tr><td><input type="text" id="user-nome-${u.id}" value="${esc(u.nome)}" style="min-width:170px;margin-bottom:4px"><br><button class="btn btn-sm" onclick="salvarNomeUsuario(${u.id})">Salvar nome</button><br><span class="small">CPF: ${esc(u.cpf||'—')}</span>${u.certificadoLiberado?'<br><span class="badge badge-info">🎓 certificado liberado</span>':''}</td><td><strong>${esc(u.usuario)}</strong><br><span class="small">Senha: ${esc(u.senha)}</span></td><td>${badgePay(u)} ${u.bloqueado?'<span class="badge badge-block">bloqueado</span>':''}<br><label class="field-label" style="display:block;margin-top:6px">Pago até</label><input type="date" id="user-vig-${u.id}" value="${esc(u.mensalidadeFim||'')}" style="min-width:150px"></td><td>${esc(u.email||'—')}<br>${esc(u.whatsapp||'—')}</td><td>${u.ultimoComprovantePix?`<strong>${esc(u.ultimoComprovantePix)}</strong><br><span class="small">${esc(u.ultimoComprovanteEm||'')}</span><br><span class="small">${esc(u.ultimoComprovanteObs||'')}</span>`:'—'}</td><td><button class="btn btn-sm" onclick="togglePay(${u.id})">Alternar pagamento</button><br><button class="btn btn-sm" style="margin-top:6px" onclick="toggleBlock(${u.id})">Bloquear/liberar</button><br><button class="btn btn-sm" style="margin-top:6px" onclick="toggleCertificado(${u.id})">${u.certificadoLiberado?'Revogar certificado':'🎓 Liberar certificado'}</button><br><button class="btn btn-sm btn-danger" style="margin-top:6px" onclick="deleteUser(${u.id})">Apagar</button></td></tr>`});
+  html+='<div class="table-wrap"><table><thead><tr><th>Nome</th><th>Turma</th><th>Acesso</th><th>Status</th><th>Contato</th><th>Comprovante</th><th>Ações</th></tr></thead><tbody>';
+  d.usuarios.forEach(u=>{html+=`<tr><td><input type="text" id="user-nome-${u.id}" value="${esc(u.nome)}" style="min-width:170px;margin-bottom:4px"><br><button class="btn btn-sm" onclick="salvarNomeUsuario(${u.id})">Salvar nome</button><br><span class="small">CPF: ${esc(u.cpf||'—')}</span>${u.certificadoLiberado?'<br><span class="badge badge-info">🎓 certificado liberado</span>':''}</td><td><select id="user-turma-${u.id}" style="min-width:140px;margin-bottom:4px">${turmaSelectOptions(d.turmas,u.turmaId)}</select><br><button class="btn btn-sm" onclick="salvarTurmaUsuario(${u.id})">Salvar turma</button></td><td><strong>${esc(u.usuario)}</strong><br><span class="small">Senha: ${esc(u.senha)}</span></td><td>${badgePay(u)} ${u.bloqueado?'<span class="badge badge-block">bloqueado</span>':''}<br><label class="field-label" style="display:block;margin-top:6px">Pago até</label><input type="date" id="user-vig-${u.id}" value="${esc(u.mensalidadeFim||'')}" style="min-width:150px"></td><td>${esc(u.email||'—')}<br>${esc(u.whatsapp||'—')}</td><td>${u.ultimoComprovantePix?`<strong>${esc(u.ultimoComprovantePix)}</strong><br><span class="small">${esc(u.ultimoComprovanteEm||'')}</span><br><span class="small">${esc(u.ultimoComprovanteObs||'')}</span>`:'—'}</td><td><button class="btn btn-sm" onclick="togglePay(${u.id})">Alternar pagamento</button><br><button class="btn btn-sm" style="margin-top:6px" onclick="toggleBlock(${u.id})">Bloquear/liberar</button><br><button class="btn btn-sm" style="margin-top:6px" onclick="toggleCertificado(${u.id})">${u.certificadoLiberado?'Revogar certificado':'🎓 Liberar certificado'}</button><br><button class="btn btn-sm btn-danger" style="margin-top:6px" onclick="deleteUser(${u.id})">Apagar</button></td></tr>`});
   html+='</tbody></table></div>'; el.innerHTML=html;
+}
+async function salvarTurmaUsuario(id){
+  const novaTurma=Number(document.getElementById('user-turma-'+id).value);
+  const d=await getData(); const u=d.usuarios.find(x=>x.id===id); if(!u)return;
+  u.turmaId=novaTurma;
+  await saveData(d); await renderAdmin(); toast('Turma atualizada.','ok');
+}
+
+function renderTurmasAdmin(d){
+  const el=document.getElementById('admin-turmas'); if(!el)return;
+  let form=`<div class="card"><h3 style="margin-bottom:14px;color:var(--purple-900);font-family:'Fraunces',serif;font-weight:600">🏫 Criar turma</h3>
+    <div class="field"><label class="field-label">Nome da turma</label><input type="text" id="turma-nome-nova" placeholder="Ex.: Turma B"></div>
+    <button class="btn btn-primary" onclick="addTurma()">Criar turma</button></div>`;
+  let list='';
+  if(!d.turmas.length){
+    list=empty('Nenhuma turma criada ainda.','🏫');
+  }else{
+    list+='<div class="table-wrap"><table><thead><tr><th>Turma</th><th>Alunos</th><th>Ações</th></tr></thead><tbody>';
+    d.turmas.forEach(t=>{
+      const qtd=d.usuarios.filter(u=>u.turmaId===t.id).length;
+      list+=`<tr><td><input type="text" id="turma-nome-${t.id}" value="${esc(t.nome)}" style="min-width:170px;margin-bottom:4px"><br><button class="btn btn-sm" onclick="salvarTurmaNome(${t.id})">Salvar nome</button></td><td>${qtd} aluno${qtd===1?'':'s'}</td><td><button class="btn btn-sm btn-danger" onclick="deleteTurma(${t.id})">Apagar</button></td></tr>`;
+    });
+    list+='</tbody></table></div>';
+  }
+  el.innerHTML=form+list;
+}
+async function addTurma(){
+  const nome=val('turma-nome-nova');
+  if(!nome){toast('Informe o nome da turma.','warn');return}
+  const d=await getData();
+  d.turmas.push({id:Date.now(), nome});
+  await saveData(d); await renderAdmin(); toast('Turma criada!','ok');
+}
+async function salvarTurmaNome(id){
+  const novoNome=val('turma-nome-'+id);
+  if(!novoNome){toast('O nome da turma não pode ficar em branco.','warn');return}
+  const d=await getData(); const t=d.turmas.find(x=>x.id===id); if(!t)return;
+  t.nome=novoNome;
+  await saveData(d); await renderAdmin(); toast('Turma atualizada.','ok');
+}
+async function deleteTurma(id){
+  const d=await getData();
+  if(d.usuarios.some(u=>u.turmaId===id)){toast('Não é possível apagar: há alunos nessa turma. Mude a turma deles antes.','warn',6000);return}
+  if(!confirm('Apagar esta turma?'))return;
+  d.turmas=d.turmas.filter(t=>t.id!==id);
+  await saveData(d); await renderAdmin(); toast('Turma apagada.','info');
 }
 
 function usuarioPodeVerMateriais(u){
@@ -1040,7 +1101,7 @@ function setMatFilterAdmin(f){
 function renderMateriaisAdmin(d){
   cachedAdminData=d;
   const el=document.getElementById('admin-materiais');
-  let form=`<div class="card"><h3 style="margin-bottom:14px;color:var(--purple-900);font-family:'Fraunces',serif;font-weight:600">Adicionar material</h3><div class="notice"><strong>Como funciona:</strong> você pode colar o link de um arquivo do Google Drive. O participante verá o conteúdo incorporado dentro da plataforma, sem precisar entrar manualmente no Drive. Para funcionar bem, deixe o arquivo como “qualquer pessoa com o link pode visualizar”.</div><div class="grid grid-2"><div class="field"><label class="field-label">Tipo</label><select id="mat-tipo"><option>Artigo</option><option>Slide</option><option>Podcast</option><option>Imagem</option><option>Vídeo</option><option>Link</option><option>Atividade</option><option>PDF</option></select></div><div class="field"><label class="field-label">Como exibir na plataforma</label><select id="mat-display"><option value="auto">Detectar automaticamente</option><option value="pdf">PDF / Slides em visualizador</option><option value="image">Imagem dentro da página</option><option value="audio">Áudio / podcast dentro da página</option><option value="video">Vídeo dentro da página</option><option value="link">Card com link</option></select></div></div><div class="field"><label class="field-label">Título</label><input type="text" id="mat-titulo"></div><div class="field"><label class="field-label">Descrição/orientação</label><textarea id="mat-desc"></textarea></div><div class="field"><label class="field-label">Link do arquivo no Drive, YouTube, áudio, PDF ou outro material</label><input type="text" id="mat-link" placeholder="https://drive.google.com/file/d/... ou outro link"></div><button class="btn btn-primary" onclick="addMaterial()">Publicar material</button></div>`;
+  let form=`<div class="card"><h3 style="margin-bottom:14px;color:var(--purple-900);font-family:'Fraunces',serif;font-weight:600">Adicionar material</h3><div class="notice"><strong>Como funciona:</strong> você pode colar o link de um arquivo do Google Drive. O participante verá o conteúdo incorporado dentro da plataforma, sem precisar entrar manualmente no Drive. Para funcionar bem, deixe o arquivo como “qualquer pessoa com o link pode visualizar”.</div><div class="grid grid-2"><div class="field"><label class="field-label">Tipo</label><select id="mat-tipo"><option>Artigo</option><option>Slide</option><option>Podcast</option><option>Imagem</option><option>Vídeo</option><option>Link</option><option>Atividade</option><option>PDF</option></select></div><div class="field"><label class="field-label">Como exibir na plataforma</label><select id="mat-display"><option value="auto">Detectar automaticamente</option><option value="pdf">PDF / Slides em visualizador</option><option value="image">Imagem dentro da página</option><option value="audio">Áudio / podcast dentro da página</option><option value="video">Vídeo dentro da página</option><option value="link">Card com link</option></select></div></div><div class="field"><label class="field-label">Título</label><input type="text" id="mat-titulo"></div><div class="field"><label class="field-label">Descrição/orientação</label><textarea id="mat-desc"></textarea></div><div class="field"><label class="field-label">Link do arquivo no Drive, YouTube, áudio, PDF ou outro material</label><input type="text" id="mat-link" placeholder="https://drive.google.com/file/d/... ou outro link"></div><div class="field"><label class="field-label">Turma</label><select id="mat-turma">${turmaSelectComTodas(d.turmas)}</select></div><button class="btn btn-primary" onclick="addMaterial()">Publicar material</button></div>`;
 
   let list='';
   if(!d.materiais.length){
@@ -1051,7 +1112,7 @@ function renderMateriaisAdmin(d){
     if(!filtrados.length){
       list+=empty('Nenhum material nessa categoria.','🔍');
     }else{
-      list+=filtrados.map(m=>`<div class="material-card"><div class="material-top"><div style="width:100%"><h3>${esc(m.titulo)}</h3><div class="material-meta">${matTypeBadge(m)} <span>Publicado em ${esc(m.data)}</span></div><p>${esc(m.descricao||'')}</p>${embedButtonHtml(m,'admin')}</div><div style="display:flex;flex-direction:column;gap:6px">
+      list+=filtrados.map(m=>`<div class="material-card"><div class="material-top"><div style="width:100%"><h3>${esc(m.titulo)}</h3><div class="material-meta">${matTypeBadge(m)} ${turmaBadgeHtml(m.turmaId,d.turmas)} <span>Publicado em ${esc(m.data)}</span></div><p>${esc(m.descricao||'')}</p>${embedButtonHtml(m,'admin')}</div><div style="display:flex;flex-direction:column;gap:6px">
 <button class="btn btn-sm" onclick="moveMaterialUp(${m.id})" title="Mover para cima na lista">↑ Subir</button>
 <button class="btn btn-sm" onclick="moveMaterialDown(${m.id})" title="Mover para baixo na lista">↓ Descer</button>
 <button class="btn btn-danger btn-sm" onclick="deleteMaterial(${m.id})">Apagar</button>
@@ -1060,7 +1121,7 @@ function renderMateriaisAdmin(d){
   }
   el.innerHTML=form+list;
 }
-async function addMaterial(){const titulo=val('mat-titulo');if(!titulo){toast('Informe o título do material.','warn');return}const d=await getData();d.materiais.push({id:Date.now(),tipo:document.getElementById('mat-tipo').value,titulo,descricao:val('mat-desc'),link:val('mat-link'),display:document.getElementById('mat-display').value,data:new Date().toLocaleDateString('pt-BR')});await saveData(d);await renderAdmin();toast('Material publicado!','ok')}
+async function addMaterial(){const titulo=val('mat-titulo');if(!titulo){toast('Informe o título do material.','warn');return}const d=await getData();const turmaV=val('mat-turma');d.materiais.push({id:Date.now(),tipo:document.getElementById('mat-tipo').value,titulo,descricao:val('mat-desc'),link:val('mat-link'),display:document.getElementById('mat-display').value,turmaId:turmaV?Number(turmaV):'',data:new Date().toLocaleDateString('pt-BR')});await saveData(d);await renderAdmin();toast('Material publicado!','ok')}
 async function deleteMaterial(id){if(!confirm('Apagar este material?'))return;const d=await getData();d.materiais=d.materiais.filter(m=>m.id!==id);await saveData(d);await renderAdmin();toast('Material apagado.','info')}
 
 // A lista é exibida do mais novo para o mais antigo (array invertido).
@@ -1090,12 +1151,13 @@ function renderAvisosAdmin(d){
     <div class="field"><label class="field-label">Título</label><input type="text" id="av-titulo" placeholder="Ex.: Mudança de horário do próximo encontro"></div>
     <div class="field"><label class="field-label">Texto do aviso</label><textarea id="av-texto" placeholder="Escreva o recado para os participantes..."></textarea></div>
     <label class="check-item" style="margin-bottom:16px;max-width:340px"><input type="checkbox" id="av-fixado"> 📌 Fixar no topo do mural</label>
+    <div class="field"><label class="field-label">Turma</label><select id="av-turma">${turmaSelectComTodas(d.turmas)}</select></div>
     <button class="btn btn-primary" onclick="addAviso()">Publicar aviso</button></div>`;
   const avisos=(d.avisos||[]).slice().sort((a,b)=>((b.fixado?1:0)-(a.fixado?1:0))||(b.id-a.id));
   let list=avisos.length?avisos.map(a=>`<div class="material-card">
     <div class="material-top"><div style="width:100%">
       <h3>${a.fixado?'📌 ':''}${esc(a.titulo)} ${avisoNovo(a)?'<span class="badge badge-info">novo</span>':''}</h3>
-      <div class="material-meta"><span>Publicado em ${esc(a.data)}</span></div>
+      <div class="material-meta">${turmaBadgeHtml(a.turmaId,d.turmas)} <span>Publicado em ${esc(a.data)}</span></div>
       <p style="white-space:pre-wrap">${esc(a.texto)}</p>
     </div><div style="display:flex;flex-direction:column;gap:6px">
       <button class="btn btn-sm" onclick="toggleFixarAviso(${a.id})">${a.fixado?'Desafixar':'📌 Fixar'}</button>
@@ -1107,7 +1169,8 @@ async function addAviso(){
   const titulo=val('av-titulo'), texto=val('av-texto');
   if(!titulo||!texto){toast('Preencha o título e o texto do aviso.','warn');return}
   const d=await getData();
-  d.avisos.push({id:Date.now(), titulo, texto, fixado:document.getElementById('av-fixado').checked, data:new Date().toLocaleString('pt-BR')});
+  const turmaV=val('av-turma');
+  d.avisos.push({id:Date.now(), titulo, texto, fixado:document.getElementById('av-fixado').checked, turmaId:turmaV?Number(turmaV):'', data:new Date().toLocaleString('pt-BR')});
   await saveData(d); await renderAdmin(); toast('Aviso publicado!','ok');
 }
 async function toggleFixarAviso(id){const d=await getData();const a=d.avisos.find(x=>x.id===id);if(a){a.fixado=!a.fixado;await saveData(d);renderAvisosAdmin(d)}}
@@ -1133,12 +1196,13 @@ function renderAgendaAdmin(d){
       <div class="field"><label class="field-label">Local ou link (Meet, Zoom...)</label><input type="text" id="ev-local" placeholder="Ex.: https://meet.google.com/... ou Sala 2"></div>
     </div>
     <div class="field"><label class="field-label">Descrição / o que levar</label><textarea id="ev-desc" placeholder="Tema do encontro, materiais necessários..."></textarea></div>
+    <div class="field"><label class="field-label">Turma</label><select id="ev-turma">${turmaSelectComTodas(d.turmas)}</select></div>
     <button class="btn btn-primary" onclick="addEvento()">Agendar encontro</button></div>`;
   const evs=(d.agenda||[]).slice().sort((a,b)=>String(a.dataISO).localeCompare(String(b.dataISO)));
   const futuros=evs.filter(e=>!eventoPassado(e)), passados=evs.filter(e=>eventoPassado(e)).reverse();
   const cardEv=e=>`<div class="material-card"><div class="material-top"><div style="width:100%">
       <h3>${esc(e.titulo)} ${eventoPassado(e)?'<span class="badge badge-block">realizado</span>':'<span class="badge badge-ok">próximo</span>'}</h3>
-      <div class="material-meta"><span>📅 ${eventoDataTexto(e)}</span>${e.local?`<span>· 📍 ${e.local.startsWith('http')?`<a class="linkish" href="${esc(e.local)}" target="_blank" rel="noopener">Acessar link</a>`:esc(e.local)}</span>`:''}</div>
+      <div class="material-meta">${turmaBadgeHtml(e.turmaId,d.turmas)} <span>📅 ${eventoDataTexto(e)}</span>${e.local?`<span>· 📍 ${e.local.startsWith('http')?`<a class="linkish" href="${esc(e.local)}" target="_blank" rel="noopener">Acessar link</a>`:esc(e.local)}</span>`:''}</div>
       ${e.descricao?`<p style="white-space:pre-wrap">${esc(e.descricao)}</p>`:''}
     </div><div><button class="btn btn-danger btn-sm" onclick="deleteEvento(${e.id})">Apagar</button></div></div></div>`;
   let list='';
@@ -1153,7 +1217,8 @@ async function addEvento(){
   const titulo=val('ev-titulo'), dataISO=val('ev-data');
   if(!titulo||!dataISO){toast('Preencha pelo menos o título e a data do encontro.','warn');return}
   const d=await getData();
-  d.agenda.push({id:Date.now(), titulo, dataISO, hora:val('ev-hora'), local:val('ev-local'), descricao:val('ev-desc')});
+  const turmaV=val('ev-turma');
+  d.agenda.push({id:Date.now(), titulo, dataISO, hora:val('ev-hora'), local:val('ev-local'), descricao:val('ev-desc'), turmaId:turmaV?Number(turmaV):''});
   await saveData(d); await renderAdmin(); toast('Encontro agendado!','ok');
 }
 async function deleteEvento(id){if(!confirm('Apagar este encontro da agenda?'))return;const d=await getData();d.agenda=d.agenda.filter(e=>e.id!==id);await saveData(d);await renderAdmin();toast('Encontro removido.','info')}
@@ -1177,6 +1242,7 @@ function renderTarefasAdmin(d){
       <div class="field"><label class="field-label">Prazo de entrega</label><input type="date" id="tf-prazo"></div>
     </div>
     <div class="field"><label class="field-label">Enunciado / orientações</label><textarea id="tf-desc" placeholder="Explique o que o participante deve fazer e como entregar..."></textarea></div>
+    <div class="field"><label class="field-label">Turma</label><select id="tf-turma">${turmaSelectComTodas(d.turmas)}</select></div>
     <button class="btn btn-primary" onclick="addTarefa()">Publicar tarefa</button></div>`;
   const ts=(d.tarefas||[]).slice().reverse();
   let list=ts.length?ts.map(t=>{
@@ -1197,7 +1263,7 @@ function renderTarefasAdmin(d){
       </div>`).join(''):'<div class="small" style="margin-top:8px">Nenhuma entrega recebida ainda.</div>';
     return `<div class="material-card"><div class="material-top"><div style="width:100%">
       <h3>${esc(t.titulo)}</h3>
-      <div class="material-meta">${prazoBadge(t)} <span>· ${ents.length} entrega${ents.length===1?'':'s'}</span> <span>· Criada em ${esc(t.criadaEm||'')}</span></div>
+      <div class="material-meta">${prazoBadge(t)} ${turmaBadgeHtml(t.turmaId,d.turmas)} <span>· ${ents.length} entrega${ents.length===1?'':'s'}</span> <span>· Criada em ${esc(t.criadaEm||'')}</span></div>
       ${t.descricao?`<p style="white-space:pre-wrap">${esc(t.descricao)}</p>`:''}
       ${entsHtml}
     </div><div><button class="btn btn-danger btn-sm" onclick="deleteTarefa(${t.id})">Apagar</button></div></div></div>`;
@@ -1208,7 +1274,8 @@ async function addTarefa(){
   const titulo=val('tf-titulo');
   if(!titulo){toast('Informe o título da tarefa.','warn');return}
   const d=await getData();
-  d.tarefas.push({id:Date.now(), titulo, descricao:val('tf-desc'), prazoISO:val('tf-prazo'), criadaEm:new Date().toLocaleDateString('pt-BR')});
+  const turmaV=val('tf-turma');
+  d.tarefas.push({id:Date.now(), titulo, descricao:val('tf-desc'), prazoISO:val('tf-prazo'), turmaId:turmaV?Number(turmaV):'', criadaEm:new Date().toLocaleDateString('pt-BR')});
   await saveData(d); await renderAdmin(); toast('Tarefa publicada!','ok');
 }
 async function deleteTarefa(id){
@@ -1236,7 +1303,7 @@ async function togglePublicarMural(entregaId){
 }
 function renderMuralTurma(d){
   const el=document.getElementById('user-mural-turma'); if(!el)return;
-  const publicadas=(d.entregas||[]).filter(e=>e.publicarMural).slice().reverse();
+  const publicadas=(d.entregas||[]).filter(e=>e.publicarMural && itemVisivelParaTurma((d.tarefas||[]).find(t=>t.id===e.tarefaId)||{}, currentUser)).slice().reverse();
   if(!publicadas.length){el.innerHTML=empty('Ainda não há entregas publicadas no mural da turma. Quando o administrador destacar uma entrega, ela aparecerá aqui para todos verem.','🖼️');return}
   el.innerHTML=publicadas.map(e=>{
     const tarefa=(d.tarefas||[]).find(t=>t.id===e.tarefaId);
@@ -1253,7 +1320,7 @@ function renderMuralTurma(d){
 // ===== Tarefas: lado do participante =====
 function renderTarefasUsuario(d){
   const el=document.getElementById('user-tarefas'); if(!el)return;
-  const ts=(d.tarefas||[]).slice().reverse();
+  const ts=(d.tarefas||[]).filter(t=>itemVisivelParaTurma(t,currentUser)).slice().reverse();
   if(!ts.length){el.innerHTML=empty('Nenhuma tarefa publicada ainda. Quando o administrador criar uma tarefa, ela aparecerá aqui.','📝');return}
   el.innerHTML=ts.map(t=>{
     const ent=(d.entregas||[]).find(e=>e.tarefaId===t.id&&e.usuarioId===currentUser.id);
@@ -1317,11 +1384,12 @@ function renderEnquetesAdmin(d){
   let form=`<div class="card"><h3 id="enq-form-titulo" style="margin-bottom:14px;color:var(--purple-900);font-family:'Fraunces',serif;font-weight:600">🗳️ Criar enquete</h3>
     <div class="field"><label class="field-label">Pergunta</label><input type="text" id="enq-pergunta" placeholder="Ex.: Qual tema você quer aprofundar no próximo encontro?"></div>
     <div class="field"><label class="field-label">Opções (uma por linha, pelo menos 2)</label><textarea id="enq-opcoes" placeholder="Ex.:&#10;Produtividade com IA&#10;Imagens e criatividade&#10;Ética e privacidade"></textarea></div>
+    <div class="field"><label class="field-label">Turma</label><select id="enq-turma">${turmaSelectComTodas(d.turmas)}</select></div>
     <div class="btn-row"><button class="btn btn-primary" id="enq-submit-btn" onclick="submitEnqueteForm()">Publicar enquete</button><button class="btn hidden" id="enq-cancel-btn" onclick="cancelarEdicaoEnquete()">Cancelar edição</button></div></div>`;
   const es=(d.enquetes||[]).slice().reverse();
   let list=es.length?es.map(e=>`<div class="material-card"><div class="material-top"><div style="width:100%">
       <h3>${esc(e.pergunta)} ${e.ativa?'<span class="badge badge-ok">aberta</span>':'<span class="badge badge-block">encerrada</span>'}</h3>
-      <div class="material-meta"><span>Criada em ${esc(e.criadaEm||'')}</span></div>
+      <div class="material-meta">${turmaBadgeHtml(e.turmaId,d.turmas)} <span>Criada em ${esc(e.criadaEm||'')}</span></div>
       <div style="margin-top:14px">${enqueteResultadosHtml(e)}</div>
     </div><div style="display:flex;flex-direction:column;gap:6px">
       <button class="btn btn-sm" onclick="editarEnquete(${e.id})">✏️ Editar</button>
@@ -1340,6 +1408,7 @@ function editarEnquete(id){
   editingEnqueteId=id;
   document.getElementById('enq-pergunta').value=e.pergunta;
   document.getElementById('enq-opcoes').value=(e.opcoes||[]).map(o=>o.texto).join('\n');
+  document.getElementById('enq-turma').value=e.turmaId||'';
   document.getElementById('enq-form-titulo').textContent='✏️ Editar enquete';
   document.getElementById('enq-submit-btn').textContent='Salvar alterações';
   document.getElementById('enq-cancel-btn').classList.remove('hidden');
@@ -1350,6 +1419,7 @@ function cancelarEdicaoEnquete(){
   editingEnqueteId=null;
   document.getElementById('enq-pergunta').value='';
   document.getElementById('enq-opcoes').value='';
+  document.getElementById('enq-turma').value='';
   document.getElementById('enq-form-titulo').textContent='🗳️ Criar enquete';
   document.getElementById('enq-submit-btn').textContent='Publicar enquete';
   document.getElementById('enq-cancel-btn').classList.add('hidden');
@@ -1359,7 +1429,8 @@ async function addEnquete(){
   const opcoesTexto=document.getElementById('enq-opcoes').value.split('\n').map(s=>s.trim()).filter(Boolean);
   if(!pergunta||opcoesTexto.length<2){toast('Informe a pergunta e pelo menos 2 opções.','warn');return}
   const d=await getData();
-  d.enquetes.push({id:Date.now(), pergunta, opcoes:opcoesTexto.map((texto,i)=>({id:Date.now()+i, texto})), votos:[], ativa:true, criadaEm:new Date().toLocaleString('pt-BR')});
+  const turmaV=val('enq-turma');
+  d.enquetes.push({id:Date.now(), pergunta, opcoes:opcoesTexto.map((texto,i)=>({id:Date.now()+i, texto})), votos:[], ativa:true, turmaId:turmaV?Number(turmaV):'', criadaEm:new Date().toLocaleString('pt-BR')});
   await saveData(d); await renderAdmin(); toast('Enquete publicada!','ok');
 }
 async function salvarEdicaoEnquete(id){
@@ -1371,8 +1442,10 @@ async function salvarEdicaoEnquete(id){
   const opcoesAntigas=e.opcoes||[];
   const novasOpcoes=opcoesTexto.map((texto,i)=> opcoesAntigas[i] ? {id:opcoesAntigas[i].id, texto} : {id:Date.now()+i, texto});
   const idsValidos=new Set(novasOpcoes.map(o=>o.id));
+  const turmaV=val('enq-turma');
   e.pergunta=pergunta;
   e.opcoes=novasOpcoes;
+  e.turmaId=turmaV?Number(turmaV):'';
   e.votos=(e.votos||[]).filter(v=>idsValidos.has(v.opcaoId));
   await saveData(d); await renderAdmin(); toast('Enquete atualizada!','ok');
 }
@@ -1381,7 +1454,7 @@ async function deleteEnquete(id){if(!confirm('Apagar esta enquete e todos os vot
 
 function pendingEnquetesUsuario(d){
   if(!currentUser) return [];
-  return (d.enquetes||[]).filter(e=>e.ativa && !(e.votos||[]).some(v=>v.usuarioId===currentUser.id));
+  return (d.enquetes||[]).filter(e=>e.ativa && itemVisivelParaTurma(e,currentUser) && !(e.votos||[]).some(v=>v.usuarioId===currentUser.id));
 }
 function enqueteVotacaoHtml(e){
   const opcoesHtml=(e.opcoes||[]).map(o=>`<label class="poll-radio-item"><input type="radio" name="enq-${e.id}" value="${o.id}"> ${esc(o.texto)}</label>`).join('');
@@ -1389,7 +1462,7 @@ function enqueteVotacaoHtml(e){
 }
 function renderEnquetesUsuario(d){
   const el=document.getElementById('user-enquetes'); if(!el)return;
-  const es=(d.enquetes||[]).slice().reverse();
+  const es=(d.enquetes||[]).filter(e=>itemVisivelParaTurma(e,currentUser)).slice().reverse();
   if(!es.length){el.innerHTML=empty('Nenhuma enquete publicada no momento.','🗳️');return}
   el.innerHTML=es.map(e=>{
     const meuVoto=(e.votos||[]).find(v=>v.usuarioId===currentUser.id);
@@ -1435,11 +1508,12 @@ function renderMuralPalavrasAdmin(d){
   const el=document.getElementById('admin-mural-palavras'); if(!el)return;
   let form=`<div class="card"><h3 style="margin-bottom:14px;color:var(--purple-900);font-family:'Fraunces',serif;font-weight:600">☁️ Criar mural de palavras</h3>
     <div class="field"><label class="field-label">Pergunta ou tema</label><input type="text" id="mp-titulo" placeholder="Ex.: Em uma palavra, o que é Inteligência Artificial para você?"></div>
+    <div class="field"><label class="field-label">Turma</label><select id="mp-turma">${turmaSelectComTodas(d.turmas)}</select></div>
     <button class="btn btn-primary" onclick="addMuralPalavras()">Criar mural</button></div>`;
   const ms=(d.muralPalavras||[]).slice().reverse();
   let list=ms.length?ms.map(m=>`<div class="material-card"><div class="material-top"><div style="width:100%">
       <h3>${esc(m.titulo)} ${m.ativa?'<span class="badge badge-ok">aberto</span>':'<span class="badge badge-block">encerrado</span>'}</h3>
-      <div class="material-meta"><span>Criado em ${esc(m.criadaEm||'')}</span> <span>· ${(m.respostas||[]).length} palavra(s) enviada(s)</span></div>
+      <div class="material-meta">${turmaBadgeHtml(m.turmaId,d.turmas)} <span>Criado em ${esc(m.criadaEm||'')}</span> <span>· ${(m.respostas||[]).length} palavra(s) enviada(s)</span></div>
       ${wordCloudHtml(m)}
     </div><div style="display:flex;flex-direction:column;gap:6px">
       <button class="btn btn-sm" onclick="toggleMuralPalavrasAtivo(${m.id})">${m.ativa?'Encerrar':'Reabrir'}</button>
@@ -1452,7 +1526,8 @@ async function addMuralPalavras(){
   const titulo=val('mp-titulo');
   if(!titulo){toast('Informe a pergunta ou tema do mural.','warn');return}
   const d=await getData();
-  d.muralPalavras.push({id:Date.now(), titulo, ativa:true, respostas:[], criadaEm:new Date().toLocaleString('pt-BR')});
+  const turmaV=val('mp-turma');
+  d.muralPalavras.push({id:Date.now(), titulo, ativa:true, respostas:[], turmaId:turmaV?Number(turmaV):'', criadaEm:new Date().toLocaleString('pt-BR')});
   await saveData(d); await renderAdmin(); toast('Mural de palavras criado!','ok');
 }
 async function toggleMuralPalavrasAtivo(id){const d=await getData();const m=d.muralPalavras.find(x=>x.id===id);if(m){m.ativa=!m.ativa;await saveData(d);await renderAdmin();toast(m.ativa?'Mural reaberto.':'Mural encerrado.','info')}}
@@ -1461,7 +1536,7 @@ async function deleteMuralPalavras(id){if(!confirm('Apagar este mural de palavra
 
 function renderMuralPalavrasUsuario(d){
   const el=document.getElementById('user-mural-palavras'); if(!el)return;
-  const ms=(d.muralPalavras||[]).slice().reverse();
+  const ms=(d.muralPalavras||[]).filter(m=>itemVisivelParaTurma(m,currentUser)).slice().reverse();
   if(!ms.length){el.innerHTML=empty('Nenhum mural de palavras no momento.','☁️');return}
   el.innerHTML=ms.map(m=>{
     const minha=(m.respostas||[]).find(r=>r.usuarioId===currentUser.id);
@@ -1493,8 +1568,8 @@ async function enviarPalavraMural(muralId){
 function renderDashboardWidgets(d){
   const el=document.getElementById('user-dashboard'); if(!el)return;
   if(!usuarioPodeVerMateriais(currentUser)){el.innerHTML='';return}
-  const avisos=(d.avisos||[]).slice().sort((a,b)=>((b.fixado?1:0)-(a.fixado?1:0))||(b.id-a.id)).slice(0,3);
-  const prox=(d.agenda||[]).filter(e=>!eventoPassado(e)).sort((a,b)=>String(a.dataISO).localeCompare(String(b.dataISO))).slice(0,3);
+  const avisos=(d.avisos||[]).filter(a=>itemVisivelParaTurma(a,currentUser)).sort((a,b)=>((b.fixado?1:0)-(a.fixado?1:0))||(b.id-a.id)).slice(0,3);
+  const prox=(d.agenda||[]).filter(e=>!eventoPassado(e)&&itemVisivelParaTurma(e,currentUser)).sort((a,b)=>String(a.dataISO).localeCompare(String(b.dataISO))).slice(0,3);
   if(!avisos.length&&!prox.length){el.innerHTML='';return}
   const avisosHtml=avisos.length?avisos.map(a=>`<div style="padding:10px 0;border-bottom:1px solid var(--border)">
       <strong>${a.fixado?'📌 ':''}${esc(a.titulo)}</strong> ${avisoNovo(a)?'<span class="badge badge-info">novo</span>':''}
@@ -1789,10 +1864,11 @@ function renderMateriaisUsuario(d, keepSearchFocus=false){
     el.innerHTML=`<div class="warning"><strong>🗳️ Responda ${pendentes.length>1?'as enquetes pendentes':'a enquete pendente'} abaixo para liberar o acesso aos materiais do curso.</strong></div>` + pendentes.map(e=>enqueteVotacaoHtml(e)).join('');
     return;
   }
-  if(!d.materiais.length){el.innerHTML=empty('Ainda não há materiais publicados. Eles aparecerão aqui conforme os encontros do curso acontecerem.','📚');return}
+  const materiaisTurma=(d.materiais||[]).filter(m=>itemVisivelParaTurma(m,currentUser));
+  if(!materiaisTurma.length){el.innerHTML=empty('Ainda não há materiais publicados. Eles aparecerão aqui conforme os encontros do curso acontecerem.','📚');return}
   const searchHtml=`<input class="mat-search" type="text" placeholder="🔍 Buscar material..." value="${esc(matSearchUser)}" oninput="setMatSearchUser(this.value)" aria-label="Buscar material">`;
-  let html=buildFilterBar(d.materiais, matFilterUser, 'setMatFilterUser', searchHtml);
-  const filtrados=filtrarMateriais(d.materiais, matFilterUser, matSearchUser);
+  let html=buildFilterBar(materiaisTurma, matFilterUser, 'setMatFilterUser', searchHtml);
+  const filtrados=filtrarMateriais(materiaisTurma, matFilterUser, matSearchUser);
   if(!filtrados.length){
     html+=empty('Nenhum material encontrado com esse filtro ou busca.','🔍');
   }else if(matFilterUser==='todos' && !matSearchUser){
