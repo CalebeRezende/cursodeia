@@ -1042,11 +1042,12 @@ const MAT_CATEGORIAS=[
   {key:'pdf',   label:'PDFs, slides e artigos', icon:'📄', badgeBg:'var(--purple-50)', badgeColor:'var(--purple-800)'},
   {key:'video', label:'Vídeos', icon:'🎬', badgeBg:'var(--coral-50)', badgeColor:'var(--coral-600)'},
   {key:'image', label:'Imagens', icon:'🖼️', badgeBg:'var(--amber-50)', badgeColor:'var(--amber-600)'},
+  {key:'html',  label:'Simulações interativas', icon:'🧪', badgeBg:'var(--teal-50)', badgeColor:'var(--teal-600)'},
   {key:'link',  label:'Sites e links', icon:'🔗', badgeBg:'var(--blue-50)', badgeColor:'var(--blue-600)'}
 ];
 function matCategoria(m){
   const t=materialDisplayType(m);
-  return MAT_CATEGORIAS.find(c=>c.key===t) || MAT_CATEGORIAS[4];
+  return MAT_CATEGORIAS.find(c=>c.key===t) || MAT_CATEGORIAS.find(c=>c.key==='link');
 }
 function matTypeBadge(m){
   const c=matCategoria(m);
@@ -1080,8 +1081,13 @@ function youtubeEmbedUrl(url){
   return u;
 }
 function renderMaterialEmbed(m,admin=false){
+  const type=materialDisplayType(m);
+  if(type==='html'){
+    if(!m.embedHtml) return `<div class="drive-placeholder">Simulação ainda não configurada. ${admin?'Cole o código HTML/JS no campo "Conteúdo interativo".':'O conteúdo será liberado em breve pelo administrador.'}</div>`;
+    return `<div class="drive-embed"><iframe class="drive-frame" style="height:600px;background:#05061a" srcdoc="${esc(m.embedHtml)}" sandbox="allow-scripts"></iframe></div>`;
+  }
   if(!m.link) return `<div class="drive-placeholder">Material cadastrado sem link. ${admin?'Adicione o link quando o arquivo estiver disponível.':'O conteúdo será liberado em breve pelo administrador.'}</div>`;
-  const type=materialDisplayType(m); const link=esc(m.link);
+  const link=esc(m.link);
   if(type==='image') return `<div class="drive-embed"><img class="drive-img" src="${esc(googleDirectUrl(m.link))}" alt="${esc(m.titulo)}" onerror="this.outerHTML='<iframe class=&quot;drive-frame&quot; src=&quot;${esc(googlePreviewUrl(m.link))}&quot; allow=&quot;autoplay&quot;></iframe>'"></div>`;
   if(type==='audio') return `<div class="drive-embed" style="padding:14px"><audio class="drive-audio" controls src="${esc(googleDirectUrl(m.link))}"></audio><div class="inline-note">Se o áudio não carregar, verifique se o arquivo do Drive está compartilhado para visualização.</div></div>`;
   if(type==='video') return `<div class="drive-embed"><iframe class="drive-frame" src="${esc(m.link.includes('youtu')?youtubeEmbedUrl(m.link):googlePreviewUrl(m.link))}" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>`;
@@ -1092,8 +1098,8 @@ function renderMaterialEmbed(m,admin=false){
 // ===== Conteúdo expansível (carrega o embed só quando abre — mais rápido) =====
 function embedButtonHtml(m, ctx){
   const type=materialDisplayType(m);
-  if(!m.link || type==='link') return renderMaterialEmbed(m, ctx==='admin');
-  const labels={audio:'Ouvir podcast',video:'Assistir vídeo',image:'Ver imagem',pdf:'Ver conteúdo'};
+  if(type!=='html' && (!m.link || type==='link')) return renderMaterialEmbed(m, ctx==='admin');
+  const labels={audio:'Ouvir podcast',video:'Assistir vídeo',image:'Ver imagem',pdf:'Ver conteúdo',html:'Abrir simulação'};
   return `<button class="btn btn-sm btn-primary toggle-embed" id="tgl-${ctx}-${m.id}" onclick="toggleEmbed(${m.id},'${ctx}',this)"><span class="chev">▶</span> ${labels[type]||'Ver conteúdo'}</button><div class="embed-slot" id="embed-${ctx}-${m.id}"><div></div></div>`;
 }
 function toggleEmbed(id, ctx, btn){
@@ -1117,7 +1123,7 @@ function setMatFilterAdmin(f){
 function renderMateriaisAdmin(d){
   cachedAdminData=d;
   const el=document.getElementById('admin-materiais');
-  let form=`<div class="card"><h3 style="margin-bottom:14px;color:var(--purple-900);font-family:'Fraunces',serif;font-weight:600">Adicionar material</h3><div class="notice"><strong>Como funciona:</strong> você pode colar o link de um arquivo do Google Drive. O participante verá o conteúdo incorporado dentro da plataforma, sem precisar entrar manualmente no Drive. Para funcionar bem, deixe o arquivo como “qualquer pessoa com o link pode visualizar”.</div><div class="grid grid-2"><div class="field"><label class="field-label">Tipo</label><select id="mat-tipo"><option>Artigo</option><option>Slide</option><option>Podcast</option><option>Imagem</option><option>Vídeo</option><option>Link</option><option>Atividade</option><option>PDF</option></select></div><div class="field"><label class="field-label">Como exibir na plataforma</label><select id="mat-display"><option value="auto">Detectar automaticamente</option><option value="pdf">PDF / Slides em visualizador</option><option value="image">Imagem dentro da página</option><option value="audio">Áudio / podcast dentro da página</option><option value="video">Vídeo dentro da página</option><option value="link">Card com link</option></select></div></div><div class="field"><label class="field-label">Título</label><input type="text" id="mat-titulo"></div><div class="field"><label class="field-label">Descrição/orientação</label><textarea id="mat-desc"></textarea></div><div class="field"><label class="field-label">Link do arquivo no Drive, YouTube, áudio, PDF ou outro material</label><input type="text" id="mat-link" placeholder="https://drive.google.com/file/d/... ou outro link"></div><div class="field"><label class="field-label">Turma</label><select id="mat-turma">${turmaSelectComTodas(d.turmas, adminTurmaFiltro)}</select></div><button class="btn btn-primary" onclick="addMaterial()">Publicar material</button></div>`;
+  let form=`<div class="card"><h3 style="margin-bottom:14px;color:var(--purple-900);font-family:'Fraunces',serif;font-weight:600">Adicionar material</h3><div class="notice"><strong>Como funciona:</strong> você pode colar o link de um arquivo do Google Drive. O participante verá o conteúdo incorporado dentro da plataforma, sem precisar entrar manualmente no Drive. Para funcionar bem, deixe o arquivo como “qualquer pessoa com o link pode visualizar”.</div><div class="grid grid-2"><div class="field"><label class="field-label">Tipo</label><select id="mat-tipo"><option>Artigo</option><option>Slide</option><option>Podcast</option><option>Imagem</option><option>Vídeo</option><option>Link</option><option>Atividade</option><option>PDF</option><option>Simulação</option></select></div><div class="field"><label class="field-label">Como exibir na plataforma</label><select id="mat-display" onchange="document.getElementById('mat-embed-field').style.display=this.value==='html'?'block':'none'"><option value="auto">Detectar automaticamente</option><option value="pdf">PDF / Slides em visualizador</option><option value="image">Imagem dentro da página</option><option value="audio">Áudio / podcast dentro da página</option><option value="video">Vídeo dentro da página</option><option value="link">Card com link</option><option value="html">Simulação interativa (HTML/JS)</option></select></div></div><div class="field"><label class="field-label">Título</label><input type="text" id="mat-titulo"></div><div class="field"><label class="field-label">Descrição/orientação</label><textarea id="mat-desc"></textarea></div><div class="field"><label class="field-label">Link do arquivo no Drive, YouTube, áudio, PDF ou outro material</label><input type="text" id="mat-link" placeholder="https://drive.google.com/file/d/... ou outro link"></div><div class="field" id="mat-embed-field" style="display:none"><label class="field-label">Conteúdo interativo (HTML/JS completo, usado quando "Como exibir" = Simulação)</label><textarea id="mat-embed" style="min-height:120px;font-family:monospace;font-size:12px" placeholder="&lt;!doctype html&gt;...código autocontido da simulação..."></textarea></div><div class="field"><label class="field-label">Turma</label><select id="mat-turma">${turmaSelectComTodas(d.turmas, adminTurmaFiltro)}</select></div><button class="btn btn-primary" onclick="addMaterial()">Publicar material</button></div>`;
   form=turmaFiltroBarHtml(d)+form;
 
   const materiaisTurma=d.materiais.filter(itemVisivelNoFiltroAdmin);
@@ -1139,7 +1145,7 @@ function renderMateriaisAdmin(d){
   }
   el.innerHTML=form+list;
 }
-async function addMaterial(){const titulo=val('mat-titulo');if(!titulo){toast('Informe o título do material.','warn');return}const d=await getData();const turmaV=val('mat-turma');d.materiais.push({id:Date.now(),tipo:document.getElementById('mat-tipo').value,titulo,descricao:val('mat-desc'),link:val('mat-link'),display:document.getElementById('mat-display').value,turmaId:turmaV?Number(turmaV):'',data:new Date().toLocaleDateString('pt-BR')});await saveData(d);await renderAdmin();toast('Material publicado!','ok')}
+async function addMaterial(){const titulo=val('mat-titulo');if(!titulo){toast('Informe o título do material.','warn');return}const d=await getData();const turmaV=val('mat-turma');d.materiais.push({id:Date.now(),tipo:document.getElementById('mat-tipo').value,titulo,descricao:val('mat-desc'),link:val('mat-link'),display:document.getElementById('mat-display').value,embedHtml:val('mat-embed'),turmaId:turmaV?Number(turmaV):'',data:new Date().toLocaleDateString('pt-BR')});await saveData(d);await renderAdmin();toast('Material publicado!','ok')}
 async function deleteMaterial(id){if(!confirm('Apagar este material?'))return;const d=await getData();d.materiais=d.materiais.filter(m=>m.id!==id);await saveData(d);await renderAdmin();toast('Material apagado.','info')}
 async function alterarTurmaMaterial(id,v){const d=await getData();const m=d.materiais.find(x=>x.id===id);if(!m)return;m.turmaId=v?Number(v):'';await saveData(d);renderMateriaisAdmin(d);toast('Turma do material atualizada.','ok')}
 
