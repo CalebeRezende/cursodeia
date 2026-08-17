@@ -1084,7 +1084,7 @@ function renderMaterialEmbed(m,admin=false){
   const type=materialDisplayType(m);
   if(type==='html'){
     if(!m.embedHtml) return `<div class="drive-placeholder">Simulação ainda não configurada. ${admin?'Cole o código HTML/JS no campo "Conteúdo interativo".':'O conteúdo será liberado em breve pelo administrador.'}</div>`;
-    return `<div class="drive-embed"><iframe class="drive-frame" style="height:600px;background:#05061a" srcdoc="${esc(m.embedHtml)}" sandbox="allow-scripts"></iframe></div>`;
+    return `<div class="drive-embed"><iframe class="drive-frame" style="height:600px;background:#05061a" srcdoc="${esc(m.embedHtml)}" sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox"></iframe></div>`;
   }
   if(!m.link) return `<div class="drive-placeholder">Material cadastrado sem link. ${admin?'Adicione o link quando o arquivo estiver disponível.':'O conteúdo será liberado em breve pelo administrador.'}</div>`;
   const link=esc(m.link);
