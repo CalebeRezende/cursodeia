@@ -490,23 +490,21 @@ tr:last-child td{border-bottom:none}
 
 <script>
 // ============================================================
-// CONFIGURAÇÃO — usando o MESMO JSONBin do HTML antigo
-// Os dados da plataforma ficam dentro do objeto "respostas".
-// Estrutura salva no BIN:
-// { respostas: { cadastros: [], usuarios: [], materiais: [], legado: [] } }
-// Se o BIN antigo tiver respostas como array, ele é preservado em "legado".
+// CONFIGURAÇÃO — Firebase Realtime Database
+// Os dados da plataforma ficam no caminho "/respostas" do banco.
+// Migrado do JSONBin (plano gratuito esgotou a cota vitalícia de
+// requisições) para o Realtime Database, cujo plano gratuito (Spark)
+// não tem esse limite de requisições — só cobra por armazenamento e
+// tráfego, com cotas muito mais folgadas para este uso.
 // ============================================================
-const JSONBIN_BIN_ID  = '69fbc777250b1311c313d5f9';
-const JSONBIN_API_KEY = '$2a$10$27rhUeaoctLDffTbCTjq7OjFhxqxihlBKPnf5UKFpy1FBs7BrHXW.';
-const API_BASE = 'https://api.jsonbin.io/v3/b/' + JSONBIN_BIN_ID;
-const HEADERS  = { 'Content-Type': 'application/json', 'X-Master-Key': JSONBIN_API_KEY };
+const FIREBASE_DB_URL = 'https://cursodeia-default-rtdb.firebaseio.com';
+const DATA_PATH = '/respostas.json';
 
 // URL do Google Apps Script publicado como Web App para enviar o comprovante por e-mail.
 // Troque pelo link /exec gerado no Apps Script.
 const PIX_EMAIL_WEBAPP_URL = 'https://script.google.com/macros/library/d/1hW-ZBBHAFChy23B-Zs83QWlpr3HjYbDQBd1VJB2dAhbq1G1NT7S5zFK0/1';
 
 let currentUser = null;
-let latestRecord = { respostas: initialData() };
 
 // Filtros de materiais (admin e participante) — apenas estado de tela, nada é salvo.
 let matFilterAdmin = 'todos';
@@ -600,13 +598,12 @@ function normalizeRespostas(raw){
 async function getData(){
   progressStart();
   try{
-    const res = await fetch(API_BASE + '/latest', { headers: { 'X-Master-Key': JSONBIN_API_KEY } });
-    if(!res.ok) throw new Error('Erro ao carregar JSONBin');
-    const json = await res.json();
-    latestRecord = json.record || {};
-    return normalizeRespostas(latestRecord.respostas);
+    const res = await fetch(FIREBASE_DB_URL + DATA_PATH);
+    if(!res.ok) throw new Error('Erro ao carregar o banco de dados');
+    const raw = await res.json();
+    return normalizeRespostas(raw);
   }catch(e){
-    toast('Não foi possível carregar o banco de dados. Verifique a internet e as configurações do JSONBin.','err',6000);
+    toast('Não foi possível carregar o banco de dados. Verifique a internet e a configuração do Firebase.','err',6000);
     return initialData();
   }finally{
     progressDone();
@@ -616,17 +613,12 @@ async function getData(){
 async function saveData(d){
   progressStart();
   try{
-    const recordToSave = { ...(latestRecord || {}), respostas: d };
-    const res = await fetch(API_BASE, { method:'PUT', headers: HEADERS, body: JSON.stringify(recordToSave) });
+    const res = await fetch(FIREBASE_DB_URL + DATA_PATH, { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(d) });
     if(!res.ok){
       const body = await res.json().catch(()=>({}));
-      const excedeuLimite = res.status===403 && /100\s*kb/i.test(body.message||'');
-      toast(excedeuLimite
-        ? 'Não foi possível salvar: os dados excederam o limite de 100KB do banco gratuito. Use uma imagem de assinatura menor.'
-        : 'Não foi possível salvar as alterações. Verifique a internet e tente novamente.', 'err', 7000);
-      throw new Error(body.message || 'Erro ao salvar no JSONBin');
+      toast('Não foi possível salvar as alterações. Verifique a internet e tente novamente.', 'err', 7000);
+      throw new Error(body.error || 'Erro ao salvar no Firebase');
     }
-    latestRecord = recordToSave;
   }finally{
     progressDone();
   }
