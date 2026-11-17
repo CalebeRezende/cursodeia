@@ -452,6 +452,7 @@ tr:last-child td{border-bottom:none}
 <section class="screen" id="screen-admin">
   <div class="admin-header"><h2>Painel administrativo</h2><div class="btn-row" style="margin-top:0"><button class="btn btn-grad btn-sm" onclick="abrirApresentacao()">🎤 Apresentação com a turma</button><button class="btn btn-sm" onclick="renderAdmin()">🔄 Atualizar</button><button class="btn btn-danger btn-sm" onclick="resetPlatform()">Limpar dados</button></div></div>
   <div class="metrics-grid" id="admin-metrics"></div>
+  <div id="admin-storage-card"></div>
   <div class="tabs">
     <button class="tab active" onclick="showTab('admin-cadastros',this)">Anamneses</button>
     <button class="tab" onclick="showTab('admin-usuarios',this)">Usuários</button>
@@ -801,9 +802,29 @@ function animateMetrics(){
   });
 }
 
+function formatBytes(bytes){
+  if(bytes < 1024) return bytes + ' B';
+  if(bytes < 1024*1024) return (bytes/1024).toFixed(1) + ' KB';
+  return (bytes/(1024*1024)).toFixed(2) + ' MB';
+}
+function renderStorageCard(d){
+  const el=document.getElementById('admin-storage-card'); if(!el)return;
+  const bytes = new Blob([JSON.stringify(d)]).size;
+  const limiteBytes = 1024*1024*1024; // 1 GB — limite de armazenamento do plano gratuito (Spark) do Firebase
+  const pct = Math.max(0.1, Math.min(100, (bytes/limiteBytes)*100));
+  el.innerHTML = `<div class="card" style="margin-bottom:20px">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px">
+      <h3 style="color:var(--purple-900);font-family:'Fraunces',serif;font-weight:600">💾 Tamanho dos dados salvos</h3>
+      <strong style="color:var(--purple-800)">${formatBytes(bytes)}</strong>
+    </div>
+    <div class="poll-bar-track"><div class="poll-bar-fill" style="width:${pct}%"></div></div>
+    <p class="small" style="margin-top:10px">Referência: o plano gratuito do Firebase (Spark) permite até 1 GB de armazenamento. Esse número cresce conforme mais anamneses, materiais, mensagens e turmas são cadastrados. Para o uso real e atualizado de banda/armazenamento do projeto, veja a aba "Uso" no <a class="linkish" href="https://console.firebase.google.com/" target="_blank" rel="noopener">console do Firebase ↗</a>.</p>
+  </div>`;
+}
 async function renderAdmin(){
   const d=await getData();
   cachedAdminData=d;
+  renderStorageCard(d);
   const ativos=d.usuarios.filter(u=>isUserActive(u)).length;
   const pend=d.usuarios.length-ativos;
   document.getElementById('admin-metrics').innerHTML=
